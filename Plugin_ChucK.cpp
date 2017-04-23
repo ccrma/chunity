@@ -11,14 +11,17 @@
 #include "IUnityGraphics.h"
 
 #include "chuck_system.h"
+
 #include <iostream>
+#include <map>
 
 namespace ChucK
 {
-    std::vector< Chuck_System * > instances;
+    std::map< unsigned int, Chuck_System * > chuck_instances;
+
     enum Param
     {
-        P_CHUCKPTR,
+        P_CHUCKID,
         P_NUM
     };
 
@@ -28,7 +31,8 @@ namespace ChucK
         {
             float p[P_NUM];
             Chuck_System * chuck;
-            UInt32 myId;
+            t_CKINT myId;
+            bool initialized;
         };
         union
         {
@@ -37,12 +41,36 @@ namespace ChucK
         };
     };
     
+    
     // C# "string" corresponds to passing char *
-    extern "C" bool runChuckCode( float chuckID, char * code )
+    extern "C" bool runChuckCode( unsigned int chuckID, const char * code )
     {
-        Chuck_System * chuck = instances[(int) chuckID];
+        Chuck_System * chuck = chuck_instances[chuckID];
         return chuck->compileCode( code, "" );
     }
+    
+    
+    // on launch, reset all ids (necessary when relaunching a lot in unity editor)
+    extern "C" void cleanRegisteredChucks() {
+        chuck_instances.clear();
+    }
+
+    
+    bool RegisterChuckData( EffectData::Data * data, const unsigned int id )
+    {
+        // only store if data hasn't been stored and id hasn't been used
+        if( data->myId >= 0 || chuck_instances.count( id ) > 0 )
+        {
+            return false;
+        }
+        
+        // store chuck by id; store id on overall data
+        chuck_instances[id] = data->chuck;
+        data->myId = id;
+        
+        return true;
+    }
+    
     
     void * launchChuck( void * c )
     {
@@ -62,13 +90,15 @@ namespace ChucK
         return NULL;
     };
     
-    // If exported by a plugin, this function will be called when the plugin is loaded.
+    
+    // Called when the plugin is loaded.
     void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces)
     {
         // Things that need to be common to ALL ChucK instances will be loaded here
     }
     
-    // If exported by a plugin, this function will be called when the plugin is about to be unloaded.
+    
+    // Called when the plugin is about to be unloaded.
     void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     {
         // Things that need to be common to ALL ChucK instances will be unloaded here
@@ -76,9 +106,6 @@ namespace ChucK
         
     }
     
-    
-
-
 
 #if !UNITY_SPU
 
@@ -86,16 +113,13 @@ namespace ChucK
     {
         int numparams = P_NUM;
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
-// TODO: somehow register the ChucK ptr or at least keep it from being edited...
         // float vals are: min, max, default, scale (?), scale (?)
-        RegisterParameter( definition, "ChucK ID", "Don't touch", -1.0f, 256.0f, instances.size(), 1.0f, 1.0f, P_CHUCKPTR, "Pointer used to run ChucK scripts programmatically");
+        RegisterParameter( definition, "ChucK ID", "#", -1.0f, 256.0f, -1.0f, 1.0f, 1.0f, P_CHUCKID, "Internal ID number used to run ChucK scripts programmatically. Leave set to -1 manually.");
         return numparams;
     }
 
 
     // instantiation
-    // TODO: problems occur when you try to instantiate more than one chuck
-    // is it because it's trying to access TCP or because of some other thing?
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectState* state)
     {
         EffectData* effectdata = new EffectData;
@@ -104,18 +128,10 @@ namespace ChucK
         // create chuck and initialize it (without audio callback)
         effectdata->data.chuck = new Chuck_System;
         launchChuck( effectdata->data.chuck );
-        effectdata->data.myId = instances.size();
-        instances.push_back( effectdata->data.chuck );
+        effectdata->data.myId = -1; // id not yet set
         
         state->effectdata = effectdata;
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
-        // :( int params are not allowed, but can't cast ptr to float :(
-        if (sizeof(float) == sizeof(Chuck_System *)) {
-            effectdata->data.p[P_CHUCKPTR] = 1;
-        } else {
-            effectdata->data.p[P_CHUCKPTR] = 2;
-        }
-        //effectdata->data.p[P_CHUCKPTR] = (float) effectdata->data.chuck;
         
         return UNITY_AUDIODSP_OK;
     }
@@ -136,40 +152,45 @@ namespace ChucK
     }
 
 
-    // NOTE: This function is NOT called by the audio SetFloat() function
-    // due to annoying hidden caching
-    // set param
+    // set param (piggy-backed to store chucks by id)
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK SetFloatParameterCallback(UnityAudioEffectState* state, int index, float value)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
         if (index >= P_NUM)
             return UNITY_AUDIODSP_ERR_UNSUPPORTED;
-        if( index == P_CHUCKPTR )
+        
+        // setting ID, time to cache the pointer to effect data
+        if( index == P_CHUCKID && value >= 0.0f )
         {
-            // special case: if CHUCKPTR is "set" to anything, reset it to the correct value
-            data->p[index] = 2.53;
+            // if false( ie already registered data or id ),
+            // an error will be outputted to the Unity console
+            if( RegisterChuckData( data, ( unsigned int )value ) == false )
+            {
+                return UNITY_AUDIODSP_ERR_UNSUPPORTED;
+            }
         }
-        else
-        {
-            data->p[index] = value;
-        }
+        
+        data->p[index] = value;
         return UNITY_AUDIODSP_OK;
     }
 
 
-    // get param
+    // get param (not useful for anything for ChucK)
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK GetFloatParameterCallback(UnityAudioEffectState* state, int index, float* value, char *valuestr)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
         if (index >= P_NUM)
             return UNITY_AUDIODSP_ERR_UNSUPPORTED;
-        if (value != NULL)
+        if (value != NULL) {
             *value = data->p[index];
+        }
         if (valuestr != NULL)
             valuestr[0] = 0;
         return UNITY_AUDIODSP_OK;
     }
 
+
+    // get float buffer (not useful for anything for ChucK)
     int UNITY_AUDIODSP_CALLBACK GetFloatBufferCallback(UnityAudioEffectState* state, const char* name, float* buffer, int numsamples)
     {
         return UNITY_AUDIODSP_OK;
@@ -208,19 +229,6 @@ namespace ChucK
         {
             chuck->run(inbuffer, outbuffer, length);
         }
-
-        
-        // Ringmod example
-        /*float w = 2.0f * sinf(kPI * data->p[P_FREQ] / state->samplerate);
-        for (unsigned int n = 0; n < length; n++)
-        {
-            for (int i = 0; i < outchannels; i++)
-            {
-                outbuffer[n * outchannels + i] = inbuffer[n * outchannels + i] * (1.0f - data->p[P_MIX] + data->p[P_MIX] * data->s);
-            }
-            data->s += data->c * w; // cheap way to calculate a steady sine-wave
-            data->c -= data->s * w;
-        }*/
 
 #if UNITY_SPU
         UNITY_PS3_CELLDMA_PUT(&g_EffectData, state->effectdata, sizeof(g_EffectData));
