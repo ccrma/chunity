@@ -15,13 +15,9 @@
 
 namespace ChucK
 {
-//    bool isChuckRunning = false;
-//    Chuck_System chuck;
-    t_CKUINT numInstances;
+    std::vector< Chuck_System * > instances;
     enum Param
     {
-//        P_FREQ,
-//        P_MIX,
         P_CHUCKPTR,
         P_NUM
     };
@@ -32,7 +28,7 @@ namespace ChucK
         {
             float p[P_NUM];
             Chuck_System * chuck;
-            XThread * loop_thread;
+            UInt32 myId;
         };
         union
         {
@@ -40,6 +36,13 @@ namespace ChucK
             unsigned char pad[(sizeof(Data) + 15) & ~15]; // This entire structure must be a multiple of 16 bytes (and and instance 16 byte aligned) for PS3 SPU DMA requirements
         };
     };
+    
+    // C# "string" corresponds to passing char *
+    extern "C" bool runChuckCode( float chuckID, char * code )
+    {
+        Chuck_System * chuck = instances[(int) chuckID];
+        return chuck->compileCode( code, "" );
+    }
     
     void * launchChuck( void * c )
     {
@@ -49,25 +52,12 @@ namespace ChucK
         std::vector< char * > argsVector;
         char arg1[] = "chuck";
         char arg2[] = "--loop";
-        // char arg3[] = "--silent";
+        char arg3[] = "--silent";
         argsVector.push_back( & arg1[0] );
         argsVector.push_back( & arg2[0] );
-        // argsVector.push_back( & arg3[0] );
+        argsVector.push_back( & arg3[0] );
         const char ** args = (const char **) & argsVector[0];
-        // TODO: need to be successful in killing this when Unity shuts down!!
-        // turns out shutdowns and startups are called a LOT
-        chuck->go( 2, args, FALSE, TRUE );
-//        chuck.go( 1, args, FALSE, TRUE );
-//        NOTE: trying to do it this way causes horrible crashes to all of unity!
-//        chuck.vm()->start();
-        
-
-        // TODO: add shreds another way than in the launch code
-        // Wow, um the most recently, this ran more than one time. which is weird because chuck should only be launched once. So there must be more than one instance of the plugin or...
-        // TODO: this stopped making sound. which makes me sad. :( but at least unity can fully quit now.
-        chuck->compileCode("SinOsc foo => dac; repeat(10) { Math.random2f(300, 1000) => foo.freq; 200::ms => now; }", "");
-        
-        numInstances++;
+        chuck->go( 3, args, FALSE, TRUE );
         
         return NULL;
     };
@@ -78,52 +68,15 @@ namespace ChucK
         // Things that need to be common to ALL ChucK instances will be loaded here
     }
     
-    
-    
-    // PROBLEM: This shutdown code is not being run!
     // If exported by a plugin, this function will be called when the plugin is about to be unloaded.
     void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     {
         // Things that need to be common to ALL ChucK instances will be unloaded here
-        // all_detach();
-        // NOTE: I don't think this function is getting called when unity is closed.
-        signal_int( 2 );
+        unity_exit();
+        
     }
     
-    // PROBLEM: THIS shutdown code is also not being run!!!
-    static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
-    {
-        switch (eventType)
-        {
-            case kUnityGfxDeviceEventInitialize:
-            {
-                // s_RendererType = s_Graphics->GetRenderer();
-                //TODO: user initialization code
-                break;
-            }
-            case kUnityGfxDeviceEventShutdown:
-            {
-                // s_RendererType = kUnityGfxRendererNull;
-                // user shutdown code
-                signal_int( 2 );
-                
-                
-                
-                break;
-            }
-            case kUnityGfxDeviceEventBeforeReset:
-            {
-                //TODO: user Direct3D 9 code
-                break;
-            }
-            case kUnityGfxDeviceEventAfterReset:
-            {
-                //TODO: user Direct3D 9 code
-                break;
-            }
-        };
-    }
-
+    
 
 
 
@@ -135,7 +88,7 @@ namespace ChucK
         definition.paramdefs = new UnityAudioParameterDefinition[numparams];
 // TODO: somehow register the ChucK ptr or at least keep it from being edited...
         // float vals are: min, max, default, scale (?), scale (?)
-        RegisterParameter( definition, "ChucK Pointer", "Don't touch", 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, P_CHUCKPTR, "Pointer used to run ChucK scripts programmatically");
+        RegisterParameter( definition, "ChucK ID", "Don't touch", -1.0f, 256.0f, instances.size(), 1.0f, 1.0f, P_CHUCKPTR, "Pointer used to run ChucK scripts programmatically");
         return numparams;
     }
 
@@ -148,27 +101,21 @@ namespace ChucK
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         
-        // create chuck and launch it on a new thread (without audio callback)
+        // create chuck and initialize it (without audio callback)
         effectdata->data.chuck = new Chuck_System;
-        effectdata->data.loop_thread = new XThread();
-        //effectdata->data.loop_thread->start( launchChuck, effectdata->data.chuck );
         launchChuck( effectdata->data.chuck );
+        effectdata->data.myId = instances.size();
+        instances.push_back( effectdata->data.chuck );
         
         state->effectdata = effectdata;
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
         // :( int params are not allowed, but can't cast ptr to float :(
+        if (sizeof(float) == sizeof(Chuck_System *)) {
+            effectdata->data.p[P_CHUCKPTR] = 1;
+        } else {
+            effectdata->data.p[P_CHUCKPTR] = 2;
+        }
         //effectdata->data.p[P_CHUCKPTR] = (float) effectdata->data.chuck;
-        
-//        if (!isChuckRunning) {
-//            // loop and wait for incoming shreds
-//            // problem: need to shut down somehow :(
-//            
-//            // not sure if this works!
-//            XThread * loop_thread = new XThread();
-//            loop_thread->start( launchChuck, NULL );
-//            isChuckRunning = true;
-//        }
-        
         
         return UNITY_AUDIODSP_OK;
     }
@@ -180,11 +127,7 @@ namespace ChucK
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
 
         Chuck_System * chuck = data->chuck;
-        // TODO: this runs "all_stop" and "all_detach" which might be bad if we have more than one chuck running
         chuck->clientPartialShutdown();
-        //signal_int(2); // send "control-c"; this also runs all_stop and all_detach
-    
-        numInstances--;
         
         delete chuck;
         delete data;
@@ -193,13 +136,23 @@ namespace ChucK
     }
 
 
+    // NOTE: This function is NOT called by the audio SetFloat() function
+    // due to annoying hidden caching
     // set param
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK SetFloatParameterCallback(UnityAudioEffectState* state, int index, float value)
     {
         EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
         if (index >= P_NUM)
             return UNITY_AUDIODSP_ERR_UNSUPPORTED;
-        data->p[index] = value;
+        if( index == P_CHUCKPTR )
+        {
+            // special case: if CHUCKPTR is "set" to anything, reset it to the correct value
+            data->p[index] = 2.53;
+        }
+        else
+        {
+            data->p[index] = value;
+        }
         return UNITY_AUDIODSP_OK;
     }
 
@@ -238,7 +191,9 @@ namespace ChucK
         UNITY_PS3_CELLDMA_GET(&g_EffectData, state->effectdata, sizeof(g_EffectData));
         data = &g_EffectData.data;
 #endif
+        
         Chuck_System * chuck = data->chuck;
+        
         // TODO: need to handle # channels other than just hoping they match
         // (might need to translate here between chuck # channels and unity # channels
         if( chuck->vm()->m_num_adc_channels != inchannels )
