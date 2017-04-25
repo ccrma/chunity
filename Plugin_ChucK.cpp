@@ -17,8 +17,6 @@
 
 namespace ChucK
 {
-    std::map< unsigned int, Chuck_System * > chuck_instances;
-
     enum Param
     {
         P_CHUCKID,
@@ -41,42 +39,16 @@ namespace ChucK
         };
     };
     
+    std::map< unsigned int, EffectData::Data * > chuck_instances;
     
-    // C# "string" corresponds to passing char *
-    extern "C" bool runChuckCode( unsigned int chuckID, const char * code )
+    
+    void startChuck( EffectData::Data * data )
     {
-        Chuck_System * chuck = chuck_instances[chuckID];
-        return chuck->compileCode( code, "" );
-    }
-    
-    
-    // on launch, reset all ids (necessary when relaunching a lot in unity editor)
-    extern "C" void cleanRegisteredChucks() {
-        chuck_instances.clear();
-    }
-
-    
-    bool RegisterChuckData( EffectData::Data * data, const unsigned int id )
-    {
-        // only store if data hasn't been stored and id hasn't been used
-        if( data->myId >= 0 || chuck_instances.count( id ) > 0 )
-        {
-            return false;
-        }
+        data->chuck = new Chuck_System;
         
-        // store chuck by id; store id on overall data
-        chuck_instances[id] = data->chuck;
-        data->myId = id;
-        
-        return true;
-    }
-    
-    
-    void * launchChuck( void * c )
-    {
-        Chuck_System * chuck = (Chuck_System *) c;
-        
-        // TODO: is this a terrible way to construct a ** char?
+        // equivalent to "chuck --loop --silent" on command line,
+        // but without engaging the audio loop -- we'll do that
+        // via the Unity callback
         std::vector< char * > argsVector;
         char arg1[] = "chuck";
         char arg2[] = "--loop";
@@ -85,10 +57,60 @@ namespace ChucK
         argsVector.push_back( & arg2[0] );
         argsVector.push_back( & arg3[0] );
         const char ** args = (const char **) & argsVector[0];
-        chuck->go( 3, args, FALSE, TRUE );
+        data->chuck->go( 3, args, FALSE, TRUE );
+    }
+    
+    
+    void quitChuck( EffectData::Data * data )
+    {
+        Chuck_System * chuck = data->chuck;
+        // this has been moved to the destructor
+        //chuck->clientPartialShutdown();
         
-        return NULL;
-    };
+        delete chuck;
+        data->chuck = NULL;
+    }
+
+
+    // C# "string" corresponds to passing char *
+    extern "C" bool runChuckCode( unsigned int chuckID, const char * code )
+    {
+        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        return chuck->compileCode( code, "" );
+    }
+    
+
+    
+    // on launch, reset all ids (necessary when relaunching a lot in unity editor)
+    extern "C" void cleanRegisteredChucks() {
+        // delete stored data pointers
+        chuck_instances.clear();
+    }
+
+    
+    bool RegisterChuckData( EffectData::Data * data, const unsigned int id )
+    {
+        // only store if id hasn't been used
+        if( chuck_instances.count( id ) > 0 )
+        {
+            return false;
+        }
+        
+        // store chuck by id
+        chuck_instances[id] = data;
+        // store id on overall data; note we might be replacing a non-zero id
+        //  in the case when unity is reusing an audio callback the next time
+        //  the scene is entered.
+        data->myId = id;
+        
+        // when the plugin callback is reused, then on even times (2nd, 4th, etc),
+        // audio doesn't happen and all the cued shreds get saved and played
+        // on the next time (3rd, 5th, etc)
+        // this is a problem with the globals, somehow... quitChuck( data ); startChuck( data ); here doesn't help
+        // also, I don't seem to get crash data :( and forcing a crash here or when about to runChuckCode doesn't tell me anything
+        
+        return true;
+    }
     
     
     // Called when the plugin is loaded.
@@ -119,6 +141,11 @@ namespace ChucK
     }
 
 
+    // NOTE: CreateCallback and ReleaseCallback are called at odd times, e.g.
+    // - When unity launches for the first time and when unity exits
+    // - When a new effect is added
+    // - When a parameter is exposed
+    // - NOT when play mode is activated or deactivated
     // instantiation
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK CreateCallback(UnityAudioEffectState* state)
     {
@@ -126,8 +153,7 @@ namespace ChucK
         memset(effectdata, 0, sizeof(EffectData));
         
         // create chuck and initialize it (without audio callback)
-        effectdata->data.chuck = new Chuck_System;
-        launchChuck( effectdata->data.chuck );
+        startChuck( & (effectdata->data) );
         effectdata->data.myId = -1; // id not yet set
         
         state->effectdata = effectdata;
@@ -140,12 +166,10 @@ namespace ChucK
     // deletion
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
-        EffectData::Data* data = &state->GetEffectData<EffectData>()->data;
+        EffectData::Data * data = &state->GetEffectData<EffectData>()->data;
 
-        Chuck_System * chuck = data->chuck;
-        chuck->clientPartialShutdown();
+        quitChuck( data );
         
-        delete chuck;
         delete data;
 
         return UNITY_AUDIODSP_OK;
@@ -227,7 +251,27 @@ namespace ChucK
         }
         else
         {
+            // TODO: every other time, the vm doesn't get run -- does unity alter the number of in or out channels between runs?  let's test that with infinite loops!
+            // NOTE: I figured out that this call IS indeed always happening!
+            // So, what could happen within this call to make the vm not actually advance?
             chuck->run(inbuffer, outbuffer, length);
+            // TODO: try ADDING white noise here to see if this callback is called at ALL
+            // Ans: It works EVERY TIME when adding white noise but same as before when adding 0!
+            // My only guess is that all the calls to rand() make things take slightly longer,
+            // which allows for something to reset in time for calls to start coming?????
+            // Ans: NOPE: it's not about the time spent on these calls.
+            // If these calls are made BEFORE chuck->run, it doesn't have the same effect and things are
+            // broken like before.
+            for (unsigned int n = 0; n < length; n++)
+            {
+                for (int i = 0; i < outchannels; i++)
+                {
+                    // multiplier:
+                    // 0.00017 works
+                    // 0.00015 does not work
+                    outbuffer[n * outchannels + i] += rand() * 0.00017 / RAND_MAX;
+                }
+            }
         }
 
 #if UNITY_SPU
