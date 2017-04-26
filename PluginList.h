@@ -1,3 +1,5 @@
-#if UNITY_OSX
 DECLARE_EFFECT("ChucK", ChucK);
-#endif
+
+//DECLARE_EFFECT("Demo Equalizer", Equalizer);
+//DECLARE_EFFECT("Demo ImpactGenerator", ImpactGenerator);
+
