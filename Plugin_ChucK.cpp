@@ -6,12 +6,10 @@
 //
 //
 
-#include "AudioPluginUtil.h"
-#include "IUnityInterface.h"
-#include "IUnityGraphics.h"
+
+#include "Plugin_ChucK.h"
 
 #include "chuck_system.h"
-
 #include <iostream>
 #include <map>
 
@@ -71,9 +69,8 @@ namespace ChucK
         data->chuck = NULL;
     }
 
-
     // C# "string" corresponds to passing char *
-    extern "C" bool runChuckCode( unsigned int chuckID, const char * code )
+    UNITY_INTERFACE_EXPORT bool runChuckCode( unsigned int chuckID, const char * code )
     {
         Chuck_System * chuck = chuck_instances[chuckID]->chuck;
         return chuck->compileCode( code, "" );
@@ -82,7 +79,7 @@ namespace ChucK
 
     
     // on launch, reset all ids (necessary when relaunching a lot in unity editor)
-    extern "C" void cleanRegisteredChucks() {
+    UNITY_INTERFACE_EXPORT void cleanRegisteredChucks() {
         // delete stored data pointers
         chuck_instances.clear();
     }
@@ -158,7 +155,7 @@ namespace ChucK
         
         state->effectdata = effectdata;
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
-        
+
         return UNITY_AUDIODSP_OK;
     }
 
@@ -238,7 +235,7 @@ namespace ChucK
 #endif
         
         Chuck_System * chuck = data->chuck;
-        
+
         // TODO: need to handle # channels other than just hoping they match
         // (might need to translate here between chuck # channels and unity # channels
         if( chuck->vm()->m_num_adc_channels != inchannels )
@@ -251,26 +248,18 @@ namespace ChucK
         }
         else
         {
-            // TODO: every other time, the vm doesn't get run -- does unity alter the number of in or out channels between runs?  let's test that with infinite loops!
-            // NOTE: I figured out that this call IS indeed always happening!
-            // So, what could happen within this call to make the vm not actually advance?
             chuck->run(inbuffer, outbuffer, length);
-            // TODO: try ADDING white noise here to see if this callback is called at ALL
-            // Ans: It works EVERY TIME when adding white noise but same as before when adding 0!
-            // My only guess is that all the calls to rand() make things take slightly longer,
-            // which allows for something to reset in time for calls to start coming?????
-            // Ans: NOPE: it's not about the time spent on these calls.
-            // If these calls are made BEFORE chuck->run, it doesn't have the same effect and things are
-            // broken like before.
-            for (unsigned int n = 0; n < length; n++)
+        }
+        // Need to add small amount of white noise (amplitude 0.00017 is fine)
+        // to prevent Unity from disabling our plugin sometimes
+        for (unsigned int n = 0; n < length; n++)
+        {
+            for (int i = 0; i < outchannels; i++)
             {
-                for (int i = 0; i < outchannels; i++)
-                {
-                    // multiplier:
-                    // 0.00017 works
-                    // 0.00015 does not work
-                    outbuffer[n * outchannels + i] += rand() * 0.00017 / RAND_MAX;
-                }
+                // multiplier:
+                // 0.00017 works
+                // 0.00015 does not work
+                outbuffer[n * outchannels + i] += rand() * 0.00017 / RAND_MAX;
             }
         }
 
