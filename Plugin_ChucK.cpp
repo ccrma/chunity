@@ -75,6 +75,7 @@ namespace ChucK
     // C# "string" corresponds to passing char *
     extern "C" bool runChuckCode( unsigned int chuckID, const char * code )
     {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         Chuck_System * chuck = chuck_instances[chuckID]->chuck;
         return chuck->compileCode( code, "" );
     }
@@ -83,7 +84,16 @@ namespace ChucK
     
     // on launch, reset all ids (necessary when relaunching a lot in unity editor)
     extern "C" void cleanRegisteredChucks() {
-        // delete stored data pointers
+        // restart all chucks
+        std::map< unsigned int, EffectData::Data * >::iterator it;
+        for( it = chuck_instances.begin(); it != chuck_instances.end(); it++ )
+        {
+            EffectData::Data * data = it->second;
+            quitChuck( data );
+            startChuck( data );
+        }
+        
+        // delete stored data pointers. they will have different id's next time.
         chuck_instances.clear();
     }
 
