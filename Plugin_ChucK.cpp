@@ -88,12 +88,32 @@ namespace ChucK
     
     
     
-    UNITY_INTERFACE_EXPORT bool getChuckInt( unsigned int chuckID, const char * name, void (* callback)(int) )
+    UNITY_INTERFACE_EXPORT bool getChuckInt( unsigned int chuckID, const char * name, void (* callback)(t_CKINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
         Chuck_System * chuck = chuck_instances[chuckID]->chuck;
         return chuck->vm()->get_external_int( std::string(name), callback );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool setChuckFloat( unsigned int chuckID, const char * name, t_CKFLOAT val )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        return chuck->vm()->set_external_float( std::string(name), val );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool getChuckFloat( unsigned int chuckID, const char * name, void (* callback)(t_CKFLOAT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        return chuck->vm()->get_external_float( std::string(name), callback );
     }
     
     

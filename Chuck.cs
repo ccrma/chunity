@@ -89,15 +89,50 @@ public class Chuck
 		}
 	}
 
+	public bool SetFloat( string chuckName, string variableName, double value )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return setChuckFloat( ids[chuckName], variableName, value );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool GetFloat( string chuckName, string variableName, Action< double > callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			// save a copy of the delegate so it doesn't get garbage collected!
+			// TODO: what to do when two requests quickly in a row???
+			string internalKey = chuckName + "$" + variableName;
+			floatCallbacks[internalKey] = new MyFloatCallback( callback );
+			// register the callback with ChucK
+			return getChuckFloat( ids[chuckName], variableName, floatCallbacks[internalKey] );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			return false;
+		}
+	}
+
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void MyLogCallback( System.String str );
 
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void MyIntCallback( System.Int64 i );
 
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void MyFloatCallback( double f );
+
 	private MyLogCallback chout_delegate;
 	private MyLogCallback cherr_delegate;
 	private Dictionary< string, MyIntCallback > intCallbacks;
+	private Dictionary< string, MyFloatCallback > floatCallbacks;
 
 	const string PLUGIN_NAME = "AudioPluginChuck";
 
@@ -112,6 +147,12 @@ public class Chuck
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool getChuckInt( System.UInt32 chuckID, System.String name, MyIntCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setChuckFloat( System.UInt32 chuckID, System.String name, double val );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool getChuckFloat( System.UInt32 chuckID, System.String name, MyFloatCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setChoutCallback( MyLogCallback fp );
@@ -138,6 +179,7 @@ public class Chuck
 
 		// Store external ints -> callbacks to avoid garbage collection of callbacks
 		intCallbacks = new Dictionary< string, MyIntCallback >();
+		floatCallbacks = new Dictionary< string, MyFloatCallback >();
 
 		// Create callbacks
 		chout_delegate = new MyLogCallback( ChoutCallback );
