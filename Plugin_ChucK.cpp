@@ -9,7 +9,6 @@
 
 #include "Plugin_ChucK.h"
 
-#include "chuck_system.h"
 #include <iostream>
 #include <map>
 
@@ -72,11 +71,39 @@ namespace ChucK
     // C# "string" corresponds to passing char *
     UNITY_INTERFACE_EXPORT bool runChuckCode( unsigned int chuckID, const char * code )
     {
-        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        if( chuck_instances.count( chuckID ) == 0 ) { std::cerr << "it wasn't initialized yet and so I am sad!" << std::endl; return false; }
         Chuck_System * chuck = chuck_instances[chuckID]->chuck;
         return chuck->compileCode( code, "" );
     }
     
+    
+    
+    UNITY_INTERFACE_EXPORT bool setChuckInt( unsigned int chuckID, const char * name, t_CKINT val )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        chuck->vm()->set_external_int( std::string(name), val );
+        
+        return true;
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool setChoutCallback( void (*fp)(const char *) )
+    {
+        Chuck_IO_Chout::getInstance()->set_output_callback( fp );
+        return true;
+    }
+
+
+
+    UNITY_INTERFACE_EXPORT bool setCherrCallback( void (*fp)(const char *) )
+    {
+        Chuck_IO_Cherr::getInstance()->set_output_callback( fp );
+        return true;
+    }
+
 
     
     // on launch, reset all ids (necessary when relaunching a lot in unity editor)

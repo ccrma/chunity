@@ -97,8 +97,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		04013CBB1EC682180086F0DB /* x-buffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "x-buffer.h"; sourceTree = "<group>"; };
 		04B4EA661EA9797700F2454C /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityInterface.h; sourceTree = "<group>"; };
 		04B4EA671EAAA82900F2454C /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphics.h; sourceTree = "<group>"; };
+		04D57E1B1ECAC01F00EC69E3 /* Plugin_ChucK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Plugin_ChucK.h; path = ../Plugin_ChucK.h; sourceTree = "<group>"; };
 		04F24D981EA5DAE700B36889 /* chuck.lex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = chuck.lex; sourceTree = "<group>"; };
 		04F24D991EA5DAE700B36889 /* chuck.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = chuck.xcodeproj; sourceTree = "<group>"; };
 		04F24D9C1EA5DAE700B36889 /* chuck.y */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.yacc; path = chuck.y; sourceTree = "<group>"; };
@@ -1039,6 +1041,7 @@
 		04F24D971EA5DAE700B36889 /* chuck src */ = {
 			isa = PBXGroup;
 			children = (
+				04013CBB1EC682180086F0DB /* x-buffer.h */,
 				04F24D981EA5DAE700B36889 /* chuck.lex */,
 				04F24D991EA5DAE700B36889 /* chuck.xcodeproj */,
 				04F24D9C1EA5DAE700B36889 /* chuck.y */,
@@ -2445,6 +2448,7 @@
 				04B4EA671EAAA82900F2454C /* IUnityGraphics.h */,
 				04B4EA661EA9797700F2454C /* IUnityInterface.h */,
 				04F254611EA7D82F00B36889 /* Plugin_ChucK.cpp */,
+				04D57E1B1ECAC01F00EC69E3 /* Plugin_ChucK.h */,
 				04F24D971EA5DAE700B36889 /* chuck src */,
 				3BA205671AD1A54300CA4036 /* hrtftable.cpp */,
 				3D199B5E1858F3E60063EC53 /* AudioPluginUtil.cpp */,
@@ -2664,6 +2668,7 @@
 					"-I../chuck/src/lo",
 					"-O3",
 					"-D__MACOSX_CORE__",
+					"-DEXTERNAL_DEBUG_CALLBACK",
 					"-isysroot",
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk,
 				);
@@ -2672,6 +2677,7 @@
 					"-I../chuck/src/lo",
 					"-g",
 					"-D__MACOSX_CORE__",
+					"-DEXTERNAL_DEBUG_CALLBACK",
 					"-isysroot",
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk,
 				);
@@ -2708,6 +2714,7 @@
 					"-I../chuck/src/lo",
 					"-O3",
 					"-D__MACOSX_CORE__",
+					"-DEXTERNAL_DEBUG_CALLBACK",
 					"-isysroot",
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk,
 				);
@@ -2736,6 +2743,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -2751,6 +2760,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
