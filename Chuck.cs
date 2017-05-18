@@ -71,11 +71,33 @@ public class Chuck
 		}
 	}
 
+	public bool GetInt( string chuckName, string variableName, Action< System.Int64 > callback ) //  MyIntCallback callback ) //
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			// save a copy of the delegate so it doesn't get garbage collected!
+			// TODO: what to do when two requests quickly in a row???
+			string internalKey = chuckName + "$" + variableName;
+			intCallbacks[internalKey] = new MyIntCallback( callback ); // callback; //
+			// register the callback with ChucK
+			return getChuckInt( ids[chuckName], variableName, intCallbacks[internalKey] );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			return false;
+		}
+	}
+
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void MyLogCallback( System.String str );
 
-	MyLogCallback chout_delegate;
-	MyLogCallback cherr_delegate;
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void MyIntCallback( System.Int64 i );
+
+	private MyLogCallback chout_delegate;
+	private MyLogCallback cherr_delegate;
+	private Dictionary< string, MyIntCallback > intCallbacks;
 
 	const string PLUGIN_NAME = "AudioPluginChuck";
 
@@ -89,10 +111,13 @@ public class Chuck
 	private static extern bool setChuckInt( System.UInt32 chuckID, System.String name, System.Int64 val );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setChoutCallback( IntPtr fp );
+	private static extern bool getChuckInt( System.UInt32 chuckID, System.String name, MyIntCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setCherrCallback( IntPtr fp );
+	private static extern bool setChoutCallback( MyLogCallback fp );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setCherrCallback( MyLogCallback fp );
 
 
 
@@ -111,17 +136,16 @@ public class Chuck
 		// Store exposed parameter names -> ids
 		ids = new Dictionary< string, System.UInt32 >();
 
-		// Create callbacks (see http://hojjatjafary.blogspot.ca/2013/01/c-plugin-debug-log.html )
+		// Store external ints -> callbacks to avoid garbage collection of callbacks
+		intCallbacks = new Dictionary< string, MyIntCallback >();
+
+		// Create callbacks
 		chout_delegate = new MyLogCallback( ChoutCallback );
 		cherr_delegate = new MyLogCallback( CherrCallback );
 
-		// Convert callback_delegate into a function pointer that can be
-		// used in unmanaged code.
-		IntPtr intptr_chout_delegate = Marshal.GetFunctionPointerForDelegate(chout_delegate);
-		IntPtr intptr_cherr_delegate = Marshal.GetFunctionPointerForDelegate(cherr_delegate);
-
-		setChoutCallback( intptr_chout_delegate );
-		setCherrCallback( intptr_cherr_delegate );
+		// Store pointers to callbacks inside ChucK's inner workings
+		setChoutCallback( chout_delegate );
+		setCherrCallback( cherr_delegate );
 	}
 
 	public void Quit()

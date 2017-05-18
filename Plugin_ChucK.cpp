@@ -83,9 +83,17 @@ namespace ChucK
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
         Chuck_System * chuck = chuck_instances[chuckID]->chuck;
-        chuck->vm()->set_external_int( std::string(name), val );
-        
-        return true;
+        return chuck->vm()->set_external_int( std::string(name), val );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool getChuckInt( unsigned int chuckID, const char * name, void (* callback)(int) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        return chuck->vm()->get_external_int( std::string(name), callback );
     }
     
     
