@@ -19,13 +19,13 @@ public class Chuck
 		}
 	}
 
-	public void Initialize( AudioMixer mixer, string name ) 
+	public void Initialize( AudioMixer mixer, string name )
 	{
 		// only initialize if haven't initialized yet
-		if( !ids.ContainsKey( name ) ) 
+		if( !ids.ContainsKey( name ) )
 		{
 			// store association in c++
-			if( !mixer.SetFloat(name, _nextValidID * 1.0f) )
+			if( !mixer.SetFloat( name, _nextValidID * 1.0f ) )
 			{
 				// note: when things go poorly, mixer.SetFloat 
 				// never *actually* returns false and so this error message will not be seen.
@@ -71,14 +71,14 @@ public class Chuck
 		}
 	}
 
-	public bool GetInt( string chuckName, string variableName, Action< System.Int64 > callback ) //  MyIntCallback callback ) //
+	public bool GetInt( string chuckName, string variableName, Action< System.Int64 > callback )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
 			// save a copy of the delegate so it doesn't get garbage collected!
 			// TODO: what to do when two requests quickly in a row???
 			string internalKey = chuckName + "$" + variableName;
-			intCallbacks[internalKey] = new MyIntCallback( callback ); // callback; //
+			intCallbacks[internalKey] = new MyIntCallback( callback );
 			// register the callback with ChucK
 			return getChuckInt( ids[chuckName], variableName, intCallbacks[internalKey] );
 		}
@@ -120,13 +120,39 @@ public class Chuck
 		}
 	}
 
-	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public bool SignalEvent( string chuckName, string variableName )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return signalChuckEvent( ids[chuckName], variableName );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool BroadcastEvent( string chuckName, string variableName )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return broadcastChuckEvent( ids[chuckName], variableName );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			return false;
+		}	
+	}
+
+	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void MyLogCallback( System.String str );
 
-	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void MyIntCallback( System.Int64 i );
 
-	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void MyFloatCallback( double f );
 
 	private MyLogCallback chout_delegate;
@@ -155,10 +181,16 @@ public class Chuck
 	private static extern bool getChuckFloat( System.UInt32 chuckID, System.String name, MyFloatCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setChoutCallback( MyLogCallback fp );
+	private static extern bool signalChuckEvent( System.UInt32 chuckID, System.String name );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setCherrCallback( MyLogCallback fp );
+	private static extern bool broadcastChuckEvent( System.UInt32 chuckID, System.String name );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setChoutCallback( MyLogCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setCherrCallback( MyLogCallback callback );
 
 
 
@@ -192,7 +224,7 @@ public class Chuck
 
 	public void Quit()
 	{
-		Debug.Log("ChucK quitting now");
+		Debug.Log( "ChucK quitting now" );
 		cleanRegisteredChucks();
 	}
 

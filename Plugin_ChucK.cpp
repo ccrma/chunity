@@ -118,6 +118,26 @@ namespace ChucK
     
     
     
+    UNITY_INTERFACE_EXPORT bool signalChuckEvent( unsigned int chuckID, const char * name )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        return chuck->vm()->signal_external_event( std::string(name) );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool broadcastChuckEvent( unsigned int chuckID, const char * name )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        return chuck->vm()->broadcast_external_event( std::string(name) );
+    }
+    
+    
+    
     UNITY_INTERFACE_EXPORT bool setChoutCallback( void (*fp)(const char *) )
     {
         Chuck_IO_Chout::getInstance()->set_output_callback( fp );
