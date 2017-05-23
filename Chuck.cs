@@ -24,8 +24,9 @@ public class Chuck
 		// only initialize if haven't initialized yet
 		if( !ids.ContainsKey( name ) )
 		{
-			// store association in c++
-			if( !mixer.SetFloat( name, _nextValidID * 1.0f ) )
+			// create a chuck in c++, then connect it to the unity callback
+			if( (!initChuckInstance( _nextValidID )) || 
+				(!mixer.SetFloat( name, _nextValidID * 1.0f )) )
 			{
 				// note: when things go poorly, mixer.SetFloat 
 				// never *actually* returns false and so this error message will not be seen.
@@ -157,6 +158,8 @@ public class Chuck
 
 	private MyLogCallback chout_delegate;
 	private MyLogCallback cherr_delegate;
+	private MyLogCallback stdout_delegate;
+	private MyLogCallback stderr_delegate;
 	private Dictionary< string, MyIntCallback > intCallbacks;
 	private Dictionary< string, MyFloatCallback > floatCallbacks;
 
@@ -164,6 +167,9 @@ public class Chuck
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern void cleanRegisteredChucks();
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool initChuckInstance( System.UInt32 chuckID );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool runChuckCode( System.UInt32 chuckID, System.String code );
@@ -192,6 +198,11 @@ public class Chuck
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setCherrCallback( MyLogCallback callback );
 
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setStdoutCallback( MyLogCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setStderrCallback( MyLogCallback callback );
 
 
 	private static Chuck __sharedInstance;
@@ -213,13 +224,17 @@ public class Chuck
 		intCallbacks = new Dictionary< string, MyIntCallback >();
 		floatCallbacks = new Dictionary< string, MyFloatCallback >();
 
-		// Create callbacks
+		// Create and store callbacks
 		chout_delegate = new MyLogCallback( ChoutCallback );
 		cherr_delegate = new MyLogCallback( CherrCallback );
+		stdout_delegate = new MyLogCallback( StdoutCallback );
+		stderr_delegate = new MyLogCallback( StderrCallback );
 
 		// Store pointers to callbacks inside ChucK's inner workings
 		setChoutCallback( chout_delegate );
 		setCherrCallback( cherr_delegate );
+		setStdoutCallback( stdout_delegate );
+		setStderrCallback( stderr_delegate );
 	}
 
 	public void Quit()
@@ -230,11 +245,21 @@ public class Chuck
 
 	static void ChoutCallback( System.String str )
 	{
-		Debug.Log( "[chout] " + str );
+		Debug.Log( "[chout]: " + str );
 	}
 
 	static void CherrCallback( System.String str )
 	{
-		Debug.LogError( "[cherr] " + str );
+		Debug.LogError( "[cherr]: " + str );
+	}
+
+	static void StdoutCallback( System.String str )
+	{
+		Debug.Log( str );
+	}
+
+	static void StderrCallback( System.String str )
+	{
+		Debug.LogError( str );
 	}
 }

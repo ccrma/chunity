@@ -138,17 +138,33 @@ namespace ChucK
     
     
     
-    UNITY_INTERFACE_EXPORT bool setChoutCallback( void (*fp)(const char *) )
+    UNITY_INTERFACE_EXPORT bool setChoutCallback( void (* callback)(const char *) )
     {
-        Chuck_IO_Chout::getInstance()->set_output_callback( fp );
+        Chuck_IO_Chout::getInstance()->set_output_callback( callback );
         return true;
     }
 
 
 
-    UNITY_INTERFACE_EXPORT bool setCherrCallback( void (*fp)(const char *) )
+    UNITY_INTERFACE_EXPORT bool setCherrCallback( void (* callback)(const char *) )
     {
-        Chuck_IO_Cherr::getInstance()->set_output_callback( fp );
+        Chuck_IO_Cherr::getInstance()->set_output_callback( callback );
+        return true;
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool setStdoutCallback( void (* callback)(const char *) )
+    {
+        ck_set_stdout_callback( callback );
+        return true;
+    }
+
+
+
+    UNITY_INTERFACE_EXPORT bool setStderrCallback( void (* callback)(const char *) )
+    {
+        ck_set_stderr_callback( callback );
         return true;
     }
     

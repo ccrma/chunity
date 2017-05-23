@@ -18,8 +18,11 @@ namespace ChucK {
     UNITY_INTERFACE_EXPORT bool broadcastChuckEvent( unsigned int chuckID, const char * name );
     UNITY_INTERFACE_EXPORT bool initChuckInstance( unsigned int chuckID );
     UNITY_INTERFACE_EXPORT void cleanRegisteredChucks();
-    UNITY_INTERFACE_EXPORT bool setChoutCallback( void (*fp)(const char *) );
-    UNITY_INTERFACE_EXPORT bool setCherrCallback( void (*fp)(const char *) );
+    UNITY_INTERFACE_EXPORT bool setChoutCallback( void (* callback)(const char *) );
+    UNITY_INTERFACE_EXPORT bool setCherrCallback( void (* callback)(const char *) );
+    UNITY_INTERFACE_EXPORT bool setStdoutCallback( void (* callback)(const char *) );
+    UNITY_INTERFACE_EXPORT bool setStderrCallback( void (* callback)(const char *) );
+
 };
 
 };
