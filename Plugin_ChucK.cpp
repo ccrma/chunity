@@ -25,7 +25,6 @@ namespace ChucK
         struct Data
         {
             float p[P_NUM];
-            Chuck_System * chuck;
             t_CKINT myId;
             bool initialized;
         };
@@ -36,12 +35,13 @@ namespace ChucK
         };
     };
     
-    std::map< unsigned int, EffectData::Data * > chuck_instances;
+    std::map< unsigned int, Chuck_System * > chuck_instances;
+    std::map< unsigned int, EffectData::Data * > data_instances;
     
     
-    void startChuck( EffectData::Data * data )
+    Chuck_System * startChuck()
     {
-        data->chuck = new Chuck_System;
+        Chuck_System * chuck = new Chuck_System;
         
         // equivalent to "chuck --loop --silent" on command line,
         // but without engaging the audio loop -- we'll do that
@@ -54,25 +54,25 @@ namespace ChucK
         argsVector.push_back( & arg2[0] );
         argsVector.push_back( & arg3[0] );
         const char ** args = (const char **) & argsVector[0];
-        data->chuck->go( 3, args, FALSE, TRUE );
+        chuck->go( 3, args, FALSE, TRUE );
+        
+        return chuck;
     }
     
     
-    void quitChuck( EffectData::Data * data )
+    void quitChuck( Chuck_System * chuck )
     {
-        Chuck_System * chuck = data->chuck;
         // this has been moved to the destructor
         //chuck->clientPartialShutdown();
-        
         delete chuck;
-        data->chuck = NULL;
     }
 
     // C# "string" corresponds to passing char *
     UNITY_INTERFACE_EXPORT bool runChuckCode( unsigned int chuckID, const char * code )
     {
-        if( chuck_instances.count( chuckID ) == 0 ) { std::cerr << "it wasn't initialized yet and so I am sad!" << std::endl; return false; }
-        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        Chuck_System * chuck = chuck_instances[chuckID];
         return chuck->compileCode( code, "" );
     }
     
@@ -82,7 +82,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        Chuck_System * chuck = chuck_instances[chuckID];
         return chuck->vm()->set_external_int( std::string(name), val );
     }
     
@@ -92,7 +92,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        Chuck_System * chuck = chuck_instances[chuckID];
         return chuck->vm()->get_external_int( std::string(name), callback );
     }
     
@@ -102,7 +102,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        Chuck_System * chuck = chuck_instances[chuckID];
         return chuck->vm()->set_external_float( std::string(name), val );
     }
     
@@ -112,7 +112,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        Chuck_System * chuck = chuck_instances[chuckID];
         return chuck->vm()->get_external_float( std::string(name), callback );
     }
     
@@ -122,7 +122,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        Chuck_System * chuck = chuck_instances[chuckID];
         return chuck->vm()->signal_external_event( std::string(name) );
     }
     
@@ -132,7 +132,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID]->chuck;
+        Chuck_System * chuck = chuck_instances[chuckID];
         return chuck->vm()->broadcast_external_event( std::string(name) );
     }
     
@@ -151,45 +151,57 @@ namespace ChucK
         Chuck_IO_Cherr::getInstance()->set_output_callback( fp );
         return true;
     }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool initChuckInstance( unsigned int chuckID )
+    {
+        if( chuck_instances.count( chuckID ) == 0 )
+        {
+            // if we aren't tracking a chuck vm on this ID, create a new one
+            chuck_instances[chuckID] = startChuck();
+        }
+        return true;
+    }
 
 
     
     // on launch, reset all ids (necessary when relaunching a lot in unity editor)
     UNITY_INTERFACE_EXPORT void cleanRegisteredChucks() {
         // restart all chucks
-        std::map< unsigned int, EffectData::Data * >::iterator it;
+        std::map< unsigned int, Chuck_System * >::iterator it;
         for( it = chuck_instances.begin(); it != chuck_instances.end(); it++ )
         {
-            EffectData::Data * data = it->second;
-            quitChuck( data );
-            startChuck( data );
+            Chuck_System * chuck = it->second;
+            quitChuck( chuck );
+            // note: data->myId has not been invalidated, so if the setup
+            // changes we can't blindly use data->myId. this is the reason
+            // for the checks involving data_instances[].
         }
         
-        // delete stored data pointers. they will have different id's next time.
+        // delete stored chuck pointers
         chuck_instances.clear();
+        // delete data instances
+        data_instances.clear();
     }
 
     
     bool RegisterChuckData( EffectData::Data * data, const unsigned int id )
     {
-        // only store if id hasn't been used
-        if( chuck_instances.count( id ) > 0 )
+        // only store if id has been used / a chuck is already initialized
+        if( chuck_instances.count( id ) == 0 )
         {
             return false;
         }
         
-        // store chuck by id
-        chuck_instances[id] = data;
-        // store id on overall data; note we might be replacing a non-zero id
+        // store id on data; note we might be replacing a non-zero id
         //  in the case when unity is reusing an audio callback the next time
         //  the scene is entered.
         data->myId = id;
         
-        // when the plugin callback is reused, then on even times (2nd, 4th, etc),
-        // audio doesn't happen and all the cued shreds get saved and played
-        // on the next time (3rd, 5th, etc)
-        // this is a problem with the globals, somehow... quitChuck( data ); startChuck( data ); here doesn't help
-        // also, I don't seem to get crash data :( and forcing a crash here or when about to runChuckCode doesn't tell me anything
+        // store the data pointer, for validation later.
+        // the chuck associated with id should only work with *this* data.
+        data_instances[id] = data;
         
         return true;
     }
@@ -199,6 +211,7 @@ namespace ChucK
     void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces)
     {
         // Things that need to be common to ALL ChucK instances will be loaded here
+        // I am pretty sure this is not called or is not called reliably.
     }
     
     
@@ -234,9 +247,11 @@ namespace ChucK
         EffectData* effectdata = new EffectData;
         memset(effectdata, 0, sizeof(EffectData));
         
-        // create chuck and initialize it (without audio callback)
-        startChuck( & (effectdata->data) );
-        effectdata->data.myId = -1; // id not yet set
+        // don't hook into any particular chuck; id not yet set
+        effectdata->data.myId = -1;
+        
+        // but, initialize a chuck so that some global things get created
+        quitChuck( startChuck() );
         
         state->effectdata = effectdata;
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
@@ -249,8 +264,6 @@ namespace ChucK
     UNITY_AUDIODSP_RESULT UNITY_AUDIODSP_CALLBACK ReleaseCallback(UnityAudioEffectState* state)
     {
         EffectData::Data * data = &state->GetEffectData<EffectData>()->data;
-
-        quitChuck( data );
         
         delete data;
 
@@ -319,22 +332,28 @@ namespace ChucK
         data = &g_EffectData.data;
 #endif
         
-        Chuck_System * chuck = data->chuck;
+        if( chuck_instances.count( data->myId ) > 0    // do we have a chuck
+            && data_instances.count( data->myId ) > 0  // do we have a data
+            && data_instances[data->myId] == data )    // && is it still aligned
+        {
+            Chuck_System * chuck = chuck_instances[data->myId];
 
-        // TODO: need to handle # channels other than just hoping they match
-        // (might need to translate here between chuck # channels and unity # channels
-        if( chuck->vm()->m_num_adc_channels != inchannels )
-        {
-            std::cout << "chuck in: " << chuck->vm()->m_num_adc_channels << " unity in: " << inchannels << std::endl;
+            // TODO: need to handle # channels other than just hoping they match
+            // (might need to translate here between chuck # channels and unity # channels
+            if( chuck->vm()->m_num_adc_channels != inchannels )
+            {
+                std::cout << "chuck in: " << chuck->vm()->m_num_adc_channels << " unity in: " << inchannels << std::endl;
+            }
+            else if( chuck->vm()->m_num_dac_channels != outchannels )
+            {
+                std::cout << "chuck out: " << chuck->vm()->m_num_dac_channels << " unity out: " << outchannels << std::endl;
+            }
+            else
+            {
+                chuck->run(inbuffer, outbuffer, length);
+            }
         }
-        else if( chuck->vm()->m_num_dac_channels != outchannels )
-        {
-            std::cout << "chuck out: " << chuck->vm()->m_num_dac_channels << " unity out: " << outchannels << std::endl;
-        }
-        else
-        {
-            chuck->run(inbuffer, outbuffer, length);
-        }
+        
         // Need to add small amount of white noise (amplitude 0.00017 is fine)
         // to prevent Unity from disabling our plugin sometimes
         for (unsigned int n = 0; n < length; n++)
