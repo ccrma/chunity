@@ -207,7 +207,15 @@ namespace ChucK
         std::map< unsigned int, Chuck_System * >::iterator it;
         for( it = chuck_instances.begin(); it != chuck_instances.end(); it++ )
         {
+            unsigned int chuckID = it->first;
             Chuck_System * chuck = it->second;
+
+            // invalidate data id before deletion
+            if( data_instances.count( chuckID ) > 0 )
+            {
+                data_instances[chuckID]->myId = -1;
+            }
+
             quitChuck( chuck );
             // note: data->myId has not been invalidated, so if the setup
             // changes we can't blindly use data->myId. this is the reason
