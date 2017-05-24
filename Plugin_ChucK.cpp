@@ -203,23 +203,24 @@ namespace ChucK
     
     // on launch, reset all ids (necessary when relaunching a lot in unity editor)
     UNITY_INTERFACE_EXPORT void cleanRegisteredChucks() {
-        // restart all chucks
-        std::map< unsigned int, Chuck_System * >::iterator it;
-        for( it = chuck_instances.begin(); it != chuck_instances.end(); it++ )
+    
+        // first, invalidate all callbacks' references to chucks
+        for( std::map< unsigned int, EffectData::Data * >::iterator it =
+             data_instances.begin(); it != data_instances.end(); it++ )
         {
-            unsigned int chuckID = it->first;
+            EffectData::Data * data = it->second;
+            data->myId = -1;
+        }
+        
+        // wait for callbacks to finish their current run
+        usleep( 30000 );
+        
+        // next, delete chucks
+        for( std::map< unsigned int, Chuck_System * >::iterator it =
+             chuck_instances.begin(); it != chuck_instances.end(); it++ )
+        {
             Chuck_System * chuck = it->second;
-
-            // invalidate data id before deletion
-            if( data_instances.count( chuckID ) > 0 )
-            {
-                data_instances[chuckID]->myId = -1;
-            }
-
             quitChuck( chuck );
-            // note: data->myId has not been invalidated, so if the setup
-            // changes we can't blindly use data->myId. this is the reason
-            // for the checks involving data_instances[].
         }
         
         // delete stored chuck pointers
