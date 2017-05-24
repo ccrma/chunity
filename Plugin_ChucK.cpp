@@ -371,6 +371,13 @@ namespace ChucK
         UNITY_PS3_CELLDMA_GET(&g_EffectData, state->effectdata, sizeof(g_EffectData));
         data = &g_EffectData.data;
 #endif
+
+        // zero out the output buffer...
+        // sometimes unity is bad and passes us an old buffer when not in play mode
+        for( unsigned int n = 0; n < length * outchannels; n++ )
+        {
+            outbuffer[n] = 0;
+        }
         
         if( chuck_instances.count( data->myId ) > 0    // do we have a chuck
             && data_instances.count( data->myId ) > 0  // do we have a data
