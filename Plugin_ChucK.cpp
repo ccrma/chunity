@@ -37,6 +37,7 @@ namespace ChucK
     
     std::map< unsigned int, Chuck_System * > chuck_instances;
     std::map< unsigned int, EffectData::Data * > data_instances;
+    t_CKBOOL chuck_init_once = FALSE;
     
     
     Chuck_System * startChuck()
@@ -66,6 +67,20 @@ namespace ChucK
         //chuck->clientPartialShutdown();
         delete chuck;
     }
+
+
+
+    void ensureChuckGlobalsInitted()
+    {
+        if( !chuck_init_once )
+        {
+            // starting and quitting a chuck causes many global variables to be initialized
+            quitChuck( startChuck() );
+            chuck_init_once = TRUE;
+        }
+    }
+
+
 
     // C# "string" corresponds to passing char *
     UNITY_INTERFACE_EXPORT bool runChuckCode( unsigned int chuckID, const char * code )
@@ -140,6 +155,7 @@ namespace ChucK
     
     UNITY_INTERFACE_EXPORT bool setChoutCallback( void (* callback)(const char *) )
     {
+        ensureChuckGlobalsInitted();
         Chuck_IO_Chout::getInstance()->set_output_callback( callback );
         return true;
     }
@@ -148,6 +164,7 @@ namespace ChucK
 
     UNITY_INTERFACE_EXPORT bool setCherrCallback( void (* callback)(const char *) )
     {
+        ensureChuckGlobalsInitted();
         Chuck_IO_Cherr::getInstance()->set_output_callback( callback );
         return true;
     }
@@ -156,6 +173,7 @@ namespace ChucK
     
     UNITY_INTERFACE_EXPORT bool setStdoutCallback( void (* callback)(const char *) )
     {
+        ensureChuckGlobalsInitted();
         ck_set_stdout_callback( callback );
         return true;
     }
@@ -164,6 +182,7 @@ namespace ChucK
 
     UNITY_INTERFACE_EXPORT bool setStderrCallback( void (* callback)(const char *) )
     {
+        ensureChuckGlobalsInitted();
         ck_set_stderr_callback( callback );
         return true;
     }
@@ -265,9 +284,6 @@ namespace ChucK
         
         // don't hook into any particular chuck; id not yet set
         effectdata->data.myId = -1;
-        
-        // but, initialize a chuck so that some global things get created
-        quitChuck( startChuck() );
         
         state->effectdata = effectdata;
         InitParametersFromDefinitions(InternalRegisterEffectDefinition, effectdata->data.p);
