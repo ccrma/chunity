@@ -50,13 +50,12 @@ namespace ChucK
         // via the Unity callback
         std::vector< const char * > argsVector;
         argsVector.push_back( "chuck" );
-        argsVector.push_back( "--loop" );
-        argsVector.push_back( "--silent" );
-        // need to store arg4 for the c_str pointer to be right
-        std::string arg4 = std::string( "--data-dir:" ) + chuck_external_data_dir;
-        argsVector.push_back( arg4.c_str() );
+        argsVector.push_back( "--external-callback" );
+        // need to store arg2 for the c_str() pointer to be right
+        std::string arg2 = std::string( "--data-dir:" ) + chuck_external_data_dir;
+        argsVector.push_back( arg2.c_str() );
         const char ** args = (const char **) & argsVector[0];
-        chuck->go( 4, args, FALSE, TRUE );
+        chuck->go( 3, args );
         
         return chuck;
     }
