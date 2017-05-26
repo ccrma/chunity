@@ -37,12 +37,12 @@ public class Chuck
 
 			// store association in c-sharp
 			ids.Add( name, _nextValidID );
-			Debug.Log( "ChucK ID " + name + " stored with id " + _nextValidID.ToString() );
+			Debug.Log( "ChucK instance " + name + " has been initialized!" );
 			_nextValidID++;
 		}
 		else
 		{
-			Debug.Log( "ChucK instance " + name + " has already been initialized" );
+			Debug.Log( "ChucK instance " + name + " has already been initialized." );
 		}
 	}
 
@@ -54,7 +54,7 @@ public class Chuck
 		}
 		else
 		{
-			Debug.Log( name + " has not been registered as a ChucK instance" );
+			Debug.Log( name + " has not been initialized as a ChucK instance" );
 		}
 		return false;
 	}
@@ -67,7 +67,7 @@ public class Chuck
 		}
 		else
 		{
-			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}
 	}
@@ -85,7 +85,7 @@ public class Chuck
 		}
 		else
 		{
-			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}
 	}
@@ -98,7 +98,7 @@ public class Chuck
 		}
 		else
 		{
-			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}
 	}
@@ -116,7 +116,7 @@ public class Chuck
 		}
 		else
 		{
-			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}
 	}
@@ -129,7 +129,7 @@ public class Chuck
 		}
 		else
 		{
-			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}
 	}
@@ -142,7 +142,7 @@ public class Chuck
 		}
 		else
 		{
-			Debug.Log( chuckName + " has not been registered as a ChucK instance" );
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}	
 	}
