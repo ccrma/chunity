@@ -22,7 +22,7 @@ namespace ChucK {
     UNITY_INTERFACE_EXPORT bool setCherrCallback( void (* callback)(const char *) );
     UNITY_INTERFACE_EXPORT bool setStdoutCallback( void (* callback)(const char *) );
     UNITY_INTERFACE_EXPORT bool setStderrCallback( void (* callback)(const char *) );
-
+    UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir );
 };
 
 };

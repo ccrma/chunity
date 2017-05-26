@@ -204,6 +204,9 @@ public class Chuck
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setStderrCallback( MyLogCallback callback );
 
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setDataDir( System.String dir );
+
 
 	private static Chuck __sharedInstance;
 	private System.UInt32 _nextValidID;
@@ -211,6 +214,9 @@ public class Chuck
 
 	private Chuck()
 	{
+		// Store the location of data files
+		setDataDir( Application.streamingAssetsPath );
+
 		// Important in the editor, where native static arrays won't be cleaned up when entering / exiting play mode
 		cleanRegisteredChucks();
 

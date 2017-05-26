@@ -38,6 +38,7 @@ namespace ChucK
     std::map< unsigned int, Chuck_System * > chuck_instances;
     std::map< unsigned int, EffectData::Data * > data_instances;
     t_CKBOOL chuck_init_once = FALSE;
+    std::string chuck_external_data_dir;
     
     
     Chuck_System * startChuck()
@@ -47,15 +48,15 @@ namespace ChucK
         // equivalent to "chuck --loop --silent" on command line,
         // but without engaging the audio loop -- we'll do that
         // via the Unity callback
-        std::vector< char * > argsVector;
-        char arg1[] = "chuck";
-        char arg2[] = "--loop";
-        char arg3[] = "--silent";
-        argsVector.push_back( & arg1[0] );
-        argsVector.push_back( & arg2[0] );
-        argsVector.push_back( & arg3[0] );
+        std::vector< const char * > argsVector;
+        argsVector.push_back( "chuck" );
+        argsVector.push_back( "--loop" );
+        argsVector.push_back( "--silent" );
+        // need to store arg4 for the c_str pointer to be right
+        std::string arg4 = std::string( "--data-dir:" ) + chuck_external_data_dir;
+        argsVector.push_back( arg4.c_str() );
         const char ** args = (const char **) & argsVector[0];
-        chuck->go( 3, args, FALSE, TRUE );
+        chuck->go( 4, args, FALSE, TRUE );
         
         return chuck;
     }
@@ -184,6 +185,14 @@ namespace ChucK
     {
         ensureChuckGlobalsInitted();
         ck_set_stderr_callback( callback );
+        return true;
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir )
+    {
+        chuck_external_data_dir = std::string( dir );
         return true;
     }
     
