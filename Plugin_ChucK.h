@@ -4,7 +4,7 @@
 #include "IUnityInterface.h"
 #include "IUnityGraphics.h"
 
-#include "chuck_system.h"
+#include "chuck_external.h"
 
 extern "C" {
 

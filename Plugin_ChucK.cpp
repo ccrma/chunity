@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <map>
+#include <unistd.h>
 
 namespace ChucK
 {
@@ -37,48 +38,7 @@ namespace ChucK
     
     std::map< unsigned int, Chuck_System * > chuck_instances;
     std::map< unsigned int, EffectData::Data * > data_instances;
-    t_CKBOOL chuck_init_once = FALSE;
     std::string chuck_external_data_dir;
-    
-    
-    Chuck_System * startChuck()
-    {
-        Chuck_System * chuck = new Chuck_System;
-        
-        // equivalent to "chuck --loop --silent" on command line,
-        // but without engaging the audio loop -- we'll do that
-        // via the Unity callback
-        std::vector< const char * > argsVector;
-        argsVector.push_back( "chuck" );
-        argsVector.push_back( "--external-callback" );
-        // need to store arg2 for the c_str() pointer to be right
-        std::string arg2 = std::string( "--data-dir:" ) + chuck_external_data_dir;
-        argsVector.push_back( arg2.c_str() );
-        const char ** args = (const char **) & argsVector[0];
-        chuck->go( 3, args );
-        
-        return chuck;
-    }
-    
-    
-    void quitChuck( Chuck_System * chuck )
-    {
-        // this has been moved to the destructor
-        //chuck->clientPartialShutdown();
-        delete chuck;
-    }
-
-
-
-    void ensureChuckGlobalsInitted()
-    {
-        if( !chuck_init_once )
-        {
-            // starting and quitting a chuck causes many global variables to be initialized
-            quitChuck( startChuck() );
-            chuck_init_once = TRUE;
-        }
-    }
 
 
 
@@ -87,8 +47,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        Chuck_System * chuck = chuck_instances[chuckID];
-        return chuck->compileCode( code, "" );
+        return Chuck_External::runCode( chuck_instances[chuckID], code );
     }
     
     
@@ -97,8 +56,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID];
-        return chuck->vm()->set_external_int( std::string(name), val );
+        return Chuck_External::setExternalInt( chuck_instances[chuckID], name, val );
     }
     
     
@@ -107,8 +65,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID];
-        return chuck->vm()->get_external_int( std::string(name), callback );
+        return Chuck_External::getExternalInt( chuck_instances[chuckID], name, callback );
     }
     
     
@@ -117,8 +74,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID];
-        return chuck->vm()->set_external_float( std::string(name), val );
+        return Chuck_External::setExternalFloat( chuck_instances[chuckID], name, val );
     }
     
     
@@ -127,8 +83,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID];
-        return chuck->vm()->get_external_float( std::string(name), callback );
+        return Chuck_External::getExternalFloat( chuck_instances[chuckID], name, callback );
     }
     
     
@@ -137,8 +92,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID];
-        return chuck->vm()->signal_external_event( std::string(name) );
+        return Chuck_External::signalExternalEvent( chuck_instances[chuckID], name );
     }
     
     
@@ -147,44 +101,35 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        Chuck_System * chuck = chuck_instances[chuckID];
-        return chuck->vm()->broadcast_external_event( std::string(name) );
+        return Chuck_External::broadcastExternalEvent( chuck_instances[chuckID], name );
     }
     
     
     
     UNITY_INTERFACE_EXPORT bool setChoutCallback( void (* callback)(const char *) )
     {
-        ensureChuckGlobalsInitted();
-        Chuck_IO_Chout::getInstance()->set_output_callback( callback );
-        return true;
+        return Chuck_External::setChoutCallback( callback );
     }
 
 
 
     UNITY_INTERFACE_EXPORT bool setCherrCallback( void (* callback)(const char *) )
     {
-        ensureChuckGlobalsInitted();
-        Chuck_IO_Cherr::getInstance()->set_output_callback( callback );
-        return true;
+        return Chuck_External::setCherrCallback( callback );
     }
     
     
     
     UNITY_INTERFACE_EXPORT bool setStdoutCallback( void (* callback)(const char *) )
     {
-        ensureChuckGlobalsInitted();
-        ck_set_stdout_callback( callback );
-        return true;
+        return Chuck_External::setStdoutCallback( callback );
     }
 
 
 
     UNITY_INTERFACE_EXPORT bool setStderrCallback( void (* callback)(const char *) )
     {
-        ensureChuckGlobalsInitted();
-        ck_set_stderr_callback( callback );
-        return true;
+        return Chuck_External::setStderrCallback( callback );
     }
     
     
@@ -202,7 +147,7 @@ namespace ChucK
         if( chuck_instances.count( chuckID ) == 0 )
         {
             // if we aren't tracking a chuck vm on this ID, create a new one
-            chuck_instances[chuckID] = startChuck();
+            chuck_instances[chuckID] = Chuck_External::startChuck( chuck_external_data_dir.c_str() );
         }
         return true;
     }
@@ -228,7 +173,7 @@ namespace ChucK
              chuck_instances.begin(); it != chuck_instances.end(); it++ )
         {
             Chuck_System * chuck = it->second;
-            quitChuck( chuck );
+            Chuck_External::quitChuck( chuck );
         }
         
         // delete stored chuck pointers
@@ -263,7 +208,7 @@ namespace ChucK
     void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces)
     {
         // Things that need to be common to ALL ChucK instances will be loaded here
-        // I am pretty sure this is not called or is not called reliably.
+        // (I am pretty sure this is not called or is not called reliably.)
     }
     
     
@@ -271,8 +216,7 @@ namespace ChucK
     void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     {
         // Things that need to be common to ALL ChucK instances will be unloaded here
-        unity_exit();
-        
+        Chuck_External::finalCleanup();
     }
     
 
@@ -381,33 +325,20 @@ namespace ChucK
         data = &g_EffectData.data;
 #endif
 
-        // zero out the output buffer...
-        // sometimes unity is bad and passes us an old buffer when not in play mode
+        // zero out the output buffer, in case chuck isn't running
         for( unsigned int n = 0; n < length * outchannels; n++ )
         {
             outbuffer[n] = 0;
         }
         
+        // if we think we can, call chuck callback
         if( chuck_instances.count( data->myId ) > 0    // do we have a chuck
             && data_instances.count( data->myId ) > 0  // do we have a data
             && data_instances[data->myId] == data )    // && is it still aligned
         {
             Chuck_System * chuck = chuck_instances[data->myId];
 
-            // TODO: need to handle # channels other than just hoping they match
-            // (might need to translate here between chuck # channels and unity # channels
-            if( chuck->vm()->m_num_adc_channels != inchannels )
-            {
-                std::cout << "chuck in: " << chuck->vm()->m_num_adc_channels << " unity in: " << inchannels << std::endl;
-            }
-            else if( chuck->vm()->m_num_dac_channels != outchannels )
-            {
-                std::cout << "chuck out: " << chuck->vm()->m_num_dac_channels << " unity out: " << outchannels << std::endl;
-            }
-            else
-            {
-                chuck->run(inbuffer, outbuffer, length);
-            }
+            Chuck_External::audioCallback( chuck, inbuffer, outbuffer, length, inchannels, outchannels );
         }
         
         // Need to add small amount of white noise (amplitude 0.00017 is fine)

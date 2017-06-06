@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		044A2D061EE5FFBF00E20683 /* chuck_external.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044A2D041EE5FFBF00E20683 /* chuck_external.cpp */; };
 		04F251411EA5DAE800B36889 /* chuck_absyn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F24D9D1EA5DAE700B36889 /* chuck_absyn.cpp */; };
 		04F251421EA5DAE800B36889 /* chuck_bbq.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F24D9F1EA5DAE700B36889 /* chuck_bbq.cpp */; };
 		04F251431EA5DAE800B36889 /* chuck_compile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F24DA11EA5DAE700B36889 /* chuck_compile.cpp */; };
@@ -98,6 +99,8 @@
 
 /* Begin PBXFileReference section */
 		04013CBB1EC682180086F0DB /* x-buffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "x-buffer.h"; sourceTree = "<group>"; };
+		044A2D041EE5FFBF00E20683 /* chuck_external.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chuck_external.cpp; sourceTree = "<group>"; };
+		044A2D051EE5FFBF00E20683 /* chuck_external.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chuck_external.h; sourceTree = "<group>"; };
 		04B4EA661EA9797700F2454C /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityInterface.h; sourceTree = "<group>"; };
 		04B4EA671EAAA82900F2454C /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphics.h; sourceTree = "<group>"; };
 		04D57E1B1ECAC01F00EC69E3 /* Plugin_ChucK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Plugin_ChucK.h; path = ../Plugin_ChucK.h; sourceTree = "<group>"; };
@@ -1060,6 +1063,8 @@
 				04F24DA91EA5DAE700B36889 /* chuck_emit.h */,
 				04F24DAA1EA5DAE700B36889 /* chuck_errmsg.cpp */,
 				04F24DAB1EA5DAE700B36889 /* chuck_errmsg.h */,
+				044A2D041EE5FFBF00E20683 /* chuck_external.cpp */,
+				044A2D051EE5FFBF00E20683 /* chuck_external.h */,
 				04F24DAC1EA5DAE700B36889 /* chuck_frame.cpp */,
 				04F24DAD1EA5DAE700B36889 /* chuck_frame.h */,
 				04F24DAE1EA5DAE700B36889 /* chuck_globals.cpp */,
@@ -2631,6 +2636,7 @@
 				04F254631EA7D82F00B36889 /* Plugin_ChucK.cpp in Sources */,
 				04F2534E1EA5DAE800B36889 /* send.c in Sources */,
 				04F253491EA5DAE800B36889 /* blob.c in Sources */,
+				044A2D061EE5FFBF00E20683 /* chuck_external.cpp in Sources */,
 				04F253481EA5DAE800B36889 /* address.c in Sources */,
 				04F2534D1EA5DAE800B36889 /* pattern_match.c in Sources */,
 				04F253501EA5DAE800B36889 /* server_thread.c in Sources */,
@@ -2649,7 +2655,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CC = /usr/bin/clang;
 				COPY_PHASE_STRIP = NO;
+				CXX = "/usr/bin/clang++";
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = "$(PROJECT_DIR)/../../Assets";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2662,6 +2670,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Plugins;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-I../chuck/src",
@@ -2698,6 +2707,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CC = /usr/bin/clang;
+				CXX = "/usr/bin/clang++";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = "$(PROJECT_DIR)/../../Assets";
@@ -2709,6 +2720,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Plugins;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OTHER_CFLAGS = (
 					"-I../chuck/src",
 					"-I../chuck/src/lo",

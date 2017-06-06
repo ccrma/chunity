@@ -10,43 +10,43 @@
 	<string>AudioPluginChuck</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>098C99B5-3B1E-4F71-B23D-F68375B0CAF1</key>
-		<string>https://github.com/ccrma/chuck.git</string>
-		<key>0EFE1CE1-952E-46FF-B3E5-38A35B7BB9DD</key>
+		<key>3D055E17F72A30ED23B30394FC966CA497718585</key>
 		<string>https://github.com/lathertonj/unity-chuck.git</string>
+		<key>98B762A2A4792C7EA78DFB742C343473354589B7</key>
+		<string>https://github.com/ccrma/chuck.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Xcode/AudioPluginChuck.xcodeproj/project.xcworkspace</string>
+	<string>Xcode/AudioPluginChuck.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>098C99B5-3B1E-4F71-B23D-F68375B0CAF1</key>
-		<string>../../../chuck</string>
-		<key>0EFE1CE1-952E-46FF-B3E5-38A35B7BB9DD</key>
+		<key>3D055E17F72A30ED23B30394FC966CA497718585</key>
 		<string>../../..</string>
+		<key>98B762A2A4792C7EA78DFB742C343473354589B7</key>
+		<string>../../..chuck</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/lathertonj/unity-chuck.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>0EFE1CE1-952E-46FF-B3E5-38A35B7BB9DD</string>
+	<string>3D055E17F72A30ED23B30394FC966CA497718585</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>098C99B5-3B1E-4F71-B23D-F68375B0CAF1</string>
+			<string>3D055E17F72A30ED23B30394FC966CA497718585</string>
 			<key>IDESourceControlWCCName</key>
-			<string>chuck</string>
+			<string>unity-chuck</string>
 		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>0EFE1CE1-952E-46FF-B3E5-38A35B7BB9DD</string>
+			<string>98B762A2A4792C7EA78DFB742C343473354589B7</string>
 			<key>IDESourceControlWCCName</key>
-			<string>unity-chuck</string>
+			<string>unity-chuckchuck</string>
 		</dict>
 	</array>
 </dict>
