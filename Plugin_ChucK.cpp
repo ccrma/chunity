@@ -137,6 +137,7 @@ namespace ChucK
     UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir )
     {
         chuck_external_data_dir = std::string( dir );
+        Chuck_External::initialSetup( dir );
         return true;
     }
     
