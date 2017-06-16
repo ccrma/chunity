@@ -16,13 +16,13 @@
 		<string>https://github.com/ccrma/chuck.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Xcode/AudioPluginChuck.xcodeproj</string>
+	<string>src/Xcode/AudioPluginChuck.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>3D055E17F72A30ED23B30394FC966CA497718585</key>
-		<string>../../..</string>
+		<string>../../../..</string>
 		<key>98B762A2A4792C7EA78DFB742C343473354589B7</key>
-		<string>../../..chuck</string>
+		<string>../../../..src/chuck/</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/lathertonj/unity-chuck.git</string>
@@ -36,17 +36,17 @@
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>3D055E17F72A30ED23B30394FC966CA497718585</string>
+			<string>98B762A2A4792C7EA78DFB742C343473354589B7</string>
 			<key>IDESourceControlWCCName</key>
-			<string>unity-chuck</string>
+			<string>chuck</string>
 		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>98B762A2A4792C7EA78DFB742C343473354589B7</string>
+			<string>3D055E17F72A30ED23B30394FC966CA497718585</string>
 			<key>IDESourceControlWCCName</key>
-			<string>unity-chuckchuck</string>
+			<string>unity-chuck</string>
 		</dict>
 	</array>
 </dict>

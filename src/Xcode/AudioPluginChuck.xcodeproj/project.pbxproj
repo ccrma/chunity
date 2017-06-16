@@ -98,10 +98,10 @@
 
 /* Begin PBXFileReference section */
 		04013CBB1EC682180086F0DB /* x-buffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "x-buffer.h"; sourceTree = "<group>"; };
+		041F9C461EF4459800E1E3D5 /* IUnityGraphics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = ../IUnityGraphics.h; sourceTree = "<group>"; };
+		041F9C471EF4459800E1E3D5 /* IUnityInterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IUnityInterface.h; path = ../IUnityInterface.h; sourceTree = "<group>"; };
 		044A2D041EE5FFBF00E20683 /* chuck_external.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chuck_external.cpp; sourceTree = "<group>"; };
 		044A2D051EE5FFBF00E20683 /* chuck_external.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chuck_external.h; sourceTree = "<group>"; };
-		04B4EA661EA9797700F2454C /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityInterface.h; sourceTree = "<group>"; };
-		04B4EA671EAAA82900F2454C /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphics.h; sourceTree = "<group>"; };
 		04D57E1B1ECAC01F00EC69E3 /* Plugin_ChucK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Plugin_ChucK.h; path = ../Plugin_ChucK.h; sourceTree = "<group>"; };
 		04F24D981EA5DAE700B36889 /* chuck.lex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = chuck.lex; sourceTree = "<group>"; };
 		04F24D991EA5DAE700B36889 /* chuck.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = chuck.xcodeproj; sourceTree = "<group>"; };
@@ -2422,8 +2422,8 @@
 		08FB77AFFE84173DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				04B4EA671EAAA82900F2454C /* IUnityGraphics.h */,
-				04B4EA661EA9797700F2454C /* IUnityInterface.h */,
+				041F9C461EF4459800E1E3D5 /* IUnityGraphics.h */,
+				041F9C471EF4459800E1E3D5 /* IUnityInterface.h */,
 				04F254611EA7D82F00B36889 /* Plugin_ChucK.cpp */,
 				04D57E1B1ECAC01F00EC69E3 /* Plugin_ChucK.h */,
 				04F24D971EA5DAE700B36889 /* chuck src */,
