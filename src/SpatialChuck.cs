@@ -29,6 +29,7 @@ public class SpatialChuck : MonoBehaviour {
 		// must run spatializer after effects (includes this chuck effect)
 		// for chuck to be spatialized
 		mySource.spatializePostEffects = true;
+		mySource.spatialBlend = 1.0f;
 
 		running = true;
 
