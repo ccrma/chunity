@@ -46,7 +46,7 @@ namespace ChucK
     UNITY_INTERFACE_EXPORT bool runChuckCode( unsigned int chuckID, const char * code )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
-        
+
         return Chuck_External::runCode( chuck_instances[chuckID], code );
     }
     
@@ -143,18 +143,38 @@ namespace ChucK
     
     
     
-    UNITY_INTERFACE_EXPORT bool initChuckInstance( unsigned int chuckID )
+    UNITY_INTERFACE_EXPORT bool initChuckInstance( unsigned int chuckID, unsigned int sampleRate )
     {
         if( chuck_instances.count( chuckID ) == 0 )
         {
             // if we aren't tracking a chuck vm on this ID, create a new one
-            chuck_instances[chuckID] = Chuck_External::startChuck( chuck_external_data_dir.c_str() );
+            chuck_instances[chuckID] = Chuck_External::startChuck( sampleRate, chuck_external_data_dir.c_str() );
         }
+        return true;
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool chuckManualAudioCallback( unsigned int chuckID, float * inBuffer, float * outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels )
+    {
+        if( chuck_instances.count( chuckID ) > 0 )
+        {
+            // zero out the output buffer, in case chuck isn't running
+            for( unsigned int n = 0; n < numFrames * outChannels; n++ )
+            {
+                outBuffer[n] = 0;
+            }
+            
+            // call callback
+            Chuck_External::audioCallback( chuck_instances[chuckID], inBuffer, outBuffer, numFrames, inChannels, outChannels );
+            
+        }
+        
         return true;
     }
 
 
-    
+
     // on launch, reset all ids (necessary when relaunching a lot in unity editor)
     UNITY_INTERFACE_EXPORT void cleanRegisteredChucks() {
     

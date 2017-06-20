@@ -24,8 +24,10 @@ public class Chuck
 		// only initialize if haven't initialized yet
 		if( !ids.ContainsKey( name ) )
 		{
+			System.UInt32 sampleRate = Convert.ToUInt32( AudioSettings.outputSampleRate );
+
 			// create a chuck in c++, then connect it to the unity callback
-			if( (!initChuckInstance( _nextValidID )) || 
+			if( (!initChuckInstance( _nextValidID, sampleRate )) || 
 				(!mixer.SetFloat( name, _nextValidID * 1.0f )) )
 			{
 				// note: when things go poorly, mixer.SetFloat 
@@ -46,11 +48,33 @@ public class Chuck
 		}
 	}
 
+	public System.UInt32 InitializeFilter()
+	{
+		System.UInt32 id = _nextValidID;
+		System.UInt32 sampleRate = Convert.ToUInt32( AudioSettings.outputSampleRate );
+
+		if( !initChuckInstance( Convert.ToUInt32( id ), sampleRate ) )
+		{
+			Debug.Log( "Chuck C++ initialization failed for filter" );
+			return System.UInt32.MaxValue;
+		}
+
+		_nextValidID++;
+
+		return id;
+	}
+
+	public bool ManualAudioCallback( System.UInt32 chuckID, float[] inBuffer, float[] outBuffer, System.UInt32 channels )
+	{
+		System.UInt32 numFrames = Convert.ToUInt32( inBuffer.Length / channels );
+		return chuckManualAudioCallback( chuckID, inBuffer, outBuffer, numFrames, channels, channels );
+	}
+
 	public bool RunCode( string name, string code )
 	{
 		if( ids.ContainsKey( name ) )
 		{
-			return runChuckCode( ids[name], code );
+			return RunCode( ids[name], code );
 		}
 		else
 		{
@@ -59,73 +83,96 @@ public class Chuck
 		return false;
 	}
 
+	public bool RunCode( System.UInt32 chuckId, string code )
+	{
+		return runChuckCode( chuckId, code );
+	}
+
 	public bool SetInt( string chuckName, string variableName, System.Int64 value )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
-			return setChuckInt( ids[chuckName], variableName, value );
+			return SetInt( ids[chuckName], variableName, value );
 		}
 		else
 		{
 			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}
+	}
+
+	public bool SetInt( System.UInt32 chuckId, string variableName, System.Int64 value )
+	{
+		return setChuckInt( chuckId, variableName, value );
 	}
 
 	public bool GetInt( string chuckName, string variableName, Action< System.Int64 > callback )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
-			// save a copy of the delegate so it doesn't get garbage collected!
-			// TODO: what to do when two requests quickly in a row???
-			string internalKey = chuckName + "$" + variableName;
-			intCallbacks[internalKey] = new MyIntCallback( callback );
-			// register the callback with ChucK
-			return getChuckInt( ids[chuckName], variableName, intCallbacks[internalKey] );
+			return GetInt( ids[chuckName], variableName, callback );
 		}
 		else
 		{
 			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}
+	}
+
+	public bool GetInt( System.UInt32 chuckId, string variableName, Action< System.Int64 > callback )
+	{
+		// save a copy of the delegate so it doesn't get garbage collected!
+		string internalKey = chuckId.ToString() + "$" + variableName;
+		intCallbacks[internalKey] = new MyIntCallback( callback );
+		// register the callback with ChucK
+		return getChuckInt( chuckId, variableName, intCallbacks[internalKey] );
 	}
 
 	public bool SetFloat( string chuckName, string variableName, double value )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
-			return setChuckFloat( ids[chuckName], variableName, value );
+			return SetFloat( ids[chuckName], variableName, value );
 		}
 		else
 		{
 			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}
+	}
+
+	public bool SetFloat( System.UInt32 chuckId, string variableName, double value )
+	{
+		return setChuckFloat( chuckId, variableName, value );
 	}
 
 	public bool GetFloat( string chuckName, string variableName, Action< double > callback )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
-			// save a copy of the delegate so it doesn't get garbage collected!
-			// TODO: what to do when two requests quickly in a row???
-			string internalKey = chuckName + "$" + variableName;
-			floatCallbacks[internalKey] = new MyFloatCallback( callback );
-			// register the callback with ChucK
-			return getChuckFloat( ids[chuckName], variableName, floatCallbacks[internalKey] );
+			return GetFloat( ids[chuckName], variableName, callback );
 		}
 		else
 		{
 			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}
+	}
+
+	public bool GetFloat( System.UInt32 chuckId, string variableName, Action< double > callback )
+	{
+		// save a copy of the delegate so it doesn't get garbage collected!
+		string internalKey = chuckId.ToString() + "$" + variableName;
+		floatCallbacks[internalKey] = new MyFloatCallback( callback );
+		// register the callback with ChucK
+		return getChuckFloat( chuckId, variableName, floatCallbacks[internalKey] );
 	}
 
 	public bool SignalEvent( string chuckName, string variableName )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
-			return signalChuckEvent( ids[chuckName], variableName );
+			return SignalEvent( ids[chuckName], variableName );
 		}
 		else
 		{
@@ -134,17 +181,27 @@ public class Chuck
 		}
 	}
 
+	public bool SignalEvent( System.UInt32 chuckId, string variableName )
+	{
+		return signalChuckEvent( chuckId, variableName );
+	}
+
 	public bool BroadcastEvent( string chuckName, string variableName )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
-			return broadcastChuckEvent( ids[chuckName], variableName );
+			return BroadcastEvent( ids[chuckName], variableName );
 		}
 		else
 		{
 			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
 			return false;
 		}	
+	}
+
+	public bool BroadcastEvent( System.UInt32 chuckId, string variableName )
+	{
+		return broadcastChuckEvent( chuckId, variableName );
 	}
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
@@ -169,7 +226,11 @@ public class Chuck
 	private static extern void cleanRegisteredChucks();
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool initChuckInstance( System.UInt32 chuckID );
+	private static extern bool initChuckInstance( System.UInt32 chuckID, System.UInt32 sampleRate );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool chuckManualAudioCallback( System.UInt32 chuckID, float[] inBuffer, float[] outBuffer,
+		System.UInt32 numFrames, System.UInt32 inChannels, System.UInt32 outChannels );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool runChuckCode( System.UInt32 chuckID, System.String code );

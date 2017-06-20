@@ -22,7 +22,7 @@
 		<key>3D055E17F72A30ED23B30394FC966CA497718585</key>
 		<string>../../../..</string>
 		<key>98B762A2A4792C7EA78DFB742C343473354589B7</key>
-		<string>../../../..src/chuck/</string>
+		<string>../../../..src/chuck</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/lathertonj/unity-chuck.git</string>
