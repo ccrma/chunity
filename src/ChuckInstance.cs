@@ -18,10 +18,9 @@ public class ChuckInstance : MonoBehaviour {
 	private AudioSource mySource;
 	private bool isMuted;
 	private bool prevSpatialize;
+    private int currentVar = 0;
 
-	private AudioClip origClip;
-	private bool origPlayOnAwake;
-	private bool origLoop;
+	private AudioClip zeroClip;
 	private AudioClip spatialClip;
 
 	// Use this for initialization
@@ -33,11 +32,11 @@ public class ChuckInstance : MonoBehaviour {
 		myChuckId = Chuck.Manager.InitializeFilter();
 
 		mySource = GetComponent<AudioSource>();
+        mySource.loop = true;
+        mySource.playOnAwake = true;
 
-		origClip = mySource.clip;
-		origPlayOnAwake = mySource.playOnAwake;
-		origLoop = mySource.loop;
 		spatialClip = (AudioClip) Resources.Load("1");
+        zeroClip = (AudioClip) Resources.Load("0");
 
 		// opposite to have first UpdateSpatialize() take effect
 		prevSpatialize = !spatialize;
@@ -62,20 +61,13 @@ public class ChuckInstance : MonoBehaviour {
 		if( spatialize )
 		{
 			mySource.spatialBlend = 1.0f;
-			origClip = mySource.clip;
 			mySource.clip = spatialClip;
-			origPlayOnAwake = mySource.playOnAwake;
-			mySource.playOnAwake = true;
-			origLoop = mySource.loop;
-			mySource.loop = true;
 			mySource.Play();
 		}
 		else
 		{
 			mySource.spatialBlend = 0.0f;
-			mySource.clip = origClip;
-			mySource.playOnAwake = origPlayOnAwake;
-			mySource.loop = origLoop;
+			mySource.clip = zeroClip;
 			mySource.Play();
 		}
 		prevSpatialize = spatialize;
@@ -117,6 +109,18 @@ public class ChuckInstance : MonoBehaviour {
 		}
 	}
 
+    public string GetUniqueVariableName()
+    {
+        currentVar++;
+        return "v" + currentVar.ToString();
+    }
+
+    public string GetUniqueVariableName( string prefix )
+    {
+        currentVar++;
+        return prefix + currentVar.ToString();
+    }
+
 	public bool RunCode( string code )
 	{
 		return Chuck.Manager.RunCode( myChuckId, code );
@@ -127,7 +131,7 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.SetInt( myChuckId, variableName, value );
 	}
 
-	public bool GetInt( string variableName, Action< System.Int64 > callback )
+	public Chuck.IntCallback GetInt( string variableName, Action< System.Int64 > callback )
 	{
 		return Chuck.Manager.GetInt( myChuckId, variableName, callback );
 	}
@@ -137,7 +141,7 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.SetFloat( myChuckId, variableName, value );
 	}
 
-	public bool GetFloat( string variableName, Action< double > callback )
+	public Chuck.FloatCallback GetFloat( string variableName, Action< double > callback )
 	{
 		return Chuck.Manager.GetFloat( myChuckId, variableName, callback );
 	}

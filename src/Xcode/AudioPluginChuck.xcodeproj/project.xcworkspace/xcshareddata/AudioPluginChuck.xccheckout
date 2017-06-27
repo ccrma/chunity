@@ -14,6 +14,8 @@
 		<string>https://github.com/lathertonj/unity-chuck.git</string>
 		<key>98B762A2A4792C7EA78DFB742C343473354589B7</key>
 		<string>https://github.com/ccrma/chuck.git</string>
+		<key>D41FE0B189BF43D97FD7B2DB674197CF4043B653</key>
+		<string>https://github.com/lathertonj/UnityProjects.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>src/Xcode/AudioPluginChuck.xcodeproj</string>
@@ -23,6 +25,8 @@
 		<string>../../../..</string>
 		<key>98B762A2A4792C7EA78DFB742C343473354589B7</key>
 		<string>../../../..src/chuck</string>
+		<key>D41FE0B189BF43D97FD7B2DB674197CF4043B653</key>
+		<string>../../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/lathertonj/unity-chuck.git</string>
@@ -32,6 +36,14 @@
 	<string>3D055E17F72A30ED23B30394FC966CA497718585</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>D41FE0B189BF43D97FD7B2DB674197CF4043B653</string>
+			<key>IDESourceControlWCCName</key>
+			<string></string>
+		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
