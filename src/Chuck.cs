@@ -106,7 +106,7 @@ public class Chuck
 		return setChuckInt( chuckId, variableName, value );
 	}
 
-	public bool GetInt( string chuckName, string variableName, Action< System.Int64 > callback )
+	public IntCallback GetInt( string chuckName, string variableName, Action< System.Int64 > callback )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
@@ -115,17 +115,21 @@ public class Chuck
 		else
 		{
 			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
-			return false;
+			return null;
 		}
 	}
 
-	public bool GetInt( System.UInt32 chuckId, string variableName, Action< System.Int64 > callback )
+	public IntCallback GetInt( System.UInt32 chuckId, string variableName, Action< System.Int64 > callback )
 	{
 		// save a copy of the delegate so it doesn't get garbage collected!
 		string internalKey = chuckId.ToString() + "$" + variableName;
-		intCallbacks[internalKey] = new MyIntCallback( callback );
+		intCallbacks[internalKey] = new IntCallback( callback );
 		// register the callback with ChucK
-		return getChuckInt( chuckId, variableName, intCallbacks[internalKey] );
+		if( !getChuckInt( chuckId, variableName, intCallbacks[internalKey] ) )
+		{
+			return null;
+		}
+		return intCallbacks[internalKey];
 	}
 
 	public bool SetFloat( string chuckName, string variableName, double value )
@@ -146,7 +150,7 @@ public class Chuck
 		return setChuckFloat( chuckId, variableName, value );
 	}
 
-	public bool GetFloat( string chuckName, string variableName, Action< double > callback )
+	public FloatCallback GetFloat( string chuckName, string variableName, Action< double > callback )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
@@ -155,17 +159,21 @@ public class Chuck
 		else
 		{
 			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
-			return false;
+			return null;
 		}
 	}
 
-	public bool GetFloat( System.UInt32 chuckId, string variableName, Action< double > callback )
+	public FloatCallback GetFloat( System.UInt32 chuckId, string variableName, Action< double > callback )
 	{
 		// save a copy of the delegate so it doesn't get garbage collected!
 		string internalKey = chuckId.ToString() + "$" + variableName;
-		floatCallbacks[internalKey] = new MyFloatCallback( callback );
+		floatCallbacks[internalKey] = new FloatCallback( callback );
 		// register the callback with ChucK
-		return getChuckFloat( chuckId, variableName, floatCallbacks[internalKey] );
+		if( !getChuckFloat( chuckId, variableName, floatCallbacks[internalKey] ) )
+		{
+			return null;
+		}
+		return floatCallbacks[internalKey];
 	}
 
 	public bool SignalEvent( string chuckName, string variableName )
@@ -208,17 +216,17 @@ public class Chuck
 	public delegate void MyLogCallback( System.String str );
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-	public delegate void MyIntCallback( System.Int64 i );
+	public delegate void IntCallback( System.Int64 i );
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-	public delegate void MyFloatCallback( double f );
+	public delegate void FloatCallback( double f );
 
 	private MyLogCallback chout_delegate;
 	private MyLogCallback cherr_delegate;
 	private MyLogCallback stdout_delegate;
 	private MyLogCallback stderr_delegate;
-	private Dictionary< string, MyIntCallback > intCallbacks;
-	private Dictionary< string, MyFloatCallback > floatCallbacks;
+	private Dictionary< string, IntCallback > intCallbacks;
+	private Dictionary< string, FloatCallback > floatCallbacks;
 
 	const string PLUGIN_NAME = "AudioPluginChuck";
 
@@ -239,13 +247,13 @@ public class Chuck
 	private static extern bool setChuckInt( System.UInt32 chuckID, System.String name, System.Int64 val );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool getChuckInt( System.UInt32 chuckID, System.String name, MyIntCallback callback );
+	private static extern bool getChuckInt( System.UInt32 chuckID, System.String name, IntCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setChuckFloat( System.UInt32 chuckID, System.String name, double val );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool getChuckFloat( System.UInt32 chuckID, System.String name, MyFloatCallback callback );
+	private static extern bool getChuckFloat( System.UInt32 chuckID, System.String name, FloatCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool signalChuckEvent( System.UInt32 chuckID, System.String name );
@@ -288,8 +296,8 @@ public class Chuck
 		ids = new Dictionary< string, System.UInt32 >();
 
 		// Store external ints -> callbacks to avoid garbage collection of callbacks
-		intCallbacks = new Dictionary< string, MyIntCallback >();
-		floatCallbacks = new Dictionary< string, MyFloatCallback >();
+		intCallbacks = new Dictionary< string, IntCallback >();
+		floatCallbacks = new Dictionary< string, FloatCallback >();
 
 		// Create and store callbacks
 		chout_delegate = new MyLogCallback( ChoutCallback );

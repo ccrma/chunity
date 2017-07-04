@@ -11,7 +11,7 @@
 		04813AAF1EF992CA00112924 /* hrtftable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04813AAC1EF992CA00112924 /* hrtftable.cpp */; };
 		04813AB01EF992CA00112924 /* Plugin_PanSpatializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04813AAD1EF992CA00112924 /* Plugin_PanSpatializer.cpp */; };
 		04813AB11EF992CA00112924 /* Plugin_Spatializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04813AAE1EF992CA00112924 /* Plugin_Spatializer.cpp */; };
-		04813AB41EF9938F00112924 /* Plugin_SpatializerReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04813AB31EF9938F00112924 /* Plugin_SpatializerReverb.cpp */; };
+		04813AB61EFAF26000112924 /* Plugin_SpatializerReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04813AB51EFAF26000112924 /* Plugin_SpatializerReverb.cpp */; };
 		04F251411EA5DAE800B36889 /* chuck_absyn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F24D9D1EA5DAE700B36889 /* chuck_absyn.cpp */; };
 		04F251421EA5DAE800B36889 /* chuck_bbq.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F24D9F1EA5DAE700B36889 /* chuck_bbq.cpp */; };
 		04F251431EA5DAE800B36889 /* chuck_compile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F24DA11EA5DAE700B36889 /* chuck_compile.cpp */; };
@@ -109,7 +109,7 @@
 		04813AAC1EF992CA00112924 /* hrtftable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hrtftable.cpp; path = ../hrtftable.cpp; sourceTree = "<group>"; };
 		04813AAD1EF992CA00112924 /* Plugin_PanSpatializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_PanSpatializer.cpp; path = ../Plugin_PanSpatializer.cpp; sourceTree = "<group>"; };
 		04813AAE1EF992CA00112924 /* Plugin_Spatializer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_Spatializer.cpp; path = ../Plugin_Spatializer.cpp; sourceTree = "<group>"; };
-		04813AB31EF9938F00112924 /* Plugin_SpatializerReverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_SpatializerReverb.cpp; path = ../../../nativeaudioplugins/NativeCode/Plugin_SpatializerReverb.cpp; sourceTree = "<group>"; };
+		04813AB51EFAF26000112924 /* Plugin_SpatializerReverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_SpatializerReverb.cpp; path = ../Plugin_SpatializerReverb.cpp; sourceTree = "<group>"; };
 		04D57E1B1ECAC01F00EC69E3 /* Plugin_ChucK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Plugin_ChucK.h; path = ../Plugin_ChucK.h; sourceTree = "<group>"; };
 		04F24D981EA5DAE700B36889 /* chuck.lex */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = chuck.lex; sourceTree = "<group>"; };
 		04F24D991EA5DAE700B36889 /* chuck.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = chuck.xcodeproj; sourceTree = "<group>"; };
@@ -2433,7 +2433,7 @@
 				04813AAC1EF992CA00112924 /* hrtftable.cpp */,
 				04813AAD1EF992CA00112924 /* Plugin_PanSpatializer.cpp */,
 				04813AAE1EF992CA00112924 /* Plugin_Spatializer.cpp */,
-				04813AB31EF9938F00112924 /* Plugin_SpatializerReverb.cpp */,
+				04813AB51EFAF26000112924 /* Plugin_SpatializerReverb.cpp */,
 				041F9C461EF4459800E1E3D5 /* IUnityGraphics.h */,
 				041F9C471EF4459800E1E3D5 /* IUnityInterface.h */,
 				04F254611EA7D82F00B36889 /* Plugin_ChucK.cpp */,
@@ -2582,7 +2582,7 @@
 				04F254501EA5DAE800B36889 /* util_xforms.c in Sources */,
 				04F254441EA5DAE800B36889 /* ulib_std.cpp in Sources */,
 				04F2514C1EA5DAE800B36889 /* chuck_lang.cpp in Sources */,
-				04813AB41EF9938F00112924 /* Plugin_SpatializerReverb.cpp in Sources */,
+				04813AB61EFAF26000112924 /* Plugin_SpatializerReverb.cpp in Sources */,
 				04F251561EA5DAE800B36889 /* chuck_table.cpp in Sources */,
 				04F251591EA5DAE800B36889 /* chuck_utils.cpp in Sources */,
 				04F251501EA5DAE800B36889 /* chuck_parse.cpp in Sources */,

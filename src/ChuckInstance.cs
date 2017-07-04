@@ -131,7 +131,7 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.SetInt( myChuckId, variableName, value );
 	}
 
-	public bool GetInt( string variableName, Action< System.Int64 > callback )
+	public Chuck.IntCallback GetInt( string variableName, Action< System.Int64 > callback )
 	{
 		return Chuck.Manager.GetInt( myChuckId, variableName, callback );
 	}
@@ -141,7 +141,7 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.SetFloat( myChuckId, variableName, value );
 	}
 
-	public bool GetFloat( string variableName, Action< double > callback )
+	public Chuck.FloatCallback GetFloat( string variableName, Action< double > callback )
 	{
 		return Chuck.Manager.GetFloat( myChuckId, variableName, callback );
 	}
