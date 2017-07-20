@@ -18,7 +18,7 @@ public class ChuckInstance : MonoBehaviour {
 	private AudioSource mySource;
 	private bool isMuted;
 	private bool prevSpatialize;
-    private int currentVar = 0;
+	private int currentVar = 0;
 
 	private AudioClip zeroClip;
 	private AudioClip spatialClip;
@@ -32,11 +32,11 @@ public class ChuckInstance : MonoBehaviour {
 		myChuckId = Chuck.Manager.InitializeFilter();
 
 		mySource = GetComponent<AudioSource>();
-        mySource.loop = true;
-        mySource.playOnAwake = true;
+		mySource.loop = true;
+		mySource.playOnAwake = true;
 
 		spatialClip = (AudioClip) Resources.Load("1");
-        zeroClip = (AudioClip) Resources.Load("0");
+		zeroClip = (AudioClip) Resources.Load("0");
 
 		// opposite to have first UpdateSpatialize() take effect
 		prevSpatialize = !spatialize;
@@ -109,17 +109,17 @@ public class ChuckInstance : MonoBehaviour {
 		}
 	}
 
-    public string GetUniqueVariableName()
-    {
-        currentVar++;
-        return "v" + currentVar.ToString();
-    }
+	public string GetUniqueVariableName()
+	{
+		currentVar++;
+		return "v" + currentVar.ToString();
+	}
 
-    public string GetUniqueVariableName( string prefix )
-    {
-        currentVar++;
-        return prefix + currentVar.ToString();
-    }
+	public string GetUniqueVariableName( string prefix )
+	{
+		currentVar++;
+		return prefix + currentVar.ToString();
+	}
 
 	public bool RunCode( string code )
 	{
@@ -156,8 +156,8 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.SignalEvent( myChuckId, variableName );
 	}
 
-    public void SetRunning( bool shouldRun )
-    {
-        running = shouldRun;
-    }
+	public void SetRunning( bool shouldRun )
+	{
+		running = shouldRun;
+	}
 }
