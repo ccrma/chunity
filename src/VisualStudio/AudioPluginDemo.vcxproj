@@ -391,7 +391,11 @@ copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClCompile Include="..\chuck\src\util_string.cpp" />
     <ClCompile Include="..\chuck\src\util_thread.cpp" />
     <ClCompile Include="..\chuck\src\util_xforms.c" />
+    <ClCompile Include="..\hrtftable.cpp" />
     <ClCompile Include="..\Plugin_ChucK.cpp" />
+    <ClCompile Include="..\Plugin_PanSpatializer.cpp" />
+    <ClCompile Include="..\Plugin_Spatializer.cpp" />
+    <ClCompile Include="..\Plugin_SpatializerReverb.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AudioPluginInterface.h" />

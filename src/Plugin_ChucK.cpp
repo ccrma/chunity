@@ -154,6 +154,34 @@ namespace ChucK
         }
         return true;
     }
+
+
+
+    UNITY_INTERFACE_EXPORT bool cleanupChuckInstance( unsigned int chuckID )
+    {
+        if( chuck_instances.count( chuckID ) > 0 )
+        {
+            Chuck_System * chuck = chuck_instances[chuckID];
+            
+            // don't track it anymore
+            chuck_instances.erase( chuckID );
+
+            if( data_instances.count( chuckID ) > 0 )
+            {
+                data_instances[chuckID]->myId = -1;
+                data_instances.erase( chuckID );
+            }
+
+            // wait a bit
+            usleep( 30000 );
+
+            // cleanup this chuck early
+            Chuck_External::quitChuck( chuck );
+
+        }
+
+        return true;
+    }
     
     
     

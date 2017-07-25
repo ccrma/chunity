@@ -160,4 +160,9 @@ public class ChuckInstance : MonoBehaviour {
 	{
 		running = shouldRun;
 	}
+
+    private void OnDestroy()
+    {
+        Chuck.Manager.CleanupFilter( myChuckId );
+    }
 }

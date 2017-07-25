@@ -64,6 +64,11 @@ public class Chuck
 		return id;
 	}
 
+    public bool CleanupFilter( System.UInt32 id )
+    {
+        return cleanupChuckInstance( id );
+    }
+
 	public bool ManualAudioCallback( System.UInt32 chuckID, float[] inBuffer, float[] outBuffer, System.UInt32 channels )
 	{
 		System.UInt32 numFrames = Convert.ToUInt32( inBuffer.Length / channels );
@@ -235,6 +240,9 @@ public class Chuck
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool initChuckInstance( System.UInt32 chuckID, System.UInt32 sampleRate );
+
+    [DllImport (PLUGIN_NAME)]
+	private static extern bool cleanupChuckInstance( System.UInt32 chuckID );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool chuckManualAudioCallback( System.UInt32 chuckID, float[] inBuffer, float[] outBuffer,

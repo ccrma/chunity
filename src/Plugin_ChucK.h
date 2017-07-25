@@ -17,6 +17,7 @@ namespace ChucK {
     UNITY_INTERFACE_EXPORT bool signalChuckEvent( unsigned int chuckID, const char * name );
     UNITY_INTERFACE_EXPORT bool broadcastChuckEvent( unsigned int chuckID, const char * name );
     UNITY_INTERFACE_EXPORT bool initChuckInstance( unsigned int chuckID, unsigned int sampleRate );
+    UNITY_INTERFACE_EXPORT bool cleanupChuckInstance( unsigned int chuckID );
     UNITY_INTERFACE_EXPORT bool chuckManualAudioCallback( unsigned int chuckID, float * inBuffer, float * outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels );
     UNITY_INTERFACE_EXPORT void cleanRegisteredChucks();
     UNITY_INTERFACE_EXPORT bool setChoutCallback( void (* callback)(const char *) );
