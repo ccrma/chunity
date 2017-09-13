@@ -104,6 +104,7 @@
 		04013CBB1EC682180086F0DB /* x-buffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "x-buffer.h"; sourceTree = "<group>"; };
 		041F9C461EF4459800E1E3D5 /* IUnityGraphics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = ../IUnityGraphics.h; sourceTree = "<group>"; };
 		041F9C471EF4459800E1E3D5 /* IUnityInterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = IUnityInterface.h; path = ../IUnityInterface.h; sourceTree = "<group>"; };
+		04487BC31F633BE600AE092F /* chuck_carrier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chuck_carrier.h; sourceTree = "<group>"; };
 		044A2D041EE5FFBF00E20683 /* chuck_external.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chuck_external.cpp; sourceTree = "<group>"; };
 		044A2D051EE5FFBF00E20683 /* chuck_external.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chuck_external.h; sourceTree = "<group>"; };
 		04813AAC1EF992CA00112924 /* hrtftable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hrtftable.cpp; path = ../hrtftable.cpp; sourceTree = "<group>"; };
@@ -1032,6 +1033,7 @@
 				04F24D9E1EA5DAE700B36889 /* chuck_absyn.h */,
 				04F24D9F1EA5DAE700B36889 /* chuck_bbq.cpp */,
 				04F24DA01EA5DAE700B36889 /* chuck_bbq.h */,
+				04487BC31F633BE600AE092F /* chuck_carrier.h */,
 				04F24DA11EA5DAE700B36889 /* chuck_compile.cpp */,
 				04F24DA21EA5DAE700B36889 /* chuck_compile.h */,
 				04F24DA31EA5DAE700B36889 /* chuck_console.cpp */,
@@ -2637,7 +2639,6 @@
 					"-I../chuck/src/lo",
 					"-O3",
 					"-D__MACOSX_CORE__",
-					"-DEXTERNAL_DEBUG_CALLBACK",
 					"-isysroot",
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk,
 				);
@@ -2646,7 +2647,6 @@
 					"-I../chuck/src/lo",
 					"-g",
 					"-D__MACOSX_CORE__",
-					"-DEXTERNAL_DEBUG_CALLBACK",
 					"-isysroot",
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk,
 				);
@@ -2686,7 +2686,6 @@
 					"-I../chuck/src/lo",
 					"-O3",
 					"-D__MACOSX_CORE__",
-					"-DEXTERNAL_DEBUG_CALLBACK",
 					"-isysroot",
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk,
 				);

@@ -329,14 +329,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {580, 277}}</string>
+								<string>{{0, 0}, {580, 260}}</string>
 								<key>RubberWindowFrame</key>
 								<string>356 294 788 504 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>277pt</string>
+							<string>260pt</string>
 						</dict>
 						<dict>
 							<key>ContentConfiguration</key>
@@ -349,14 +349,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 282}, {580, 181}}</string>
+								<string>{{0, 265}, {580, 198}}</string>
 								<key>RubberWindowFrame</key>
 								<string>356 294 788 504 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
 							<key>Proportion</key>
-							<string>181pt</string>
+							<string>198pt</string>
 						</dict>
 					</array>
 					<key>Proportion</key>
@@ -375,9 +375,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>049895301EF4456400224BC9</string>
+				<string>042064631F60A8D700F04C1E</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>049895311EF4456400224BC9</string>
+				<string>042064641F60A8D700F04C1E</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -596,7 +596,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>049895331EF4456400224BC9</string>
-				<string>049895341EF4456400224BC9</string>
+				<string>042064651F60A8D700F04C1E</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
