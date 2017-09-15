@@ -45,7 +45,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "117"
             endingLineNumber = "117"
-            landmarkName = "global_cleanup()"
+            landmarkName = "signal_int( int sig_num )"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

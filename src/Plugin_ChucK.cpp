@@ -15,7 +15,7 @@
 #include <unistd.h>
 #endif
 
-namespace ChucK
+namespace ChucK_For_Unity
 {
     enum Param
     {
@@ -38,7 +38,7 @@ namespace ChucK
         };
     };
     
-    std::map< unsigned int, Chuck_System * > chuck_instances;
+    std::map< unsigned int, ChucK * > chuck_instances;
     std::map< unsigned int, EffectData::Data * > data_instances;
     std::string chuck_external_data_dir;
 
@@ -49,7 +49,8 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return Chuck_External::runCode( chuck_instances[chuckID], code );
+        return chuck_instances[chuckID]->compileCode(
+            std::string( code ), std::string("") );
     }
     
     
@@ -58,7 +59,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return Chuck_External::setExternalInt( chuck_instances[chuckID], name, val );
+        return chuck_instances[chuckID]->setExternalInt( name, val );
     }
     
     
@@ -67,7 +68,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return Chuck_External::getExternalInt( chuck_instances[chuckID], name, callback );
+        return chuck_instances[chuckID]->getExternalInt( name, callback );
     }
     
     
@@ -76,7 +77,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return Chuck_External::setExternalFloat( chuck_instances[chuckID], name, val );
+        return chuck_instances[chuckID]->setExternalFloat( name, val );
     }
     
     
@@ -85,7 +86,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return Chuck_External::getExternalFloat( chuck_instances[chuckID], name, callback );
+        return chuck_instances[chuckID]->getExternalFloat( name, callback );
     }
     
     
@@ -94,7 +95,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return Chuck_External::signalExternalEvent( chuck_instances[chuckID], name );
+        return chuck_instances[chuckID]->signalExternalEvent( name );
     }
     
     
@@ -103,35 +104,35 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return Chuck_External::broadcastExternalEvent( chuck_instances[chuckID], name );
+        return chuck_instances[chuckID]->broadcastExternalEvent( name );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool setChoutCallback( void (* callback)(const char *) )
+    UNITY_INTERFACE_EXPORT bool setChoutCallback( unsigned int chuckID, void (* callback)(const char *) )
     {
-        return Chuck_External::setChoutCallback( callback );
+        return chuck_instances[chuckID]->setChoutCallback( callback );
     }
 
 
 
-    UNITY_INTERFACE_EXPORT bool setCherrCallback( void (* callback)(const char *) )
+    UNITY_INTERFACE_EXPORT bool setCherrCallback( unsigned int chuckID, void (* callback)(const char *) )
     {
-        return Chuck_External::setCherrCallback( callback );
+        return chuck_instances[chuckID]->setCherrCallback( callback );
     }
     
     
     
     UNITY_INTERFACE_EXPORT bool setStdoutCallback( void (* callback)(const char *) )
     {
-        return Chuck_External::setStdoutCallback( callback );
+        return ChucK::setStdoutCallback( callback );
     }
 
 
 
     UNITY_INTERFACE_EXPORT bool setStderrCallback( void (* callback)(const char *) )
     {
-        return Chuck_External::setStderrCallback( callback );
+        return ChucK::setStderrCallback( callback );
     }
     
     
@@ -139,7 +140,6 @@ namespace ChucK
     UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir )
     {
         chuck_external_data_dir = std::string( dir );
-        Chuck_External::initialSetup( dir );
         return true;
     }
     
@@ -150,7 +150,21 @@ namespace ChucK
         if( chuck_instances.count( chuckID ) == 0 )
         {
             // if we aren't tracking a chuck vm on this ID, create a new one
-            chuck_instances[chuckID] = Chuck_External::startChuck( sampleRate, chuck_external_data_dir.c_str() );
+            ChucK * chuck = new ChucK();
+            
+            // set params: sample rate, 2 in channels, 2 out channels,
+            // don't halt the vm, and use our data directory
+            chuck->setParam( CHUCK_PARAM_SAMPLE_RATE, (t_CKINT) sampleRate );
+            chuck->setParam( CHUCK_PARAM_INPUT_CHANNELS, (t_CKINT) 2 );
+            chuck->setParam( CHUCK_PARAM_OUTPUT_CHANNELS, (t_CKINT) 2 );
+            chuck->setParam( CHUCK_PARAM_VM_HALT, (t_CKINT) 0 );
+            chuck->setParam( CHUCK_PARAM_WORKING_DIRECTORY, chuck_external_data_dir );
+            
+            // initialize and start
+            chuck->init();
+            chuck->start();
+            
+            chuck_instances[chuckID] = chuck;
         }
         return true;
     }
@@ -161,7 +175,7 @@ namespace ChucK
     {
         if( chuck_instances.count( chuckID ) > 0 )
         {
-            Chuck_System * chuck = chuck_instances[chuckID];
+            ChucK * chuck = chuck_instances[chuckID];
             
             // don't track it anymore
             chuck_instances.erase( chuckID );
@@ -176,7 +190,7 @@ namespace ChucK
             usleep( 30000 );
 
             // cleanup this chuck early
-            Chuck_External::quitChuck( chuck );
+            delete chuck;
 
         }
 
@@ -196,7 +210,8 @@ namespace ChucK
             }
             
             // call callback
-            Chuck_External::audioCallback( chuck_instances[chuckID], inBuffer, outBuffer, numFrames, inChannels, outChannels );
+            // TODO: check inChannels, outChannels
+            chuck_instances[chuckID]->run( inBuffer, outBuffer, numFrames );
             
         }
         
@@ -220,11 +235,11 @@ namespace ChucK
         usleep( 30000 );
         
         // next, delete chucks
-        for( std::map< unsigned int, Chuck_System * >::iterator it =
+        for( std::map< unsigned int, ChucK * >::iterator it =
              chuck_instances.begin(); it != chuck_instances.end(); it++ )
         {
-            Chuck_System * chuck = it->second;
-            Chuck_External::quitChuck( chuck );
+            ChucK * chuck = it->second;
+            delete chuck;
         }
         
         // delete stored chuck pointers
@@ -267,7 +282,7 @@ namespace ChucK
     void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     {
         // Things that need to be common to ALL ChucK instances will be unloaded here
-        Chuck_External::finalCleanup();
+        ChucK::finalCleanup();
     }
     
 
@@ -387,9 +402,10 @@ namespace ChucK
             && data_instances.count( data->myId ) > 0  // do we have a data
             && data_instances[data->myId] == data )    // && is it still aligned
         {
-            Chuck_System * chuck = chuck_instances[data->myId];
+            ChucK * chuck = chuck_instances[data->myId];
 
-            Chuck_External::audioCallback( chuck, inbuffer, outbuffer, length, inchannels, outchannels );
+            // TODO: check inChannels, outChannels
+            chuck->run( inbuffer, outbuffer, length );
         }
         
         // Need to add small amount of white noise (amplitude 0.00017 is fine)

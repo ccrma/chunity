@@ -24,17 +24,23 @@ public class Chuck
 		// only initialize if haven't initialized yet
 		if( !ids.ContainsKey( name ) )
 		{
+			System.UInt32 id = _nextValidID;
 			System.UInt32 sampleRate = Convert.ToUInt32( AudioSettings.outputSampleRate );
 
 			// create a chuck in c++, then connect it to the unity callback
-			if( (!initChuckInstance( _nextValidID, sampleRate )) || 
-				(!mixer.SetFloat( name, _nextValidID * 1.0f )) )
+			if( (!initChuckInstance( id, sampleRate )) || 
+				(!mixer.SetFloat( name, id * 1.0f )) )
 			{
 				// note: when things go poorly, mixer.SetFloat 
 				// never *actually* returns false and so this error message will not be seen.
 				// instead, will see "Assertion failed on expression: 'res == FMOD_OK'
 				Debug.Log( "ChucK ID C++ storage failed for " + name );
 				return;
+			}
+			else
+			{
+				setChoutCallback( id, chout_delegate );
+				setCherrCallback( id, cherr_delegate );
 			}
 
 			// store association in c-sharp
@@ -53,10 +59,15 @@ public class Chuck
 		System.UInt32 id = _nextValidID;
 		System.UInt32 sampleRate = Convert.ToUInt32( AudioSettings.outputSampleRate );
 
-		if( !initChuckInstance( Convert.ToUInt32( id ), sampleRate ) )
+		if( !initChuckInstance( id , sampleRate ) )
 		{
 			Debug.Log( "Chuck C++ initialization failed for filter" );
 			return System.UInt32.MaxValue;
+		}
+		else
+		{
+			setChoutCallback( id, chout_delegate );
+			setCherrCallback( id, cherr_delegate );
 		}
 
 		_nextValidID++;
@@ -270,10 +281,10 @@ public class Chuck
 	private static extern bool broadcastChuckEvent( System.UInt32 chuckID, System.String name );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setChoutCallback( MyLogCallback callback );
+	private static extern bool setChoutCallback( System.UInt32 chuckID, MyLogCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setCherrCallback( MyLogCallback callback );
+	private static extern bool setCherrCallback( System.UInt32 chuckID, MyLogCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setStdoutCallback( MyLogCallback callback );
@@ -314,8 +325,6 @@ public class Chuck
 		stderr_delegate = new MyLogCallback( StderrCallback );
 
 		// Store pointers to callbacks inside ChucK's inner workings
-		setChoutCallback( chout_delegate );
-		setCherrCallback( cherr_delegate );
 		setStdoutCallback( stdout_delegate );
 		setStderrCallback( stderr_delegate );
 	}
