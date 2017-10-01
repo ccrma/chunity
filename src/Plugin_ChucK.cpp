@@ -158,6 +158,7 @@ namespace ChucK_For_Unity
             chuck->setParam( CHUCK_PARAM_INPUT_CHANNELS, (t_CKINT) 2 );
             chuck->setParam( CHUCK_PARAM_OUTPUT_CHANNELS, (t_CKINT) 2 );
             chuck->setParam( CHUCK_PARAM_VM_HALT, (t_CKINT) 0 );
+            chuck->setParam( CHUCK_PARAM_DUMP_INSTRUCTIONS, (t_CKINT) 0 );
             chuck->setParam( CHUCK_PARAM_WORKING_DIRECTORY, chuck_external_data_dir );
             
             // initialize and start
@@ -246,6 +247,10 @@ namespace ChucK_For_Unity
         chuck_instances.clear();
         // delete data instances
         data_instances.clear();
+        
+        // clear out callbacks also
+        setStdoutCallback( NULL );
+        setStderrCallback( NULL );
     }
 
     
