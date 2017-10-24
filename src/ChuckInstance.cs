@@ -156,6 +156,11 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.GetFloat( myChuckId, variableName, callback );
 	}
 
+	public Chuck.VoidCallback CreateVoidCallback( Action callbackFunction )
+	{
+		return Chuck.CreateVoidCallback( callbackFunction );
+	}
+
 	public bool SignalEvent( string variableName )
 	{
 		return Chuck.Manager.SignalEvent( myChuckId, variableName );
@@ -164,6 +169,21 @@ public class ChuckInstance : MonoBehaviour {
 	public bool BroadcastEvent( string variableName )
 	{
 		return Chuck.Manager.SignalEvent( myChuckId, variableName );
+	}
+
+	public bool ListenForChuckEventOnce( string variableName, Chuck.VoidCallback callback )
+	{
+		return Chuck.Manager.ListenForChuckEventOnce( myChuckId, variableName, callback );
+	}
+
+	public bool StartListeningForChuckEvent( string variableName, Chuck.VoidCallback callback )
+	{
+		return Chuck.Manager.StartListeningForChuckEvent( myChuckId, variableName, callback );
+	}
+
+	public bool StopListeningForChuckEvent( string variableName, Chuck.VoidCallback callback )
+	{
+		return Chuck.Manager.StopListeningForChuckEvent( myChuckId, variableName, callback );
 	}
 
 	public void SetRunning( bool shouldRun )

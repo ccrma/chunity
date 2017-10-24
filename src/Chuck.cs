@@ -202,6 +202,11 @@ public class Chuck
 		return true;
 	}
 
+	public static Chuck.VoidCallback CreateVoidCallback( Action callbackFunction )
+	{
+		return new VoidCallback( callbackFunction );
+	}
+
 	public bool SignalEvent( string chuckName, string variableName )
 	{
 		if( ids.ContainsKey( chuckName ) )
@@ -238,11 +243,70 @@ public class Chuck
 		return broadcastChuckEvent( chuckId, variableName );
 	}
 
+	public bool ListenForChuckEventOnce( string chuckName, string variableName, Chuck.VoidCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return ListenForChuckEventOnce( ids[chuckName], variableName, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}	
+	}
+
+	public bool ListenForChuckEventOnce( System.UInt32 chuckId, string variableName, Chuck.VoidCallback callback )
+	{
+		return listenForChuckEventOnce( chuckId, variableName, callback );
+	}
+
+	public bool StartListeningForChuckEvent( string chuckName, string variableName, Chuck.VoidCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return StartListeningForChuckEvent( ids[chuckName], variableName, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}	
+	}
+
+	public bool StartListeningForChuckEvent( System.UInt32 chuckId, string variableName, Chuck.VoidCallback callback )
+	{
+		return startListeningForChuckEvent( chuckId, variableName, callback );
+	}
+
+
+	public bool StopListeningForChuckEvent( string chuckName, string variableName, Chuck.VoidCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return StopListeningForChuckEvent( ids[chuckName], variableName, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}	
+	}
+
+	public bool StopListeningForChuckEvent( System.UInt32 chuckId, string variableName, Chuck.VoidCallback callback )
+	{
+		return stopListeningForChuckEvent( chuckId, variableName, callback );
+	}
+
+
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void MyLogCallback( System.String str );
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void IntCallback( System.Int64 i );
+
+	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+	public delegate void VoidCallback();
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void FloatCallback( double f );
@@ -289,6 +353,15 @@ public class Chuck
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool broadcastChuckEvent( System.UInt32 chuckID, System.String name );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool listenForChuckEventOnce( System.UInt32 chuckID, System.String name, VoidCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool startListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool stopListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setChoutCallback( System.UInt32 chuckID, MyLogCallback callback );
