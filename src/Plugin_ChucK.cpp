@@ -109,6 +109,36 @@ namespace ChucK_For_Unity
     
     
     
+    UNITY_INTERFACE_EXPORT bool listenForChuckEventOnce( unsigned int chuckID, const char * name, void (* callback)(void) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->listenForExternalEvent(
+            name, callback, FALSE );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool startListeningForChuckEvent( unsigned int chuckID, const char * name, void (* callback)(void) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->listenForExternalEvent(
+            name, callback, TRUE );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool stopListeningForChuckEvent( unsigned int chuckID, const char * name, void (* callback)(void) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->stopListeningForExternalEvent(
+            name, callback );
+    }
+    
+    
+    
     UNITY_INTERFACE_EXPORT bool setChoutCallback( unsigned int chuckID, void (* callback)(const char *) )
     {
         return chuck_instances[chuckID]->setChoutCallback( callback );
@@ -159,7 +189,12 @@ namespace ChucK_For_Unity
             chuck->setParam( CHUCK_PARAM_OUTPUT_CHANNELS, (t_CKINT) 2 );
             chuck->setParam( CHUCK_PARAM_VM_HALT, (t_CKINT) 0 );
             chuck->setParam( CHUCK_PARAM_DUMP_INSTRUCTIONS, (t_CKINT) 0 );
+            // directory for compiled.code
             chuck->setParam( CHUCK_PARAM_WORKING_DIRECTORY, chuck_external_data_dir );
+            // directories to search for chugins and auto-run ck files
+            std::list< std::string > chugin_search;
+            chugin_search.push_back( chuck_external_data_dir );
+            chuck->setParam( CHUCK_PARAM_USER_CHUGIN_DIRECTORIES, chugin_search );
             
             // initialize and start
             chuck->init();
