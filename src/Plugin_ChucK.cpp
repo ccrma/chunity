@@ -91,6 +91,24 @@ namespace ChucK_For_Unity
     
     
     
+    UNITY_INTERFACE_EXPORT bool setChuckString( unsigned int chuckID, const char * name, const char * val )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        return chuck_instances[chuckID]->setExternalString( name, val );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool getChuckString( unsigned int chuckID, const char * name, void (* callback)(const char *) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        return chuck_instances[chuckID]->getExternalString( name, callback );
+    }
+    
+    
+    
     UNITY_INTERFACE_EXPORT bool signalChuckEvent( unsigned int chuckID, const char * name )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
