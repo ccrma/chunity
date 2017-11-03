@@ -87,7 +87,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;_DEBUG;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -95,6 +95,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\chuck\src\core;..\;..\chuck\src\core\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -111,7 +112,7 @@ copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>EXTERNAL_DEBUG_CALLBACK;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>
@@ -120,8 +121,8 @@ copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>false</ExceptionHandling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>..\chuck\src\RtAudio;..\chuck\src;..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ShowIncludes>true</ShowIncludes>
+      <AdditionalIncludeDirectories>..\chuck\src\core;..\;..\chuck\src\core\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -139,7 +140,7 @@ copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
@@ -150,6 +151,7 @@ copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
       <FloatingPointModel>Fast</FloatingPointModel>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointExceptions>false</FloatingPointExceptions>
+      <AdditionalIncludeDirectories>..\chuck\src\core;..\;..\chuck\src\core\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -169,7 +171,7 @@ copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>EXTERNAL_DEBUG_CALLBACK;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
@@ -182,8 +184,8 @@ copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
       <ExceptionHandling>Sync</ExceptionHandling>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <AdditionalIncludeDirectories>..\chuck\src\RtAudio;..\chuck\src;..\..\src;..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ShowIncludes>true</ShowIncludes>
+      <AdditionalIncludeDirectories>..\chuck\src\core;..\;..\chuck\src\core\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -201,196 +203,191 @@ copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\AudioPluginUtil.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_absyn.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_bbq.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_compile.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_console.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_dl.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_emit.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_errmsg.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_external.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_frame.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_globals.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_instr.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_io.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_lang.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_main.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_oo.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_otf.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_parse.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_scan.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_shell.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_stats.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_symbol.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_system.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_table.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_type.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_ugen.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_utils.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_vm.cpp" />
-    <ClCompile Include="..\chuck\src\chuck_win32.c" />
-    <ClCompile Include="..\chuck\src\digiio_rtaudio.cpp" />
-    <ClCompile Include="..\chuck\src\hidio_sdl.cpp" />
-    <ClCompile Include="..\chuck\src\lo\address.c">
+    <ClCompile Include="..\chuck\src\core\chuck.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_absyn.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_compile.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_dl.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_emit.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_errmsg.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_frame.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_instr.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_io.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_lang.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_oo.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_otf.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_parse.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_scan.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_shell.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_stats.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_symbol.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_table.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_type.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_ugen.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_utils.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_vm.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_win32.c" />
+    <ClCompile Include="..\chuck\src\core\hidio_sdl.cpp" />
+    <ClCompile Include="..\chuck\src\core\lo\address.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\lo\blob.c">
+    <ClCompile Include="..\chuck\src\core\lo\blob.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\lo\bundle.c">
+    <ClCompile Include="..\chuck\src\core\lo\bundle.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\lo\message.c">
+    <ClCompile Include="..\chuck\src\core\lo\message.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\lo\method.c">
+    <ClCompile Include="..\chuck\src\core\lo\method.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\lo\pattern_match.c">
+    <ClCompile Include="..\chuck\src\core\lo\pattern_match.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\lo\send.c">
+    <ClCompile Include="..\chuck\src\core\lo\send.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\lo\server.c">
+    <ClCompile Include="..\chuck\src\core\lo\server.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\lo\timetag.c">
+    <ClCompile Include="..\chuck\src\core\lo\timetag.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\lo;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\midiio_rtmidi.cpp" />
-    <ClCompile Include="..\chuck\src\regex\regcomp.c">
+    <ClCompile Include="..\chuck\src\core\midiio_rtmidi.cpp" />
+    <ClCompile Include="..\chuck\src\core\regex\regcomp.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\regerror.c">
+    <ClCompile Include="..\chuck\src\core\regex\regerror.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\regexec.c">
+    <ClCompile Include="..\chuck\src\core\regex\regexec.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;__USE_DINPUT8LIB__;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;_DEBUG;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\tre-ast.c">
+    <ClCompile Include="..\chuck\src\core\regex\tre-ast.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\tre-compile.c">
+    <ClCompile Include="..\chuck\src\core\regex\tre-compile.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HAVE_CONFIG_H;__USE_DINPUT8LIB__;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;_DEBUG;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\chuck\src\core\regex\tre-filter.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\tre-filter.c">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\tre-match-approx.c">
+    <ClCompile Include="..\chuck\src\core\regex\tre-match-approx.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\tre-match-backtrack.c">
+    <ClCompile Include="..\chuck\src\core\regex\tre-match-backtrack.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\tre-match-parallel.c">
+    <ClCompile Include="..\chuck\src\core\regex\tre-match-parallel.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\tre-mem.c">
+    <ClCompile Include="..\chuck\src\core\regex\tre-mem.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\tre-parse.c">
+    <ClCompile Include="..\chuck\src\core\regex\tre-parse.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\tre-stack.c">
+    <ClCompile Include="..\chuck\src\core\regex\tre-stack.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\regex\xmalloc.c">
+    <ClCompile Include="..\chuck\src\core\regex\xmalloc.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\chuck\src\regex;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\RtAudio\RtAudio.cpp" />
-    <ClCompile Include="..\chuck\src\rtmidi.cpp" />
-    <ClCompile Include="..\chuck\src\uana_extract.cpp" />
-    <ClCompile Include="..\chuck\src\uana_xform.cpp" />
-    <ClCompile Include="..\chuck\src\ugen_filter.cpp" />
-    <ClCompile Include="..\chuck\src\ugen_osc.cpp" />
-    <ClCompile Include="..\chuck\src\ugen_stk.cpp" />
-    <ClCompile Include="..\chuck\src\ugen_xxx.cpp" />
-    <ClCompile Include="..\chuck\src\ulib_machine.cpp" />
-    <ClCompile Include="..\chuck\src\ulib_math.cpp" />
-    <ClCompile Include="..\chuck\src\ulib_opsc.cpp">
+    <ClCompile Include="..\chuck\src\core\rtmidi.cpp" />
+    <ClCompile Include="..\chuck\src\core\uana_extract.cpp" />
+    <ClCompile Include="..\chuck\src\core\uana_xform.cpp" />
+    <ClCompile Include="..\chuck\src\core\ugen_filter.cpp" />
+    <ClCompile Include="..\chuck\src\core\ugen_osc.cpp" />
+    <ClCompile Include="..\chuck\src\core\ugen_stk.cpp" />
+    <ClCompile Include="..\chuck\src\core\ugen_xxx.cpp" />
+    <ClCompile Include="..\chuck\src\core\ulib_machine.cpp" />
+    <ClCompile Include="..\chuck\src\core\ulib_math.cpp" />
+    <ClCompile Include="..\chuck\src\core\ulib_opsc.cpp">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\ulib_regex.cpp" />
-    <ClCompile Include="..\chuck\src\ulib_std.cpp" />
-    <ClCompile Include="..\chuck\src\util_buffers.cpp" />
-    <ClCompile Include="..\chuck\src\util_console.cpp" />
-    <ClCompile Include="..\chuck\src\util_hid.cpp" />
-    <ClCompile Include="..\chuck\src\util_math.c" />
-    <ClCompile Include="..\chuck\src\util_network.c" />
-    <ClCompile Include="..\chuck\src\util_opsc.cpp" />
-    <ClCompile Include="..\chuck\src\util_raw.c" />
-    <ClCompile Include="..\chuck\src\util_serial.cpp" />
-    <ClCompile Include="..\chuck\src\util_sndfile.c" />
-    <ClCompile Include="..\chuck\src\util_string.cpp" />
-    <ClCompile Include="..\chuck\src\util_thread.cpp" />
-    <ClCompile Include="..\chuck\src\util_xforms.c" />
+    <ClCompile Include="..\chuck\src\core\ulib_regex.cpp" />
+    <ClCompile Include="..\chuck\src\core\ulib_std.cpp" />
+    <ClCompile Include="..\chuck\src\core\util_buffers.cpp" />
+    <ClCompile Include="..\chuck\src\core\util_console.cpp" />
+    <ClCompile Include="..\chuck\src\core\util_hid.cpp" />
+    <ClCompile Include="..\chuck\src\core\util_math.c" />
+    <ClCompile Include="..\chuck\src\core\util_network.c" />
+    <ClCompile Include="..\chuck\src\core\util_opsc.cpp" />
+    <ClCompile Include="..\chuck\src\core\util_raw.c" />
+    <ClCompile Include="..\chuck\src\core\util_serial.cpp" />
+    <ClCompile Include="..\chuck\src\core\util_sndfile.c" />
+    <ClCompile Include="..\chuck\src\core\util_string.cpp" />
+    <ClCompile Include="..\chuck\src\core\util_thread.cpp" />
+    <ClCompile Include="..\chuck\src\core\util_xforms.c" />
     <ClCompile Include="..\hrtftable.cpp" />
     <ClCompile Include="..\Plugin_ChucK.cpp" />
     <ClCompile Include="..\Plugin_PanSpatializer.cpp" />
@@ -400,88 +397,81 @@ copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
   <ItemGroup>
     <ClInclude Include="..\AudioPluginInterface.h" />
     <ClInclude Include="..\AudioPluginUtil.h" />
-    <ClInclude Include="..\chuck\src\chuck_absyn.h" />
-    <ClInclude Include="..\chuck\src\chuck_bbq.h" />
-    <ClInclude Include="..\chuck\src\chuck_compile.h" />
-    <ClInclude Include="..\chuck\src\chuck_console.h" />
-    <ClInclude Include="..\chuck\src\chuck_def.h" />
-    <ClInclude Include="..\chuck\src\chuck_dl.h" />
-    <ClInclude Include="..\chuck\src\chuck_emit.h" />
-    <ClInclude Include="..\chuck\src\chuck_errmsg.h" />
-    <ClInclude Include="..\chuck\src\chuck_external.h" />
-    <ClInclude Include="..\chuck\src\chuck_frame.h" />
-    <ClInclude Include="..\chuck\src\chuck_globals.h" />
-    <ClInclude Include="..\chuck\src\chuck_instr.h" />
-    <ClInclude Include="..\chuck\src\chuck_io.h" />
-    <ClInclude Include="..\chuck\src\chuck_lang.h" />
-    <ClInclude Include="..\chuck\src\chuck_oo.h" />
-    <ClInclude Include="..\chuck\src\chuck_otf.h" />
-    <ClInclude Include="..\chuck\src\chuck_parse.h" />
-    <ClInclude Include="..\chuck\src\chuck_scan.h" />
-    <ClInclude Include="..\chuck\src\chuck_shell.h" />
-    <ClInclude Include="..\chuck\src\chuck_stats.h" />
-    <ClInclude Include="..\chuck\src\chuck_symbol.h" />
-    <ClInclude Include="..\chuck\src\chuck_system.h" />
-    <ClInclude Include="..\chuck\src\chuck_table.h" />
-    <ClInclude Include="..\chuck\src\chuck_type.h" />
-    <ClInclude Include="..\chuck\src\chuck_ugen.h" />
-    <ClInclude Include="..\chuck\src\chuck_utils.h" />
-    <ClInclude Include="..\chuck\src\chuck_vm.h" />
-    <ClInclude Include="..\chuck\src\chuck_win32.h" />
-    <ClInclude Include="..\chuck\src\digiio_rtaudio.h" />
-    <ClInclude Include="..\chuck\src\dirent_win32.h" />
-    <ClInclude Include="..\chuck\src\hidio_sdl.h" />
-    <ClInclude Include="..\chuck\src\lo\config.h" />
-    <ClInclude Include="..\chuck\src\lo\lo.h" />
-    <ClInclude Include="..\chuck\src\lo\lo_endian.h" />
-    <ClInclude Include="..\chuck\src\lo\lo_errors.h" />
-    <ClInclude Include="..\chuck\src\lo\lo_internal.h" />
-    <ClInclude Include="..\chuck\src\lo\lo_lowlevel.h" />
-    <ClInclude Include="..\chuck\src\lo\lo_macros.h" />
-    <ClInclude Include="..\chuck\src\lo\lo_osc_types.h" />
-    <ClInclude Include="..\chuck\src\lo\lo_throw.h" />
-    <ClInclude Include="..\chuck\src\lo\lo_types.h" />
-    <ClInclude Include="..\chuck\src\lo\lo_types_internal.h" />
-    <ClInclude Include="..\chuck\src\midiio_rtmidi.h" />
-    <ClInclude Include="..\chuck\src\regex\config.h" />
-    <ClInclude Include="..\chuck\src\regex\regex.h" />
-    <ClInclude Include="..\chuck\src\regex\tre-ast.h" />
-    <ClInclude Include="..\chuck\src\regex\tre-compile.h" />
-    <ClInclude Include="..\chuck\src\regex\tre-config.h" />
-    <ClInclude Include="..\chuck\src\regex\tre-filter.h" />
-    <ClInclude Include="..\chuck\src\regex\tre-internal.h" />
-    <ClInclude Include="..\chuck\src\regex\tre-match-utils.h" />
-    <ClInclude Include="..\chuck\src\regex\tre-mem.h" />
-    <ClInclude Include="..\chuck\src\regex\tre-parse.h" />
-    <ClInclude Include="..\chuck\src\regex\tre-stack.h" />
-    <ClInclude Include="..\chuck\src\regex\tre.h" />
-    <ClInclude Include="..\chuck\src\regex\xmalloc.h" />
-    <ClInclude Include="..\chuck\src\RtAudio\RtAudio.h" />
-    <ClInclude Include="..\chuck\src\RtAudio\RtError.h" />
-    <ClInclude Include="..\chuck\src\rtmidi.h" />
-    <ClInclude Include="..\chuck\src\uana_extract.h" />
-    <ClInclude Include="..\chuck\src\uana_xform.h" />
-    <ClInclude Include="..\chuck\src\ugen_filter.h" />
-    <ClInclude Include="..\chuck\src\ugen_osc.h" />
-    <ClInclude Include="..\chuck\src\ugen_stk.h" />
-    <ClInclude Include="..\chuck\src\ugen_xxx.h" />
-    <ClInclude Include="..\chuck\src\ulib_machine.h" />
-    <ClInclude Include="..\chuck\src\ulib_math.h" />
-    <ClInclude Include="..\chuck\src\ulib_opsc.h" />
-    <ClInclude Include="..\chuck\src\ulib_regex.h" />
-    <ClInclude Include="..\chuck\src\ulib_std.h" />
-    <ClInclude Include="..\chuck\src\util_buffers.h" />
-    <ClInclude Include="..\chuck\src\util_console.h" />
-    <ClInclude Include="..\chuck\src\util_hid.h" />
-    <ClInclude Include="..\chuck\src\util_math.h" />
-    <ClInclude Include="..\chuck\src\util_network.h" />
-    <ClInclude Include="..\chuck\src\util_opsc.h" />
-    <ClInclude Include="..\chuck\src\util_raw.h" />
-    <ClInclude Include="..\chuck\src\util_serial.h" />
-    <ClInclude Include="..\chuck\src\util_sndfile.h" />
-    <ClInclude Include="..\chuck\src\util_string.h" />
-    <ClInclude Include="..\chuck\src\util_thread.h" />
-    <ClInclude Include="..\chuck\src\util_xforms.h" />
+    <ClInclude Include="..\chuck\src\core\chuck.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_absyn.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_compile.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_def.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_dl.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_emit.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_errmsg.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_frame.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_instr.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_io.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_lang.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_oo.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_otf.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_parse.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_scan.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_shell.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_stats.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_symbol.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_table.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_type.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_ugen.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_utils.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_vm.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_win32.h" />
+    <ClInclude Include="..\chuck\src\core\dirent_win32.h" />
+    <ClInclude Include="..\chuck\src\core\hidio_sdl.h" />
+    <ClInclude Include="..\chuck\src\core\lo\config.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo_endian.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo_errors.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo_internal.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo_lowlevel.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo_macros.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo_osc_types.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo_throw.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo_types.h" />
+    <ClInclude Include="..\chuck\src\core\lo\lo_types_internal.h" />
+    <ClInclude Include="..\chuck\src\core\midiio_rtmidi.h" />
+    <ClInclude Include="..\chuck\src\core\regex\config.h" />
+    <ClInclude Include="..\chuck\src\core\regex\regex.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre-ast.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre-compile.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre-config.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre-filter.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre-internal.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre-match-utils.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre-mem.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre-parse.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre-stack.h" />
+    <ClInclude Include="..\chuck\src\core\regex\tre.h" />
+    <ClInclude Include="..\chuck\src\core\regex\xmalloc.h" />
+    <ClInclude Include="..\chuck\src\core\rtmidi.h" />
+    <ClInclude Include="..\chuck\src\core\uana_extract.h" />
+    <ClInclude Include="..\chuck\src\core\uana_xform.h" />
+    <ClInclude Include="..\chuck\src\core\ugen_filter.h" />
+    <ClInclude Include="..\chuck\src\core\ugen_osc.h" />
+    <ClInclude Include="..\chuck\src\core\ugen_stk.h" />
+    <ClInclude Include="..\chuck\src\core\ugen_xxx.h" />
+    <ClInclude Include="..\chuck\src\core\ulib_machine.h" />
+    <ClInclude Include="..\chuck\src\core\ulib_math.h" />
+    <ClInclude Include="..\chuck\src\core\ulib_opsc.h" />
+    <ClInclude Include="..\chuck\src\core\ulib_regex.h" />
+    <ClInclude Include="..\chuck\src\core\ulib_std.h" />
+    <ClInclude Include="..\chuck\src\core\util_buffers.h" />
+    <ClInclude Include="..\chuck\src\core\util_console.h" />
+    <ClInclude Include="..\chuck\src\core\util_hid.h" />
+    <ClInclude Include="..\chuck\src\core\util_math.h" />
+    <ClInclude Include="..\chuck\src\core\util_network.h" />
+    <ClInclude Include="..\chuck\src\core\util_opsc.h" />
+    <ClInclude Include="..\chuck\src\core\util_raw.h" />
+    <ClInclude Include="..\chuck\src\core\util_serial.h" />
+    <ClInclude Include="..\chuck\src\core\util_sndfile.h" />
+    <ClInclude Include="..\chuck\src\core\util_string.h" />
+    <ClInclude Include="..\chuck\src\core\util_thread.h" />
+    <ClInclude Include="..\chuck\src\core\util_xforms.h" />
     <ClInclude Include="..\IUnityGraphics.h" />
     <ClInclude Include="..\IUnityInterface.h" />
     <ClInclude Include="..\PluginList.h" />

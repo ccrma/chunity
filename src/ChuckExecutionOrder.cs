@@ -10,9 +10,9 @@ public class ChuckExecutionOrder : Editor
 		string chuckMainInstance = typeof(ChuckMainInstance).Name;
 		string chuckSubInstance = typeof(ChuckSubInstance).Name;
 
-		SetExecutionOrder( chuckInstance, -32000 );
-		SetExecutionOrder( chuckMainInstance, -31000 );
-		SetExecutionOrder( chuckSubInstance, -30000 );
+		SetExecutionOrder( chuckInstance, -30000 );
+		SetExecutionOrder( chuckMainInstance, -29000 );
+		SetExecutionOrder( chuckSubInstance, -28000 );
 
 	}
 

@@ -234,6 +234,18 @@ public class ChuckSubInstance : MonoBehaviour {
 
 
 
+	// ----------------------------------------------------
+	// name: SetRunning
+	// desc: whether the SubInstance is outputting sound
+	// ----------------------------------------------------
+	public void SetRunning( bool r )
+	{
+		running = r;
+	}
+
+
+
+
 
 
 	// =========== INTERNAL MECHANICS ========== //
@@ -359,5 +371,10 @@ public class ChuckSubInstance : MonoBehaviour {
 		}
 	}
 
+
+    public string GetUniqueVariableName()
+    {
+        return chuckMainInstance.GetUniqueVariableName();
+    }
 
 }
