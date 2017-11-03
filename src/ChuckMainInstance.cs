@@ -1,32 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using System;
 
+
+
 [RequireComponent(typeof(AudioSource))]
-public class ChuckSubInstance : MonoBehaviour {
+public class ChuckMainInstance : MonoBehaviour {
+
+
 
 	// ================= PUBLIC FACING ================== //
 
 
 	// ----------------------------------------------------
-	// name: chuckMainInstance
-	// desc: ChuckSubInstance relies on a ChuckMainInstance
-	//       that it shares with all other ChuckSubInstances
-	//       relying on that ChuckMainInstance
+	// name: microphoneIdentifier
+	// desc: ChucK will search all your mic devices
+	//       for one containing this substring.
+	//       If left blank, will use the default device
 	// ----------------------------------------------------
-	[Tooltip( "The ChuckMainInstance this sub-instance relies on." )]
-	public ChuckMainInstance chuckMainInstance;
-
-
-
-
-	// ----------------------------------------------------
-	// name: spatialize
-	// desc: whether to spatialize this ChuckSubInstance
-	// ----------------------------------------------------
-	[Tooltip( "Whether to spatialize this ChuckSubInstance" )]
-	public bool spatialize = false;
+	[Tooltip( "A substring to search for in your microphone devices list." )]
+	public string microphoneIdentifier = "";
 
 
 
@@ -37,7 +32,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool RunCode( string code )
 	{
-		return chuckMainInstance.RunCode( code );
+		return Chuck.Manager.RunCode( myChuckId, code );
 	}
 
 
@@ -49,7 +44,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool SetInt( string variableName, System.Int64 value )
 	{
-		return chuckMainInstance.SetInt( variableName, value );
+		return Chuck.Manager.SetInt( myChuckId, variableName, value );
 	}
 
 
@@ -74,7 +69,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool GetInt( string variableName, Chuck.IntCallback callback )
 	{
-		return chuckMainInstance.GetInt( variableName, callback );
+		return Chuck.Manager.GetInt( myChuckId, variableName, callback );
 	}
 
 
@@ -86,7 +81,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool SetFloat( string variableName, double value )
 	{
-		return chuckMainInstance.SetFloat( variableName, value );
+		return Chuck.Manager.SetFloat( myChuckId, variableName, value );
 	}
 
 
@@ -111,7 +106,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool GetFloat( string variableName, Chuck.FloatCallback callback )
 	{
-		return chuckMainInstance.GetFloat( variableName, callback );
+		return Chuck.Manager.GetFloat( myChuckId, variableName, callback );
 	}
 
 
@@ -123,7 +118,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool SetString( string variableName, System.String value )
 	{
-		return chuckMainInstance.SetString( variableName, value );
+		return Chuck.Manager.SetString( myChuckId, variableName, value );
 	}
 
 
@@ -148,7 +143,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool GetString( string variableName, Chuck.StringCallback callback )
 	{
-		return chuckMainInstance.GetString( variableName, callback );
+		return Chuck.Manager.GetString( myChuckId, variableName, callback );
 	}
 
 
@@ -161,7 +156,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool SignalEvent( string variableName )
 	{
-		return chuckMainInstance.SignalEvent( variableName );
+		return Chuck.Manager.SignalEvent( myChuckId, variableName );
 	}
 
 
@@ -174,12 +169,12 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool BroadcastEvent( string variableName )
 	{
-		return chuckMainInstance.SignalEvent( variableName );
+		return Chuck.Manager.SignalEvent( myChuckId, variableName );
 	}
-
-
-
-
+	
+	
+	
+	
 	// ----------------------------------------------------
 	// name: CreateVoidCallback
 	// desc: create the callback necessary for waiting on
@@ -200,7 +195,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool ListenForChuckEventOnce( string variableName, Chuck.VoidCallback callback )
 	{
-		return chuckMainInstance.ListenForChuckEventOnce( variableName, callback );
+		return Chuck.Manager.ListenForChuckEventOnce( myChuckId, variableName, callback );
 	}
 
 
@@ -214,7 +209,7 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool StartListeningForChuckEvent( string variableName, Chuck.VoidCallback callback )
 	{
-		return chuckMainInstance.StartListeningForChuckEvent( variableName, callback );
+		return Chuck.Manager.StartListeningForChuckEvent( myChuckId, variableName, callback );
 	}
 
 
@@ -227,9 +222,8 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool StopListeningForChuckEvent( string variableName, Chuck.VoidCallback callback )
 	{
-		return chuckMainInstance.StopListeningForChuckEvent( variableName, callback );
+		return Chuck.Manager.StopListeningForChuckEvent( myChuckId, variableName, callback );
 	}
-
 
 
 
@@ -237,96 +231,89 @@ public class ChuckSubInstance : MonoBehaviour {
 
 	// =========== INTERNAL MECHANICS ========== //
 
-
-	private string myOutputUgen;
-
-	private bool running = false;
-	private int myNumChannels = 2;
-	private int myBufferLength;
-	private float[] myOutBuffer;
-	private float[] myMonoBuffer;
 	private AudioSource mySource;
-	private bool isMuted;
-	private bool prevSpatialize;
+	private AudioClip micClip;
+	private string myMicDevice;
 
-	private AudioClip spatialClip;
-
+	private System.UInt32 myChuckId = System.UInt32.MaxValue;
+	private int currentVar = 0;
 	private long numSamplesSeen = 0;
 
-	// Use this for initialization
-	void Awake() {
-		// unity getting stuff
+	private float[] myOutBuffer;
+	private int myNumChannels = 2;
+	private int myBufferLength;
+
+	private bool hasInit = false;
+
+
+	void Awake()
+	{
+		// create a chuck
+		myChuckId = Chuck.Manager.InitializeFilter();
+
+		// initialize my buffer
 		int numBuffers;
 		AudioSettings.GetDSPBufferSize( out myBufferLength, out numBuffers );
-
 		myOutBuffer = new float[myBufferLength * myNumChannels];
-		myMonoBuffer = new float[myBufferLength];
+
+		// setup mic
+		SetupMic();
+
+		// has init
+		hasInit = true;
+	}
+
+	public bool HasInit()
+	{	
+		return hasInit;
+	}
+
+	private void SetupMic()
+	{
+		// default device
+		myMicDevice = "";
+		// try to find one that matches identifier
+		if( microphoneIdentifier != "" )
+		{
+			foreach( string device in Microphone.devices )
+			{
+				if( device.Contains( microphoneIdentifier ) )
+				{
+					myMicDevice = device;
+				}
+			}
+		}
 
 		mySource = GetComponent<AudioSource>();
+
+		// make a clip that loops recording when it reaches the end, is 10 seconds long, and uses the project sample rate
+		micClip = Microphone.Start( myMicDevice, true, 10, AudioSettings.GetConfiguration().sampleRate );
+	
+		mySource.clip = micClip;
+		// also loop the audio source
 		mySource.loop = true;
-		mySource.playOnAwake = true;
-		// medium priority
-		mySource.priority = 128;
-
-		spatialClip = (AudioClip) Resources.Load("1");
-		mySource.clip = spatialClip;
+		// high priority!
+		mySource.priority = 0;
+		// wait for mic to start
+		while( !( Microphone.GetPosition( myMicDevice ) > 0 ) ) { };
+		// play audio source!
 		mySource.Play();
-
-		// opposite to have first UpdateSpatialize() take effect
-		prevSpatialize = !spatialize;
-		UpdateSpatialize();
-
-
-		// setup chuck
-		myOutputUgen = chuckMainInstance.GetUniqueVariableName( "dac" );
-		chuckMainInstance.RunCode( string.Format( @"
-			external Gain {0} => blackhole;
-			true => {0}.buffered;
-		", myOutputUgen ) );
-
-		running = true;
-
 	}
 
-	void Update()
+	public string GetUniqueVariableName()
 	{
-		isMuted = mySource.mute;
-		UpdateSpatialize();
+		currentVar++;
+		return "v" + currentVar.ToString();
 	}
 
-	void UpdateSpatialize()
+	public string GetUniqueVariableName( string prefix )
 	{
-		if( prevSpatialize == spatialize )
-		{
-			return;
-		}
-
-		if( spatialize )
-		{
-			mySource.spatialBlend = 1.0f;
-		}
-		else
-		{
-			mySource.spatialBlend = 0.0f;
-		}
-		prevSpatialize = spatialize;
+		currentVar++;
+		return prefix + currentVar.ToString();
 	}
 
-	public string GetSubDac()
+	void OnAudioFilterRead( float[] data, int channels )
 	{
-		return string.Format( "external Gain {0}", myOutputUgen );
-	}
-
-	// Update is called once per frame
-	void OnAudioFilterRead(float[] data, int channels)
-	{
-		if( !chuckMainInstance.HasInit() )
-		{
-			// my chuck is not ready. be silent.
-			Array.Clear( data, 0, data.Length );
-			return;
-		}
-
 		// check whether channels is correct
 		if( channels != myNumChannels )
 		{
@@ -335,31 +322,47 @@ public class ChuckSubInstance : MonoBehaviour {
 			myOutBuffer = new float[myBufferLength * myNumChannels];
 		}
 
-		// update num samples seen
-		int numFrames = data.Length / channels;
-		numSamplesSeen += numFrames;
-
-		if( !running || isMuted )
+		// advance the MasterInstance to the now we need
+		if( Chuck.Manager.ManualAudioCallback( myChuckId, data, myOutBuffer, Convert.ToUInt32( channels ) ) )
 		{
-			// I am not ready. be silent.
-			Array.Clear( data, 0, data.Length );
-			return;
+			numSamplesSeen += data.Length / channels;
+		}
+		else
+		{
+			// be silent when chuck fails
+			Array.Clear( myOutBuffer, 0, myOutBuffer.Length );
 		}
 
-		// get ugen output
-		chuckMainInstance.GetUGenSamples( myOutputUgen, myMonoBuffer, numFrames );
-
-		// always multiply output by input
-		// if spatializing, input is some lowered level
-		// if not spatializing, input is 1 and multiplication is a nop
-		for( int i = 0; i < numFrames; i++ )
-		{
-			for( int j = 0; j < channels; j++ )
-			{
-				data[i*channels + j] *= myMonoBuffer[i];
-			}
-		}
+		// copy output back to data, which is now output
+		Array.Copy( myOutBuffer, data, data.Length );
 	}
 
+	// unused for the moment
+	private bool Advance( long now, float[] input, float[] output, uint channels ) 
+	{
+		// check if we've already advanced far enough
+		if( now <= numSamplesSeen )
+		{
+			return true;
+		}
 
+		if( Chuck.Manager.ManualAudioCallback( myChuckId, input, output, channels ) )
+		{
+			numSamplesSeen += output.Length / channels;
+			return true;
+		}
+
+		// couldn't call audio callback
+		return false;
+	}
+
+	public bool GetUGenSamples( string variableName, float[] buffer, int numSamples )
+	{
+		return Chuck.Manager.GetUGenSamples( myChuckId, variableName, buffer, numSamples );
+	}
+
+	private void OnDestroy()
+	{
+		Chuck.Manager.CleanupFilter( myChuckId );
+	}
 }
