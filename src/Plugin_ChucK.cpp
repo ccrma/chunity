@@ -156,6 +156,23 @@ namespace ChucK_For_Unity
     }
     
     
+    UNITY_INTERFACE_EXPORT bool getExternalUGenSamples( unsigned int chuckID,
+        const char * name, SAMPLE * buffer, int numSamples )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        if( !chuck_instances[chuckID]->getExternalUGenSamples(
+            name, buffer, numSamples ) )
+        {
+            // failed. fill with zeroes.
+            memset( buffer, 0, sizeof( SAMPLE ) * numSamples );
+            return false;
+        }
+        
+        return true;
+    }
+    
+    
     
     UNITY_INTERFACE_EXPORT bool setChoutCallback( unsigned int chuckID, void (* callback)(const char *) )
     {

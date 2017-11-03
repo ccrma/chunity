@@ -354,6 +354,12 @@ public class Chuck
 		return stopListeningForChuckEvent( chuckId, variableName, callback );
 	}
 
+	public bool GetUGenSamples( System.UInt32 chuckID, System.String name,
+		float[] buffer, System.Int32 numSamples )
+	{
+		return getExternalUGenSamples( chuckID, name, buffer, numSamples );
+	}
+
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void MyLogCallback( System.String str );
@@ -393,6 +399,10 @@ public class Chuck
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool chuckManualAudioCallback( System.UInt32 chuckID, float[] inBuffer, float[] outBuffer,
 		System.UInt32 numFrames, System.UInt32 inChannels, System.UInt32 outChannels );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool getExternalUGenSamples( System.UInt32 chuckID, System.String name,
+		float[] buffer, System.Int32 numSamples );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool runChuckCode( System.UInt32 chuckID, System.String code );
