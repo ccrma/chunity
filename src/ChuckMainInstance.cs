@@ -361,6 +361,11 @@ public class ChuckMainInstance : MonoBehaviour {
 		return Chuck.Manager.GetUGenSamples( myChuckId, variableName, buffer, numSamples );
 	}
 
+	public bool RunCodeWithReplacementDac( string code, string replacementDac )
+	{
+		return Chuck.Manager.RunCodeWithReplacementDac( myChuckId, code, replacementDac );
+	}
+
 	private void OnDestroy()
 	{
 		Chuck.Manager.CleanupFilter( myChuckId );

@@ -206,6 +206,11 @@ public class ChuckInstance : MonoBehaviour {
 		running = shouldRun;
 	}
 
+	public bool RunCodeWithReplacementDac( string code, string replacementDac )
+	{
+		return Chuck.Manager.RunCodeWithReplacementDac( myChuckId, code, replacementDac );
+	}
+
     private void OnDestroy()
     {
         Chuck.Manager.CleanupFilter( myChuckId );

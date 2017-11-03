@@ -104,6 +104,11 @@ public class Chuck
 		return runChuckCode( chuckId, code );
 	}
 
+	public bool RunCodeWithReplacementDac( System.UInt32 chuckId, string code, string replacementDac )
+	{
+		return runChuckCodeWithReplacementDac( chuckId, code, replacementDac );
+	}
+
 	public bool SetInt( string chuckName, string variableName, System.Int64 value )
 	{
 		if( ids.ContainsKey( chuckName ) )
@@ -406,6 +411,9 @@ public class Chuck
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool runChuckCode( System.UInt32 chuckID, System.String code );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool runChuckCodeWithReplacementDac( System.UInt32 chuckID, System.String code, System.String replacement_dac );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setChuckInt( System.UInt32 chuckID, System.String name, System.Int64 val );

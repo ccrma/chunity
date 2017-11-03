@@ -37,7 +37,8 @@ public class ChuckSubInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	public bool RunCode( string code )
 	{
-		return chuckMainInstance.RunCode( code );
+		return chuckMainInstance.RunCodeWithReplacementDac(
+			code, myOutputUgen );
 	}
 
 
@@ -278,7 +279,9 @@ public class ChuckSubInstance : MonoBehaviour {
 
 
 		// setup chuck
-		myOutputUgen = chuckMainInstance.GetUniqueVariableName( "dac" );
+		myOutputUgen = chuckMainInstance.GetUniqueVariableName( "__dac__" );
+		// replacement dac is initted and constructed here!
+		// so it shouldn't have to be anywhere else.
 		chuckMainInstance.RunCode( string.Format( @"
 			external Gain {0} => blackhole;
 			true => {0}.buffered;
@@ -310,11 +313,6 @@ public class ChuckSubInstance : MonoBehaviour {
 			mySource.spatialBlend = 0.0f;
 		}
 		prevSpatialize = spatialize;
-	}
-
-	public string GetSubDac()
-	{
-		return string.Format( "external Gain {0}", myOutputUgen );
 	}
 
 	// Update is called once per frame
