@@ -468,6 +468,8 @@ public class Chuck
 	private System.UInt32 _nextValidID;
 	private Dictionary< string, System.UInt32 > ids;
 
+    private static AudioMixer chuckMixer;
+
 	private Chuck()
 	{
 		// Store the location of data files
@@ -497,6 +499,9 @@ public class Chuck
 		// Store pointers to callbacks inside ChucK's inner workings
 		setStdoutCallback( stdout_delegate );
 		setStderrCallback( stderr_delegate );
+
+        // Load up the ChuckMixer
+        chuckMixer = Resources.Load("ChuckMixer") as AudioMixer;
 	}
 
 	public void Quit()
@@ -524,4 +529,9 @@ public class Chuck
 	{
 		Debug.LogError( str );
 	}
+
+    public static AudioMixerGroup FindAudioMixerGroup( string name )
+    {
+        return chuckMixer.FindMatchingGroups( name )[0];
+    }
 }

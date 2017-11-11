@@ -234,7 +234,7 @@ public class ChuckSubInstance : MonoBehaviour {
 
 
 
-	// ----------------------------------------------------
+    // ----------------------------------------------------
 	// name: SetRunning
 	// desc: whether the SubInstance is outputting sound
 	// ----------------------------------------------------
@@ -268,6 +268,11 @@ public class ChuckSubInstance : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake() {
+        if( chuckMainInstance == null )
+        {
+            chuckMainInstance = TheMainChuck.Instance;
+        }
+
 		// unity getting stuff
 		int numBuffers;
 		AudioSettings.GetDSPBufferSize( out myBufferLength, out numBuffers );
@@ -275,7 +280,10 @@ public class ChuckSubInstance : MonoBehaviour {
 		myOutBuffer = new float[myBufferLength * myNumChannels];
 		myMonoBuffer = new float[myBufferLength];
 
-		mySource = GetComponent<AudioSource>();
+		// setup group for reliable ordering
+        mySource = GetComponent<AudioSource>();
+        mySource.outputAudioMixerGroup = Chuck.FindAudioMixerGroup( "ChuckSubInstanceDestination" );
+        // other settings
 		mySource.loop = true;
 		mySource.playOnAwake = true;
 		// medium priority

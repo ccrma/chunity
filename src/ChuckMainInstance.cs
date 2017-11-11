@@ -256,6 +256,10 @@ public class ChuckMainInstance : MonoBehaviour {
 		AudioSettings.GetDSPBufferSize( out myBufferLength, out numBuffers );
 		myOutBuffer = new float[myBufferLength * myNumChannels];
 
+        // setup group for reliable ordering
+        mySource = GetComponent<AudioSource>();
+        mySource.outputAudioMixerGroup = Chuck.FindAudioMixerGroup( "ChuckMainInstanceDestination" );
+
 		// setup mic
 		SetupMic();
 
@@ -283,8 +287,6 @@ public class ChuckMainInstance : MonoBehaviour {
 				}
 			}
 		}
-
-		mySource = GetComponent<AudioSource>();
 
 		// make a clip that loops recording when it reaches the end, is 10 seconds long, and uses the project sample rate
 		micClip = Microphone.Start( myMicDevice, true, 10, AudioSettings.GetConfiguration().sampleRate );
