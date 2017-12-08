@@ -254,7 +254,9 @@ namespace ChucK_For_Unity
             chuck->setParam( CHUCK_PARAM_WORKING_DIRECTORY, chuck_external_data_dir );
             // directories to search for chugins and auto-run ck files
             std::list< std::string > chugin_search;
-            chugin_search.push_back( chuck_external_data_dir );
+            chugin_search.push_back( chuck_external_data_dir + "/Chugins" );
+            chugin_search.push_back( chuck_external_data_dir + "/ChuGins" );
+            chugin_search.push_back( chuck_external_data_dir + "/chugins" );
             chuck->setParam( CHUCK_PARAM_USER_CHUGIN_DIRECTORIES, chugin_search );
             
             // initialize and start
