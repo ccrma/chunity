@@ -60,9 +60,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "1629"
-            endingLineNumber = "1629"
-            landmarkName = "Chuck_VM::should_call_external_ctor( std::string name, te_ExternalType type )"
-            landmarkType = "5">
+            endingLineNumber = "1629">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

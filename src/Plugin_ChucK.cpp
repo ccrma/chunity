@@ -385,7 +385,7 @@ namespace ChucK_For_Unity
     void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
     {
         // Things that need to be common to ALL ChucK instances will be unloaded here
-        ChucK::finalCleanup();
+        ChucK::globalCleanup();
     }
     
 
