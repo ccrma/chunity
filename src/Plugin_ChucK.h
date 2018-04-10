@@ -29,6 +29,16 @@ namespace ChucK_For_Unity {
     
     UNITY_INTERFACE_EXPORT bool getExternalUGenSamples( unsigned int chuckID, const char * name, SAMPLE * buffer, int numSamples );
     
+    // int array methods
+    UNITY_INTERFACE_EXPORT bool setExternalIntArray( unsigned int chuckID, const char * name, t_CKINT arrayValues[], uint numValues );
+    UNITY_INTERFACE_EXPORT bool getExternalIntArray( unsigned int chuckID, const char * name, void (* callback)(t_CKINT[], t_CKUINT));
+    UNITY_INTERFACE_EXPORT bool setExternalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, t_CKINT value );
+    UNITY_INTERFACE_EXPORT bool getExternalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(t_CKINT) );
+    UNITY_INTERFACE_EXPORT bool setExternalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, t_CKINT value );
+    UNITY_INTERFACE_EXPORT bool getExternalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(t_CKINT) );
+    // TODO: set entire dict, add to dict in batch; get entire dict
+    
+    
     UNITY_INTERFACE_EXPORT bool initChuckInstance( unsigned int chuckID, unsigned int sampleRate );
     UNITY_INTERFACE_EXPORT bool cleanupChuckInstance( unsigned int chuckID );
     UNITY_INTERFACE_EXPORT bool chuckManualAudioCallback( unsigned int chuckID, float * inBuffer, float * outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels );

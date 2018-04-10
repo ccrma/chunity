@@ -228,6 +228,90 @@ public class ChuckMainInstance : MonoBehaviour {
 
 
 
+	// ----------------------------------------------------
+	// name: CreateGetIntArrayCallback
+	// desc: create a callback for getting an int array
+	// ----------------------------------------------------
+	public Chuck.IntArrayCallback CreateGetIntArrayCallback( Action< long[], ulong > callbackFunction )
+	{
+		return Chuck.CreateGetIntArrayCallback( callbackFunction );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: SetIntArray
+	// desc: set the value of external int variableName[]
+	// ----------------------------------------------------
+	public bool SetIntArray( string variableName, long[] values )
+	{
+		return Chuck.Manager.SetIntArray( myChuckId, variableName, values );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: GetIntArray
+	// desc: get the value of external int variableName[]
+	// ----------------------------------------------------
+	public bool GetIntArray( string variableName, Chuck.IntArrayCallback callback )
+	{
+		return Chuck.Manager.GetIntArray( myChuckId, variableName, callback );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: SetIntArrayValue
+	// desc: set the value of external int variableName[index]
+	// ----------------------------------------------------
+	public bool SetIntArrayValue( string variableName, uint index, long value )
+	{
+		return Chuck.Manager.SetIntArrayValue( myChuckId, variableName, index, value );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: GetIntArrayValue
+	// desc: get the value of external int variableName[index]
+	// ----------------------------------------------------
+	public bool GetIntArrayValue( string variableName, uint index, Chuck.IntCallback callback )
+	{
+		return Chuck.Manager.GetIntArrayValue( myChuckId, variableName, index, callback );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: SetAssociativeIntArrayValue
+	// desc: set the value of external int variableName[key]
+	// ----------------------------------------------------
+	public bool SetAssociativeIntArrayValue( string variableName, string key, long value )
+	{
+		return Chuck.Manager.SetAssociativeIntArrayValue( myChuckId, variableName, key, value );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: GetAssociativeIntArrayValue
+	// desc: get the value of external int variableName[key]
+	// ----------------------------------------------------
+	public bool GetAssociativeIntArrayValue( string variableName, string key, Chuck.IntCallback callback )
+	{
+		return Chuck.Manager.GetAssociativeIntArrayValue( myChuckId, variableName, key, callback );
+	}
+
+
+
+
 
 	// =========== INTERNAL MECHANICS ========== //
 

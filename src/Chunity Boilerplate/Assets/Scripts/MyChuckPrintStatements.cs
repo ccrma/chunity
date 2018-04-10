@@ -9,7 +9,7 @@ public class MyChuckPrintStatements : MonoBehaviour {
 		GetComponent<ChuckSubInstance>().RunCode(@"
 			SinOsc foo => dac;
 			<<< ""Hello, I am a print statement and my script has connected foo to dac! "" >>>;
-			chout <= ""Hello, I am another kind of print statement. "" <= IO.newline();
+			chout <= ""Hello, I am another kind of print statement. "" <= "" with TWO PARTS! "" <= IO.newline();
 
 			while( true ) 
 			{

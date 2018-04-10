@@ -365,6 +365,119 @@ public class Chuck
 		return getExternalUGenSamples( chuckID, name, buffer, numSamples );
 	}
 
+	public static Chuck.IntArrayCallback CreateGetIntArrayCallback( Action< long[], ulong > callbackFunction )
+	{
+		return new IntArrayCallback( callbackFunction );
+	}
+
+	public bool SetIntArray( string chuckName, string variableName, long[] values )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return SetIntArray( ids[chuckName], variableName, values );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool SetIntArray( System.UInt32 chuckId, string variableName, long[] values )
+	{
+		return setExternalIntArray( chuckId, variableName, values, (uint) values.Length );
+	}
+
+	public bool GetIntArray( string chuckName, string variableName, Chuck.IntArrayCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return GetIntArray( ids[chuckName], variableName, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool GetIntArray( System.UInt32 chuckId, string variableName, Chuck.IntArrayCallback callback )
+	{
+		return getExternalIntArray( chuckId, variableName, callback );
+	}
+
+	public bool SetIntArrayValue( string chuckName, string variableName, uint index, long value )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return SetIntArrayValue( ids[chuckName], variableName, index, value );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool SetIntArrayValue( System.UInt32 chuckId, string variableName, uint index, long value )
+	{
+		return setExternalIntArrayValue( chuckId, variableName, index, value );
+	}
+
+	public bool GetIntArrayValue( string chuckName, string variableName, uint index, Chuck.IntCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return GetIntArrayValue( ids[chuckName], variableName, index, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool GetIntArrayValue( System.UInt32 chuckId, string variableName, uint index, Chuck.IntCallback callback )
+	{
+		return getExternalIntArrayValue( chuckId, variableName, index, callback );
+	}
+
+	public bool SetAssociativeIntArrayValue( string chuckName, string variableName, string key, long value )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return SetAssociativeIntArrayValue( ids[chuckName], variableName, key, value );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool SetAssociativeIntArrayValue( System.UInt32 chuckId, string variableName, string key, long value )
+	{
+		return setExternalAssociativeIntArrayValue( chuckId, variableName, key, value );
+	}
+
+	public bool GetAssociativeIntArrayValue( string chuckName, string variableName, string key, Chuck.IntCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return GetAssociativeIntArrayValue( ids[chuckName], variableName, key, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool GetAssociativeIntArrayValue( System.UInt32 chuckId, string variableName, string key, Chuck.IntCallback callback )
+	{
+		return getExternalAssociativeIntArrayValue( chuckId, variableName, key, callback );
+	}
+
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void MyLogCallback( System.String str );
@@ -380,6 +493,13 @@ public class Chuck
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void StringCallback( System.String str );
+
+	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+	public delegate void IntArrayCallback(
+		[MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 1)]
+		System.Int64[] values,
+		System.UInt64 numValues
+	);
 
 	private MyLogCallback chout_delegate;
 	private MyLogCallback cherr_delegate;
@@ -447,6 +567,24 @@ public class Chuck
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool stopListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setExternalIntArray( System.UInt32 chuckID, System.String name, long[] arrayValues, uint numValues );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool getExternalIntArray( System.UInt32 chuckID, System.String name, IntArrayCallback callback);
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setExternalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, long value );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool getExternalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, IntCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setExternalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, long value );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool getExternalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, IntCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setChoutCallback( System.UInt32 chuckID, MyLogCallback callback );

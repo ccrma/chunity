@@ -200,6 +200,74 @@ namespace ChucK_For_Unity
     
     
     
+    // int array methods
+    UNITY_INTERFACE_EXPORT bool setExternalIntArray( unsigned int chuckID,
+        const char * name, t_CKINT arrayValues[], uint numValues )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->setExternalIntArray(
+            name, arrayValues, numValues );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool getExternalIntArray( unsigned int chuckID,
+        const char * name, void (* callback)(t_CKINT[], t_CKUINT))
+    {
+       if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->getExternalIntArray(
+            name, callback );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool setExternalIntArrayValue( unsigned int chuckID,
+        const char * name, unsigned int index, t_CKINT value )
+    {
+       if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->setExternalIntArrayValue(
+            name, index, value );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool getExternalIntArrayValue( unsigned int chuckID,
+        const char * name, unsigned int index, void (* callback)(t_CKINT) )
+    {
+       if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->getExternalIntArrayValue(
+            name, index, callback );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool setExternalAssociativeIntArrayValue(
+        unsigned int chuckID, const char * name, char * key, t_CKINT value )
+    {
+       if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->setExternalAssociativeIntArrayValue(
+            name, key, value );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool getExternalAssociativeIntArrayValue(
+        unsigned int chuckID, const char * name, char * key,
+        void (* callback)(t_CKINT) )
+    {
+       if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->getExternalAssociativeIntArrayValue(
+            name, key, callback );
+    }
+    
+    
+    
     UNITY_INTERFACE_EXPORT bool setChoutCallback( unsigned int chuckID, void (* callback)(const char *) )
     {
         return chuck_instances[chuckID]->setChoutCallback( callback );

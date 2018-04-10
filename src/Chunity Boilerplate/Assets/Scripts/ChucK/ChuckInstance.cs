@@ -201,6 +201,41 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.StopListeningForChuckEvent( myChuckId, variableName, callback );
 	}
 
+	public Chuck.IntArrayCallback CreateGetIntArrayCallback( Action< long[], ulong > callbackFunction )
+	{
+		return Chuck.CreateGetIntArrayCallback( callbackFunction );
+	}
+
+	public bool SetIntArray( string variableName, long[] values )
+	{
+		return Chuck.Manager.SetIntArray( myChuckId, variableName, values );
+	}
+
+	public bool GetIntArray( string variableName, Chuck.IntArrayCallback callback )
+	{
+		return Chuck.Manager.GetIntArray( myChuckId, variableName, callback );
+	}
+
+	public bool SetIntArrayValue( string variableName, uint index, long value )
+	{
+		return Chuck.Manager.SetIntArrayValue( myChuckId, variableName, index, value );
+	}
+
+	public bool GetIntArrayValue( string variableName, uint index, Chuck.IntCallback callback )
+	{
+		return Chuck.Manager.GetIntArrayValue( myChuckId, variableName, index, callback );
+	}
+
+	public bool SetAssociativeIntArrayValue( string variableName, string key, long value )
+	{
+		return Chuck.Manager.SetAssociativeIntArrayValue( myChuckId, variableName, key, value );
+	}
+
+	public bool GetAssociativeIntArrayValue( string variableName, string key, Chuck.IntCallback callback )
+	{
+		return Chuck.Manager.GetAssociativeIntArrayValue( myChuckId, variableName, key, callback );
+	}
+
 	public void SetRunning( bool shouldRun )
 	{
 		running = shouldRun;
