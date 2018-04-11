@@ -1,0 +1,601 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0052)http://chuck.stanford.edu/doc/language/overview.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ChucK - [Unity: Tutorials]</title>
+<link rel="stylesheet" type="text/css" href="./css/style.css">
+
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<center>
+
+<!-- all in a big fat table-->
+
+<table id="page_layout" border="0" width="640">
+
+<!-- heading row-->
+
+<tbody><tr><td>
+<div id="chuck_header">
+<center>
+<h1>
+<strong>ChucK</strong> : Unity &gt; Tutorials
+</h1>
+
+<table border="0">
+<tbody><tr><td>
+  	<div id="chuck_revision">
+	version: 1.3.x.x (chimera)
+  	</div>
+  	
+</td></tr>
+</tbody></table>
+
+<hr width="20%">
+</center>
+</div>
+</td></tr>
+
+<!-- navigation bar -->
+
+<tr><td>
+<center>
+<div class="chuck_nav">
+
+	<table border="0"><tbody><tr><td>
+	<center>
+	<div class="chuck_nav_bar">	
+  (up): <a href="">up link</a> | (next): <a href="">next link</a> &gt; 
+	</div>
+	</center>  
+	</td></tr></tbody></table>
+
+</div>
+</center>
+</td></tr>
+
+<!-- lang specification section -->
+<tr><td>
+<div id="chuck_body">
+
+<div id="lang_topic_body">
+
+<h1><strong>Overview</strong></h1>
+
+<p>ChucK is a strongly-typed, <strong><em>strongly-timed</em></strong>, concurrent audio 
+and multimedia programming language.  It is compiled into virtual 
+instructions, which are immediately run in the ChucK Virtual Machine.  
+This guide documents how to use the language in the Unity game engine environment.
+</p>
+
+<!-- additional sub topic sections go here... -->
+
+<div class="lang_subtopic_body">
+<h2><strong>Tutorials</strong></h2>
+
+<ul>
+<li><a href="#setup">Setup</a></li>
+<li><a href="#unityvariables1">Responding to Unity Events / Using Unity Variables (1)</a></li>
+<li><a href="#spatialization">Spatialization</a></li>
+<li><a href="#audiofiles">Audio Files</a></li>
+<li><a href="#console">Printing to the Unity Console</a></li>
+<li><a href="#unityvariables2">Using Unity Variables (2): ChucK External Variables</a></li>
+<li><a href="#getexternal">Getting ChucK External Variables</a></li>
+<li><a href="#chugins">Chugins</a></li>
+</ul>
+
+<p>
+These tutorials start from a working Roll a Ball game (<a target="_blank" href="https://unity3d.com/learn/tutorials/projects/roll-ball-tutorial">&#10144;Official Unity Tutorial</a>).<br />
+You are encouraged to follow that tutorial first if you are unfamiliar with working in Unity.
+If you'd rather not go through the Roll a Ball tutorial, you can download <a href="./files/Roll-a-ball_without_audio.zip" download>the resulting project</a>.
+</p>
+
+<p>If you know your way around Unity, you'll probably do fine following the below tutorials
+to add ChucK to any existing Unity project.</p>
+
+<p>These tutorials were created with Unity version 5.6.0f3.</p>
+
+
+</div>
+
+<div id="setup" class="lang_subtopic_body">
+<h2><strong>Setup</strong></h2>
+<ol>
+<li>
+<p>First, you'll need to add the <a href="./files/chunity.zip" download>necessary files</a> into the project. 
+    Unzip this file and copy its files to your project hierarchy, mimicking the folder structure.
+    Make sure to use the same spelling for the folders <span class="mono2">Plugins</span>, <span class="mono2">Resources</span>, 
+    and <span class="mono2">StreamingAssets</span>, since these are folders that Unity treats specially because of their names.
+</p>
+<img class="tutorialimg" src="./images/tutorial1/1.png" width=300 />
+
+<p>Next, restart Unity so that the plugins are loaded correctly.</p>
+<img class="tutorialimg" src="./images/tutorial1/restart.png" width=500 />
+
+
+<p>Now, you've finished adding the necessary files to use ChucK in your project! <br /><br /><br /></p>
+</li>
+
+<li>
+<p>Next, we'll add an instance of ChucK to our scene. This tutorial will cover how to add ChucK to an individual
+   game object. To use ChucK as a plugin in an Audio Mixer, see the <a href="./with-plugins">Plugin Tutorials</a>.</p>
+
+<p>Pick the game object you want to add ChucK to. In this case, I will add it to my <span class="mono2">Player</span> object.</p>
+<p>Add a <span class="mono2">Chuck Instance</span> script to this game object.</p>
+<img class="tutorialimg" src="./images/tutorial1/2.png" width=400 />
+
+<p>By adding this script, an <span class="mono2">Audio Source</span> will also be added to your game object.
+   This Audio Source is used by ChucK to function correctly. (If you want to play audio files in ChucK, you
+   should not use this Audio Source but should instead follow the directions in the <a href="#audiofiles">Audio Files</a> tutorial.)</p>
+<img class="tutorialimg" src="./images/tutorial1/3.png" width=400 />
+<p>If you are using ChucK spatially, you can edit the 3D Sound options of this Audio Source. Since we are not using this 
+   ChucK spatially, we can leave all the settings alone. Now we are done adding a ChucK Instance to our scene!</p>
+</li>
+
+<li>
+<p>Next, let's access this ChucK plugin through a Unity C# script.</p>
+
+<p>Since I am adding ChucK to my Roll a Ball project (<a target="_blank" href="https://unity3d.com/learn/tutorials/projects/roll-ball-tutorial">&#10144;Official Unity Tutorial</a>),
+   I'll add ChucK to my PlayerController script. This script operates on the same object I added the ChucK Instance to.</p>
+<img class="tutorialimg" src="./images/tutorial1/4.png" width=300 />
+
+
+<p>Now, let's write our first ChucK script in Unity!</p>
+<p>Here's a new ChucK script. It's sent to the ChucK plugin using <br />
+   <span class="mono2">GetComponent&lt;ChuckInstance&gt;().RunCode</span>, where the argument
+   is a string with ChucK code that will be compiled and run on the fly.</p>
+<p>This particular ChucK script connects a sine wave to the output,
+   then sets its frequency randomly between 300 Hz and 1000 Hz every 100 ms, forever.</p>
+<p>(Note: <span class="mono2">@""</span> denotes a multi-line string.)</p>
+<img class="tutorialimg" src="./images/tutorial1/5.png" width=500 />
+
+<p>Let's test it! Enter play mode.</p>
+<img class="tutorialimg" src="./images/tutorial1/6.png" width=600 />
+
+<p>And you can hear audio! (Check the ChuckInstance script to see the audio levels for the instance while the game is in Play Mode.)</p>
+
+
+<p><strong>Congratulations!</strong> You now have ChucK working inside of a Unity project!!</p>
+
+</li>
+</ol>
+</div>
+
+
+
+<div id="unityvariables1" class="lang_subtopic_body">
+<h2><strong>Responding to Unity Events / Using Unity Variables (1)</strong></h2>
+
+<p>In the previous tutorial, we set up ChucK in a Unity project and 
+   wrote a script that plays a sine wave with a randomly-changing frequency
+   forever. Let's change that script into something a bit more appropriate
+   for our Roll a Ball game.</p>
+<p>First, delete the original call to <span class="mono2">ChuckInstance.RunCode()</span>
+   so that our original ChucK script doesn't play anymore.</p>
+<p>Now, I want to write a script that plays every time our Player object
+   picks up a Pick Up object. This will go in the <span class="mono2">OnTriggerEnter</span>
+   function, where we detect collisions with trigger objects.</p>
+<img class="tutorialimg" src="./images/tutorial2/1.png" width=450 />
+
+<p>Here, I've added a new ChucK script in that function. It runs directly after
+   we increment the count of how many pickup objects have been picked up so far.
+   It's very similar to the first script, but only plays 5 different frequencies
+   instead of running forever. ( <span class="mono2">repeat( 5 )</span> instead
+   of <span class="mono2">while( true )</span> ).</p>
+<img class="tutorialimg" src="./images/tutorial2/2.png" width=500 />
+
+<p>This is a good start, but it's not very interesting. How about we make it repeat
+   a number of times according to the current <span class="mono2">count</span>?</p>
+<p>To do this, we can use the <span class="mono2">string.Format()</span> function.
+   This function takes a string with format substrings that look like <span class="mono2">{0}</span>,
+   <span class="mono2">{1:0.00}</span>, <span class="mono2">{2}</span>, etc.
+   and takes arguments to fill all the numbered slots.</p>
+<p>Because arguments to <span class="mono2">string.Format()</span> are
+   specified with <span class="mono2">{</span> and <span class="mono2">}</span>, 
+   we have to write <span class="mono2">{{</span> if we mean <span class="mono2">{</span>
+   and <span class="mono2">}}</span> if we mean <span class="mono2">}</span>.</p>
+<p>So, to translate the above script into one that repeats <span class="mono2">count</span>
+   times instead of <span class="mono2">5</span> times, I replace the 
+   <span class="mono2">5</span> with a <span class="mono2">{0}</span>,
+   replace all <span class="mono2">{</span> and <span class="mono2">}</span> with
+   <span class="mono2">{{</span> and <span class="mono2">}}</span>, then wrap the
+   code string in a call to <span class="mono2">string.Format()</span> and include
+   <span class="mono2">count</span> as the second argument.</p>
+<img class="tutorialimg" src="./images/tutorial2/3.png" width=600 />
+
+<p>It's that simple to write and launch ChucK code that responds to a Unity event
+   and uses values from current Unity variables!</p>
+
+</div>
+
+<div id="spatialization" class="lang_subtopic_body">
+<h2><strong>Spatialization</strong></h2>
+
+<p>Spatialization is the technique of processing a stream of audio so that it
+   is perceived to be originating from a particular place in the environment.</p>
+<p>Here, I will demonstrate how to achieve a simple form of spatialization in
+   Unity to spatialize sounds generated from a ChucK plugin.</p>
+<p>This technique will set the overall volume according to the distance from
+   the audio listener to the source of audio, and will set the relative volume
+   of the left and right channels according to the direction between the audio
+   listener and the source of audio, but will not use HRTFs or change the spectral
+   content of the source of audio in any way.</p>
+<p>(There is another script to use if you'd like to use your own Spatializer Audio Plugin.
+   More on that to come later.)</p>
+
+<ol>
+<li>
+<p>First, we will set up a new ChucK plugin. Let's select a Unity object that we will be spatializing.</p>
+
+<p>I'd like for one of my Pick Up objects to create spatialized sound, so I'll select
+   one of these objects from the Hierarchy pane.</p>
+<img class="tutorialimg" src="./images/tutorial3/1.png" width=800 />
+
+<p>Add a ChucK instance to this object.</p>
+<img class="tutorialimg" src="./images/tutorial3/2.png" width=800 />
+
+<p>And select the <span class="mono2">spatialize</span> option!</p>
+<img class="tutorialimg" src="./images/tutorial3/3.png" width=400 />
+
+<p>Note that an <span class="mono2">AudioSource</span> has been added as a result of
+   adding the ChucK Instance script. ChucK uses this AudioSource to capture spatialization
+   data. ChucK will use the AudioClip, Play On Awake, Loop, and Spatial Blend fiels, setting
+   them automatically whenever the scene is run. (If you'd like to play an audio file, use
+   <a href="#audiofiles">audio files in ChucK</a> instead.)</p>
+<p>You can use the 3D sound settings to adjust how your ChucK script is spatialized.</p>
+<img class="tutorialimg" src="./images/tutorial3/4.png" width=400 />
+
+<p>In particular, I am going to change my maximum distance to be 40, since my scene is rather small.</p>
+<img class="tutorialimg" src="./images/tutorial3/5.png" width=400 />
+<p>Now, the ChucK instance is all set up for spatial audio!<br /><br/></p>
+</li>
+
+<li>
+<p>Now, let's write a script to use the new spatialized ChucK instance.</p>
+<p>I'll add a new script called <span class="mono2">PickupAudio</span> to my
+   pickup object -- the same object that has the <span class="mono2">ChuckInstance</span>
+   component from the last step.</p>
+<img class="tutorialimg" src="./images/tutorial3/6.png" width=800 />
+
+<p>(Don't forget to move your new script to the <span class="mono2">Scripts</span> folder!)</p>
+<img class="tutorialimg" src="./images/tutorial3/7.png" width=300 />
+
+<p>We write ChucK code for a spatialized ChucK instance in exactly the same way as for a 
+   non-spatialized ChucK instance!</p>
+<img class="tutorialimg" src="./images/tutorial3/8.png" width=600 />
+
+</li>
+
+<li>
+<p>Let's test our new script to see if it's working!</p>
+<p>When my Audio Listener has an the Audio Source on its right, then the spatialized audio output is louder
+   in the left channel than the right.</p>
+<img class="tutorialimg" src="./images/tutorial3/9.png" width=600 />
+
+<p>And, when my Audio Listener is on the left side of an Audio Source, the spatialized audio
+   is louder on the right channel than the left! The reason that the audio is so quiet in both cases is
+   that the Audio Listener is on our scene's Camera, so in both cases the Audio Listener is actually pretty
+   far away from the Audio Source.</p>
+<img class="tutorialimg" src="./images/tutorial3/10.png" width=600 />
+<p>Congratulations! You've just set up your first spatial audio script in Unity using ChucK!<br /><br /><br /></p>
+</li>
+
+<li>
+<p>(Addendum) In the spirit of designing audio and visuals in tandem, I'd like to make
+   the spatialized Pick Up stand out from the rest of the Pick Ups.
+   This way, there will be a visual cue that corresponds to the spatial sound cues.</p>
+<p>I'll start by making the spatialized Pick Up a different color.</p>
+<p>Highlight the Pick Up material in the Project pane.
+   This material is what gives the Pick Ups their yellow color.</p>
+<img class="tutorialimg" src="./images/tutorial3/11.png" width=300 />
+
+<p>Duplicate it using CTRL-D (Windows) or CMD-D (OS X).</p>
+<img class="tutorialimg" src="./images/tutorial3/12.png" width=300 />
+
+<p>Give the duplicated material a new name. I'll call mine Spatial Pick Up.</p>
+<img class="tutorialimg" src="./images/tutorial3/13.png" width=250 />
+
+<p>Next, I'll change the color of my new material by editing the Albedo property.</p>
+<img class="tutorialimg" src="./images/tutorial3/14.png" width=400 />
+
+<p>There! Now, any object using the Spatial Pick Up material will be colored green.</p>
+<img class="tutorialimg" src="./images/tutorial3/15.png" width=400 />
+
+<p>Apply the new material to the Pick Up we added spatialization to by dragging
+   the material from the Project pane onto the Pick Up in the Hierarchy pane.</p>
+<img class="tutorialimg" src="./images/tutorial3/16.png" width=250 />
+
+<p>Now, the Pick Up looks different! But, I still don't think that its visual
+   appearance corresponds very well with the sound of a triangle wave oscillator
+   with a rapidly-changing frequency...</p>
+<img class="tutorialimg" src="./images/tutorial3/17.png" width=700 />
+
+<p>Let's change this by adding a rapid movement to the spatial Pick Up!</p>
+<p>We'll do this by modifying the existing <span class="mono2">Rotator</span>
+   class, which is responsible for rotating all the Pick Ups.</p>
+<p>Since we want to create a behavior that is turned on only for some
+   Pick Ups, we'll add a new public boolean that controls whether the behavior
+   is turned on or off.</p>
+<img class="tutorialimg" src="./images/tutorial3/18.png" width=500 />
+
+<p>Next, we'll add a new <span class="mono2">Vector3</span> local variable to 
+   the <span class="mono2">Update()</span> function. If the <span class="mono2">rotateRandomly</span>
+   behavior is enabled, then the <span class="mono2">rotateAmount</span> vector is
+   set to have three random values, each selected uniformly from the range 
+   <span class="mono2">[100, 800)</span>.
+   If <span class="mono2">rotateRandomly</span> is not enabled, then the 
+   <span class="mono2">rotateAmount</span> will be the same as it was before we
+   started modifying this script.
+   Finally, we'll modify the call to <span class="mono2">transform.Rotate</span>
+   to take our new <span class="mono2">rotateAmount</span> variable.</p>
+<img class="tutorialimg" src="./images/tutorial3/19.png" width=400 />
+
+<p>The last thing to do is to set the new Rotate Randomly boolean to be checked on
+   for the Pick Up we spatialized earlier.</p>
+<img class="tutorialimg" src="./images/tutorial3/20.png" width=500 />
+
+<p>When you've done that, it will look like this for the spatial Pick Up, but will
+   remain unchecked for the rest of the Pick Ups.</p>
+<img class="tutorialimg" src="./images/tutorial3/21.png" width=400 />
+
+<p>Now, the spatial Pick Up looks really visually distinct, and its movement aligns
+   well with the audio it is emitting!</p>
+<img class="tutorialimg" src="./images/tutorial3/22.png" width=700 />
+<p>Congratulations! You've finished integrating spatial audio into a ChucK project! </p>
+</li>
+</ol>
+</div>
+
+<div id="audiofiles" class="lang_subtopic_body">
+<h2><strong>Audio Files</strong></h2>
+<p>This tutorial will walk through writing a ChucK script that plays an audio
+   file. The script will play an audio file whenever the Player game object collides
+   with another game object. The audio file's amplitude and speed of playback will 
+   depend on a Unity variable, added to the script with string formatting. </p>
+<p>For any file to be copied directly to the file system for your code to access
+   during runtime, it must be located inside of a special folder called <span class="mono2">StreamingAssets</span>.
+   Create this folder in your Project pane and put an audio file you'd like to
+   use inside it. My audio file is called <span class="mono2">impact.wav</span>.</p>
+<img class="tutorialimg" src="./images/tutorial4/1.png" width=300 />
+
+<p>Since I'd like to play this file when the Player collides with another game object,
+   I'll add an <span class="mono2">OnCollisionEnter()</span> method to my Player class.</p>
+<img class="tutorialimg" src="./images/tutorial4/2.png" width=400 />
+
+<p>To determine what range of possible values the collision's velocity magnitude 
+   can take on, I'll use Unity's Debug Log to print out the value, enter play
+   mode, and cause collisions with the game walls at a variety of velocities.</p>
+<img class="tutorialimg" src="./images/tutorial4/3.png" width=500 />
+
+<p>Based on this experiment, it looks like the relevant range of my <span class="mono2">intensity</span>
+   variable will be roughly <span class="mono2">[0, 16]</span>.</p>
+<img class="tutorialimg" src="./images/tutorial4/4.png" width=600 />
+
+<p>I'll scale the intensity down to roughly <span class="mono2">[0, 1]</span> by dividing it by 
+   <span class="mono2">16</span>, then clamp it to exactly <span class="mono2">[0, 1]</span>.
+   Finally, I'll square this value so that the sound changes quadratically with an increase in velocity,
+   rather than linearly. This will help especially fast collisions to stand out more.</p>
+<img class="tutorialimg" src="./images/tutorial4/5.png" width=650 />
+
+<p>Finally, I'll add my ChucK code. The intensity parameter is inserted just as in the
+   <a href="#unityvariables1">Using Unity Variables(1)</a> tutorial. Note that when
+   writing multi-line strings, any single quotes <span class="mono2">"</span> must be
+   specified by writing <span class="mono2">""</span>.</p>
+<p>The sound file itself is accessed via its filename. Note that in Unity, the
+   <span class="mono2">me.dir()</span> ChucK expression refers automatically to the 
+   <span class="mono2">StreamingAssets</span> folder for code that is run using 
+   <span class="mono2">ChuckInstance.RunCode()</span>.</p>
+<img class="tutorialimg" src="./images/tutorial4/6.png" width=675 />
+<p>It's that simple to write ChucK scripts that use audio files in Unity! Just add your
+   audio files to the <span class="mono2">StreamingAssets</span> folder and access their
+   filenames in ChucK using <span class="mono2">me.dir()</span>.</p>
+</div>
+
+<div id="console" class="lang_subtopic_body">
+<h2><strong>Printing to the Unity Console</strong></h2>
+<p>It's easy to write print statements in ChucK that you can see in Unity.
+   Any print statements written using <span class="mono2">chout</span>, 
+   <span class="mono2">cherr</span>, or the "gack" triple-angle-brackets 
+   (&nbsp;<span class="mono2"><<< "hello, world" >>>;</span>&nbsp;) will
+   automatically appear in the Unity console.</p>
+<p>For example, this ChucK script computes a value with a random error added to it,
+   then prints the resulting value to the console.</p>
+<img class="tutorialimg" src="./images/tutorial5/1.png" width=750 />
+<p></p>
+<img class="tutorialimg" src="./images/tutorial5/2.png" width=400 />
+
+</div>
+
+<div id="unityvariables2" class="lang_subtopic_body">
+<h2><strong>Using Unity Variables (2): ChucK External Variables</strong></h2>
+<p>This tutorial documents ChucK external variables. Using this type of variable 
+   allows you to set and get the values of ChucK variables after a ChucK script
+   is already running. Currently, it can be applied to ints and floats. It can
+   also be applied to Events, for which the relevant actions are signaling and
+   broadcasting the event.</p>
+<p>This tutorial will also go over writing a function in ChucK and running that
+   function in a new shred (the word for threads in ChucK).</p>
+<p>Let's start with the ChucK script that we wrote in the <a href="#audiofiles">Audio Files</a>
+   tutorial. This ChucK script plays an audio file and exits immediately afterward. The script
+   is compiled and run every time the Player object has a collision.</p>
+
+<img class="tutorialimg" src="./images/tutorial6/1.png" width=700 />
+
+<p>In this tutorial, I will translate this script into one that is compiled and run once when
+   the scene is opened. The new version of the script will trigger the audio file as a result
+   of communication with Unity using ChucK external variables.</p>
+
+<p>The first thing to do is move the script from <span class="mono2">OnCollisionEnter()</span>
+   to <span class="mono2">Start()</span>.</p>
+<img class="tutorialimg" src="./images/tutorial6/2.png" width=700 />
+
+<p>Next, remove the call to <span class="mono2">string.Format</span> and replace all
+   of the format locations in the string with a new variable, <span class="mono2">intensity</span>.
+   Wrap the entire script into a function called <span class="mono2">playImpact(&nbsp;float&nbsp;intensity&nbsp;)</span>.</p>
+<img class="tutorialimg" src="./images/tutorial6/3.png" width=700 />
+
+<p>Now, let's add the external variables we will use to signal when this function should be called.
+   We will set the value of an <span class="mono2">external float</span> from Unity, and then we
+   will signal an <span class="mono2">external Event</span> from Unity to tell the ChucK script
+   that it should play an impact using the value stored in the external float.</p>
+<p>These variables are specified just like regular variables, but with the <span class="mono2">external</span>
+   keyword. Note that only global variables can be <span class="mono2">external</span>, and currently the
+   only variable types supported are int, float, and Event.</p>
+<img class="tutorialimg" src="./images/tutorial6/4.png" width=700 />
+
+<p>Let's write the code that uses these variables. To wait for an Event to fire,
+   we simply chuck the event to <span class="mono2">now</span>. To call the <span class="mono2">playImpact</span>
+   function we just defined, but in a new shred, we <span class="mono2">spork&nbsp;~</span> the function
+   call.</p>
+<p>So, forever (&nbsp;<span class="mono2">while(&nbsp;true&nbsp;)</span>&nbsp;), we will wait for an 
+   <span class="mono2">impactHappened</span> event, and then call <span class="mono2">playImpact</span>
+   with the value stored in <span class="mono2">impactIntensity</span>.</p>
+<img class="tutorialimg" src="./images/tutorial6/5.png" width=700 />
+
+<p>Finally, in the <span class="mono2">OnCollisionEnter</span> function, after we compute 
+   the collision's intensity, we first set the value of the float <span class="mono2">impactIntensity</span>
+   and then broadcast the event <span class="mono2">impactHappened</span>. These functions take the string
+   name of the ChucK plugin as the first argument and the name of the external variable as the second argument,
+   since each ChucK plugin has its own namespace of external variables.</p>
+<img class="tutorialimg" src="./images/tutorial6/6.png" width=700 />
+<p>Congratulations! You've written a script using external variables. This practice allows you to write
+   slightly more efficient code, since you won't need to send a new script to the ChucK compiler every time you want
+   to generate sound.</p>
+</div>
+
+<div id="getexternal" class="lang_subtopic_body">
+<h2><strong>Getting ChucK External Variables</strong></h2>
+<p>Now let's look at how to get back out the values of external variables! 
+   You might want to do this if you want to do some analysis of your audio in ChucK and use the results in Unity.</p>
+<p>Let's start by adding a new script onto the same game object where our ChuckInstance is. I'll call my script
+   <span class="mono2">AudioAnalyzer</span> because it will be analyzing all the audio that comes out of the 
+   <span class="mono2">dac</span> on this ChuckInstance.</p>
+
+<img class="tutorialimg" src="./images/tutorial8/1.png" width=500 />
+
+<p>In this new Unity class, I add a variable to store a float from ChucK. This is <span class="mono2">
+   double mostRecentDacLoudness</span>. (Note that ChucK <span class="mono2">float</span>s correspond to Unity 
+   <span class="mono2">double</span>s, and ChucK <span class="mono2">int</span>s correspond to Unity
+   <span class="mono2">long</span>s.)</p>
+<p>Next, I write a ChucK script. In it, I have a ChucK external variable <span class="mono2">dacLoudness</span>, and every time
+   I compute the loudness of the <span class="mono2">dac</span> using an RMS Unit Analyzer ("UAna"),
+   I store the result in <span class="mono2">dacLoudness</span>.</p>
+<p>Then, in the Unity <span class="mono2">Update()</span> function, I call <span class="mono2">GetFloat</span> with the name
+   of the float I'd like to get and a function that will be called for the ChuckInstance to send back the value of the float. 
+   The name of the function is <span class="mono2">GetDacLoudnessCallback</span>.</p>
+<p>In that function, I store the value of the double (remember, a ChucK float is a Unity double) into a class
+   member variable to use later. Note that you cannot use many Unity-provided functions within such a callback,
+   so if you want to do something other than a <span class="mono2">Debug.Log</span>, you will need to store
+   the value in this way and use it somewhere else, such as in <span class="mono2">Update()</span> or
+   <span class="mono2">FixedUpdate()</span>.</p>
+<img class="tutorialimg" src="./images/tutorial8/2.png" width=700 />
+
+<p>This script might work most of the time, but it is incomplete.</p>
+<p>When you send a callback function to a ChuckInstance, your app can crash if Unity (really, C#)
+   garbage collects the callback function before ChucK has a chance to call it. The way to prevent this is to store
+   the callback function.</p>
+<p>If you call <span class="mono2">ChuckInstance.GetFloat</span> only occasionally, then it will internally store
+   the callback for you. However, if you call it frequently for the same variable and there is a chance
+   that you will call it again before you receive the result for the previous call, then you will need
+   to store the resulting callback object yourself.</p>
+<p>You do this by storing the return value of <span class="mono2">ChuckInstance.GetFloat</span> into a
+   variable with type <span class="mono2">Chuck.FloatCallback</span>.</p>
+<p>Here, I will only call <span class="mono2">ChuckInstance.GetFloat</span> if I know that my previous call
+   has executed fully. I accomplish this by storing the callback into a variable <span class="mono2">myFloatCallback</span>,
+   and setting that value to <span class="mono2">null</span> inside my callback function itself. This way,
+   I will not call <span class="mono2">GetFloat()</span> again from <span class="mono2">Update()</span> until
+   <span class="mono2">GetDacLoudnessCallback()</span> has finished executing, and
+   I know for certain that I will only have one getter callback at once for my external variable and that
+   I will always have the callback stored properly.</p>
+<p>(If you want to devise a more complex way of storing every <span class="mono2">Chuck.FloatCallback</span> and
+   <span class="mono2">Chuck.IntCallback</span>, then you don't have to restrict yourself to only having one
+   get request per variable name at any given time. I find that in practice, asking ChucK for an updated value
+   only after I receive the value of the previous request works quickly enough for me.)</p>
+<img class="tutorialimg" src="./images/tutorial8/3.png" width=800 />
+<p>Congratulations! You've written a script to get the value of a ChucK external variable! Now you can communicate
+   the results of ChucK computation back to Unity!</p>
+</div>
+
+<div id="chugins" class="lang_subtopic_body">
+<h2><strong>Chugins</strong></h2>
+<p>It's possible to write additions to ChucK in C++ and compile these additions
+   as dynamically linked libraries (known as <a target="_blank" href="http://chuck.stanford.edu/extend/#chugins">ChuGins</a>).
+   If you're interested in writing your own ChuGin, check out the 
+   <a target="_blank" href="https://github.com/ccrma/chugins">GitHub</a>
+   repository for more information.</p>
+<p>In Unity, any ChuGin that is added to the <span class="mono2">StreamingAssets</span>
+   folder is automatically usable in any ChucK script.
+   (StreamingAssets is the same folder that is used to store your <a href="#audiofiles">audio files</a>.)</p>
+<p>ChuGins often take the form of new UGens (unit generators), the core objects that
+   process all audio in ChucK.</p>
+<p>For example, if I add the <span class="mono2">Bitcrusher.chug</span> ChuGin to
+   my StreamingAssets folder...</p>
+<img class="tutorialimg" src="./images/tutorial7/1.png" width=300 />
+
+<p>... then, I can write ChucK scripts using the Bitcrusher UGen!</p>
+<p>Here, I've modified the <a href="#audiofiles">Audio File</a> impact script
+   to process my audio file through a Bitcrusher. To do this, I just added
+   the Bitcrusher to the signal flow, set its settings, and allowed some extra
+   time at the end of the audio file to wait for the Bitcrusher's tail of audio
+   to finish playing.</p>
+<img class="tutorialimg" src="./images/tutorial7/2.png" width=650 />
+
+<p>ChuGins have been used to extend ChucK in pretty fantastic ways. For example,
+   you can write <a target="_blank" href="http://faust.grame.fr/">Faust</a> signal processing code 
+   in ChucK using the Faust ChuGin!</p>
+<p>Just add the Faust.chug Chugin to your StreamingAssets folder...</p>
+<img class="tutorialimg" src="./images/tutorial7/3.png" width=300 />
+
+<p>... and then, you can write Faust code inside your ChucK code inside your Unity code!</p>
+<img class="tutorialimg" src="./images/tutorial7/4.png" width=500 />
+<p>Wow! That's Fausttastic!</p>
+<p>Thanks for following these tutorials. Good luck ChucKing in Unity!</p>
+</div>
+
+
+
+
+<!-- end subtopics -->
+
+</div>
+</div>
+</td></tr>
+
+<!-- navigation bar -->
+
+<tr><td>
+<center>
+<div class="chuck_nav">
+
+	<table border="0"><tbody><tr><td>
+	<center>
+	<div class="chuck_nav_bar">	
+  (up): <a href="">up link</a> | (next): <a href="">next link</a> &gt; 
+	</div>
+	</center>  
+	</td></tr></tbody></table>
+
+</div>
+</center>
+</td></tr>
+
+<!-- chuck-footer -->
+
+<tr><td>
+<div id="chuck_footer">
+<center>
+<hr width="15%">
+<a href="http://chuck.stanford.edu/">chuck</a> |
+<a href="http://soundlab.cs.princeton.edu/">soundlab</a> |
+<a href="http://www.cs.princeton.edu/">cs</a> |
+<a href="http://www.music.princeton.edu/">music</a> |
+<a href="http://ccrma.stanford.edu/">ccrma</a>
+
+</center>
+</div>
+</td></tr>
+</tbody></table>
+
+</center>
+
+
+</body></html>

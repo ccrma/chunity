@@ -1,0 +1,134 @@
+body, div, p, th, td, li, dd { 
+	font-size: 10pt;
+}
+
+body { 
+	background : #ffffff url(../images/chuckula.jpg) top center no-repeat;
+	color: #000000; 
+	font-family: verdana, helvetica, sans-serif;
+}
+
+
+a { 
+}
+
+a:link { 
+	color: #2222ff;
+}
+
+a:active { 
+	color: #000088;
+}
+
+a:visited { 
+	color: #5050cc;
+}
+
+h1 { 
+	font-size: 135%; 
+	font-weight: 200; 
+}
+
+h2 { 
+	font-size: 125%; 
+	font-weight: 300;
+}
+
+#chuck_header { 
+
+}
+
+#chuck_revision { 
+	border: 2px solid #d9d9d9;
+	background: #fdfdfd;
+	font-size: 80%;
+	padding: 4px;
+}	
+
+#chuck_body { 
+	margin-top: 40px;
+}
+
+#lang_topic_body { 
+}
+
+#lang_topic_body p { 
+	text-align: justify; 
+}
+
+.lang_code_ref { 
+	font-weight : 700;
+	text-indent: 2em;
+	margin-top: 2em;
+	margin-bottom: 1em;
+	background: #fff0dd;
+	padding: 0.5em;
+	border: 1px solid #b0b0b0;
+}
+
+.lang_subtopic_body { 
+	text-align:justify; 
+	margin-top: 4em;
+	margin-bottom: 2em;
+}
+
+.lang_subtopic_body p { 
+}
+
+pre { 
+	border: 1px solid #d9d9d9; 
+	margin-left: 3em;
+	font-size: 9pt;
+	padding: 0.2em;
+	margin-right: 4em;
+}
+.chuck_nav { 
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.chuck_nav_bar { 
+	font-size: 90%; 
+	padding: 4px;
+	border: 1px solid #d9d9d9;
+	background: #fdfdfd;
+
+}
+#chuck_footer { 
+	font-size: 85%; 
+}
+
+.mono { 
+	font-family : courier, monospaced;
+}
+
+.mono2 { 
+	font-family : courier new, monospaced;
+}
+
+#topic_body { 
+}
+
+.topic_main { 
+	margin-top: 2em;
+	font-weight: 900;
+}
+
+.topic_sub { 
+	text-align: left; 
+	font-weight: 400;
+	text-indent: 1em;
+	border-bottom: 2px dotted #b9b9b9;
+	margin: 0.33em;
+}
+
+.topic_file_list { 
+	padding: 0.2em;
+	margin-bottom: 0.33em;
+}
+
+.tutorialimg {
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+}
+
