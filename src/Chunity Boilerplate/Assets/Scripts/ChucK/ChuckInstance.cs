@@ -236,6 +236,41 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.GetAssociativeIntArrayValue( myChuckId, variableName, key, callback );
 	}
 
+	public Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action< double[], ulong > callbackFunction )
+	{
+		return Chuck.CreateGetFloatArrayCallback( callbackFunction );
+	}
+
+	public bool SetFloatArray( string variableName, double[] values )
+	{
+		return Chuck.Manager.SetFloatArray( myChuckId, variableName, values );
+	}
+
+	public bool GetFloatArray( string variableName, Chuck.FloatArrayCallback callback )
+	{
+		return Chuck.Manager.GetFloatArray( myChuckId, variableName, callback );
+	}
+
+	public bool SetFloatArrayValue( string variableName, uint index, double value )
+	{
+		return Chuck.Manager.SetFloatArrayValue( myChuckId, variableName, index, value );
+	}
+
+	public bool GetFloatArrayValue( string variableName, uint index, Chuck.FloatCallback callback )
+	{
+		return Chuck.Manager.GetFloatArrayValue( myChuckId, variableName, index, callback );
+	}
+
+	public bool SetAssociativeFloatArrayValue( string variableName, string key, double value )
+	{
+		return Chuck.Manager.SetAssociativeFloatArrayValue( myChuckId, variableName, key, value );
+	}
+
+	public bool GetAssociativeFloatArrayValue( string variableName, string key, Chuck.FloatCallback callback )
+	{
+		return Chuck.Manager.GetAssociativeFloatArrayValue( myChuckId, variableName, key, callback );
+	}
+
 	public void SetRunning( bool shouldRun )
 	{
 		running = shouldRun;

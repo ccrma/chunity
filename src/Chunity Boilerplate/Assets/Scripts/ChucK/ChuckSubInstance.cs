@@ -318,6 +318,90 @@ public class ChuckSubInstance : MonoBehaviour {
 
 
 
+	// ----------------------------------------------------
+	// name: CreateGetFloatArrayCallback
+	// desc: create a callback for getting a float array
+	// ----------------------------------------------------
+	public Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action< double[], ulong > callbackFunction )
+	{
+		return Chuck.CreateGetFloatArrayCallback( callbackFunction );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: SetFloatArray
+	// desc: set the value of external float variableName[]
+	// ----------------------------------------------------
+	public bool SetFloatArray( string variableName, double[] values )
+	{
+		return chuckMainInstance.SetFloatArray( variableName, values );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: GetFloatArray
+	// desc: get the value of external float variableName[]
+	// ----------------------------------------------------
+	public bool GetFloatArray( string variableName, Chuck.FloatArrayCallback callback )
+	{
+		return chuckMainInstance.GetFloatArray( variableName, callback );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: SetFloatArrayValue
+	// desc: set the value of external float variableName[index]
+	// ----------------------------------------------------
+	public bool SetFloatArrayValue( string variableName, uint index, double value )
+	{
+		return chuckMainInstance.SetFloatArrayValue( variableName, index, value );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: GetFloatArrayValue
+	// desc: get the value of external float variableName[index]
+	// ----------------------------------------------------
+	public bool GetFloatArrayValue( string variableName, uint index, Chuck.FloatCallback callback )
+	{
+		return chuckMainInstance.GetFloatArrayValue( variableName, index, callback );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: SetAssociativeFloatArrayValue
+	// desc: set the value of external float variableName[key]
+	// ----------------------------------------------------
+	public bool SetAssociativeFloatArrayValue( string variableName, string key, double value )
+	{
+		return chuckMainInstance.SetAssociativeFloatArrayValue( variableName, key, value );
+	}
+
+
+
+
+	// ----------------------------------------------------
+	// name: GetAssociativeFloatArrayValue
+	// desc: get the value of external float variableName[key]
+	// ----------------------------------------------------
+	public bool GetAssociativeFloatArrayValue( string variableName, string key, Chuck.FloatCallback callback )
+	{
+		return chuckMainInstance.GetAssociativeFloatArrayValue( variableName, key, callback );
+	}
+
+
+
+
     // ----------------------------------------------------
 	// name: SetRunning
 	// desc: whether the SubInstance is outputting sound

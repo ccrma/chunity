@@ -478,6 +478,119 @@ public class Chuck
 		return getExternalAssociativeIntArrayValue( chuckId, variableName, key, callback );
 	}
 
+	public static Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action< double[], ulong > callbackFunction )
+	{
+		return new FloatArrayCallback( callbackFunction );
+	}
+
+	public bool SetFloatArray( string chuckName, string variableName, double[] values )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return SetFloatArray( ids[chuckName], variableName, values );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool SetFloatArray( System.UInt32 chuckId, string variableName, double[] values )
+	{
+		return setExternalFloatArray( chuckId, variableName, values, (uint) values.Length );
+	}
+
+	public bool GetFloatArray( string chuckName, string variableName, Chuck.FloatArrayCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return GetFloatArray( ids[chuckName], variableName, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool GetFloatArray( System.UInt32 chuckId, string variableName, Chuck.FloatArrayCallback callback )
+	{
+		return getExternalFloatArray( chuckId, variableName, callback );
+	}
+
+	public bool SetFloatArrayValue( string chuckName, string variableName, uint index, double value )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return SetFloatArrayValue( ids[chuckName], variableName, index, value );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool SetFloatArrayValue( System.UInt32 chuckId, string variableName, uint index, double value )
+	{
+		return setExternalFloatArrayValue( chuckId, variableName, index, value );
+	}
+
+	public bool GetFloatArrayValue( string chuckName, string variableName, uint index, Chuck.FloatCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return GetFloatArrayValue( ids[chuckName], variableName, index, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool GetFloatArrayValue( System.UInt32 chuckId, string variableName, uint index, Chuck.FloatCallback callback )
+	{
+		return getExternalFloatArrayValue( chuckId, variableName, index, callback );
+	}
+
+	public bool SetAssociativeFloatArrayValue( string chuckName, string variableName, string key, double value )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return SetAssociativeFloatArrayValue( ids[chuckName], variableName, key, value );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool SetAssociativeFloatArrayValue( System.UInt32 chuckId, string variableName, string key, double value )
+	{
+		return setExternalAssociativeFloatArrayValue( chuckId, variableName, key, value );
+	}
+
+	public bool GetAssociativeFloatArrayValue( string chuckName, string variableName, string key, Chuck.FloatCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return GetAssociativeFloatArrayValue( ids[chuckName], variableName, key, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}
+	}
+
+	public bool GetAssociativeFloatArrayValue( System.UInt32 chuckId, string variableName, string key, Chuck.FloatCallback callback )
+	{
+		return getExternalAssociativeFloatArrayValue( chuckId, variableName, key, callback );
+	}
+
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void MyLogCallback( System.String str );
@@ -498,6 +611,13 @@ public class Chuck
 	public delegate void IntArrayCallback(
 		[MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 1)]
 		System.Int64[] values,
+		System.UInt64 numValues
+	);
+
+	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+	public delegate void FloatArrayCallback(
+		[MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R8, SizeParamIndex = 1)]
+		double[] values,
 		System.UInt64 numValues
 	);
 
@@ -585,6 +705,24 @@ public class Chuck
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool getExternalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, IntCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setExternalFloatArray( System.UInt32 chuckID, System.String name, double[] arrayValues, uint numValues );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool getExternalFloatArray( System.UInt32 chuckID, System.String name, FloatArrayCallback callback);
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setExternalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, double value );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool getExternalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, FloatCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setExternalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, double value );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool getExternalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, FloatCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setChoutCallback( System.UInt32 chuckID, MyLogCallback callback );
