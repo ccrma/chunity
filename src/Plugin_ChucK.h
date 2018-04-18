@@ -62,6 +62,8 @@ namespace ChucK_For_Unity {
     UNITY_INTERFACE_EXPORT bool setStderrCallback( void (* callback)(const char *) );
     
     UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir );
+    
+    UNITY_INTERFACE_EXPORT bool setLogLevel( unsigned int level );
 };
 
 };

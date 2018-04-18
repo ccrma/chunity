@@ -654,6 +654,25 @@ public class Chuck
 		return getExternalAssociativeFloatArrayValue( chuckId, variableName, key, callback );
 	}
 
+	public enum LogLevel {
+		None = 0,
+		Core,
+		System,
+		Severe,
+		Warning,
+		Info,
+		Config,
+		Fine,
+		Finer,
+		Finest,
+		Crazy
+	}
+
+	public static void SetLogLevel( Chuck.LogLevel level )
+	{
+		setLogLevel( (uint) level );
+	}
+
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void MyLogCallback( System.String str );
@@ -814,6 +833,9 @@ public class Chuck
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setDataDir( System.String dir );
 
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool setLogLevel( System.UInt32 level );
+
 
 	private static Chuck __sharedInstance;
 	private System.UInt32 _nextValidID;
@@ -825,7 +847,6 @@ public class Chuck
 	{
 		// Store the location of data files
 		setDataDir( Application.streamingAssetsPath );
-		Debug.Log( Application.streamingAssetsPath );
 
 		// Important in the editor, where native static arrays won't be cleaned up when entering / exiting play mode
 		cleanRegisteredChucks();

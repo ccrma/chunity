@@ -433,6 +433,14 @@ namespace ChucK_For_Unity
     
     
     
+    UNITY_INTERFACE_EXPORT bool setLogLevel( unsigned int level )
+    {
+        EM_setlog( level );
+        return true;
+    }
+    
+    
+    
     UNITY_INTERFACE_EXPORT bool initChuckInstance( unsigned int chuckID, unsigned int sampleRate )
     {
         if( chuck_instances.count( chuckID ) == 0 )
