@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.IO;
 using UnityEngine.Audio;
 using System.Runtime.InteropServices;
 
@@ -107,6 +108,68 @@ public class Chuck
 	public bool RunCodeWithReplacementDac( System.UInt32 chuckId, string code, string replacementDac )
 	{
 		return runChuckCodeWithReplacementDac( chuckId, code, replacementDac );
+	}
+
+	public bool RunFile( string name, string filename, bool fromStreamingAssets = true )
+	{
+		if( ids.ContainsKey( name ) )
+		{
+			return RunFile( ids[name], filename, fromStreamingAssets );
+		}
+		else
+		{
+			Debug.Log( name + " has not been initialized as a ChucK instance" );
+		}
+		return false;
+	}
+
+	public bool RunFile( System.UInt32 chuckId, string filename, bool fromStreamingAssets = true )
+	{
+		if( fromStreamingAssets )
+		{
+			filename = Path.Combine( Application.streamingAssetsPath, filename );
+		}
+		return runChuckFile( chuckId, filename );
+	}
+
+	public bool RunFileWithReplacementDac( System.UInt32 chuckId, string filename, string replacementDac, bool fromStreamingAssets = true )
+	{
+		if( fromStreamingAssets )
+		{
+			filename = Path.Combine( Application.streamingAssetsPath, filename );
+		}
+		return runChuckFileWithReplacementDac( chuckId, filename, replacementDac );
+	}
+
+	public bool RunFile( string name, string filename, string args, bool fromStreamingAssets = true )
+	{
+		if( ids.ContainsKey( name ) )
+		{
+			return RunFile( ids[name], filename, args, fromStreamingAssets );
+		}
+		else
+		{
+			Debug.Log( name + " has not been initialized as a ChucK instance" );
+		}
+		return false;
+	}
+
+	public bool RunFile( System.UInt32 chuckId, string filename, string args, bool fromStreamingAssets = true )
+	{
+		if( fromStreamingAssets )
+		{
+			filename = Path.Combine( Application.streamingAssetsPath, filename );
+		}
+		return runChuckFileWithArgs( chuckId, filename, args );
+	}
+
+	public bool RunFileWithReplacementDac( System.UInt32 chuckId, string filename, string args, string replacementDac, bool fromStreamingAssets = true )
+	{
+		if( fromStreamingAssets )
+		{
+			filename = Path.Combine( Application.streamingAssetsPath, filename );
+		}
+		return runChuckFileWithArgsWithReplacementDac( chuckId, filename, args, replacementDac );
 	}
 
 	public bool SetInt( string chuckName, string variableName, System.Int64 value )
@@ -654,6 +717,18 @@ public class Chuck
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool runChuckCodeWithReplacementDac( System.UInt32 chuckID, System.String code, System.String replacement_dac );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool runChuckFile( System.UInt32 chuckID, System.String filename );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool runChuckFileWithReplacementDac( System.UInt32 chuckID, System.String filename, System.String replacement_dac );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool runChuckFileWithArgs( System.UInt32 chuckID, System.String filename, System.String args );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool runChuckFileWithArgsWithReplacementDac( System.UInt32 chuckID, System.String filename, System.String args, System.String replacement_dac );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setChuckInt( System.UInt32 chuckID, System.String name, System.Int64 val );

@@ -81,6 +81,67 @@ namespace ChucK_For_Unity
     
     
     
+    UNITY_INTERFACE_EXPORT bool runChuckFile( unsigned int chuckID,
+        const char * filename )
+    {
+        // run with empty args
+        return runChuckFileWithArgs( chuckID, filename, "" );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool runChuckFileWithArgs( unsigned int chuckID,
+        const char * filename, const char * args )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        // don't want to replace dac
+        // (a safeguard in case compiler got interrupted while replacing dac)
+        chuck_instances[chuckID]->compiler()->setReplaceDac( FALSE, "" );
+
+        // compile it!
+        return chuck_instances[chuckID]->compileFile(
+            std::string( filename ), std::string( args )
+        );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool runChuckFileWithReplacementDac(
+        unsigned int chuckID, const char * filename,
+        const char * replacement_dac )
+    {
+        // run with empty args
+        return runChuckFileWithArgsWithReplacementDac(
+            chuckID, filename, "", replacement_dac
+        );
+    }
+    
+    
+    
+    UNITY_INTERFACE_EXPORT bool runChuckFileWithArgsWithReplacementDac(
+        unsigned int chuckID, const char * filename, const char * args,
+        const char * replacement_dac )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        // replace dac
+        chuck_instances[chuckID]->compiler()->setReplaceDac( TRUE,
+            std::string( replacement_dac ) );
+        
+        // compile it!
+        bool ret = chuck_instances[chuckID]->compileFile(
+            std::string( filename ), std::string( args )
+        );
+        
+        // don't replace dac for future compilations
+        chuck_instances[chuckID]->compiler()->setReplaceDac( FALSE, "" );
+        
+        return ret;
+    }
+    
+    
+    
     UNITY_INTERFACE_EXPORT bool setChuckInt( unsigned int chuckID, const char * name, t_CKINT val )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }

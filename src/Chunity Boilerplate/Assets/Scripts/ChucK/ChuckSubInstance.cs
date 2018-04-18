@@ -45,6 +45,42 @@ public class ChuckSubInstance : MonoBehaviour {
 
 
 	// ----------------------------------------------------
+	// name: RunFile
+	// desc: add a new ChucK program to this VM, from
+	//       filename. 
+	//       (fromStreamingAssets == true -->
+	//       prepend the location of the StreamingAssets
+	//       folder to the filename)
+	// ----------------------------------------------------
+	public bool RunFile( string filename, bool fromStreamingAssets = true )
+	{
+		return chuckMainInstance.RunFileWithReplacementDac( 
+			filename, myOutputUgen, fromStreamingAssets );
+	}
+
+
+
+
+
+	// ----------------------------------------------------
+	// name: RunFile
+	// desc: add a new ChucK program to this VM, from
+	//       filename, with colonSeparatedArgs.
+	//       (fromStreamingAssets == true -->
+	//       prepend the location of the StreamingAssets
+	//       folder to the filename)
+	// ----------------------------------------------------
+	public bool RunFile( string filename, string colonSeparatedArgs, 
+		bool fromStreamingAssets = true )
+	{
+		return chuckMainInstance.RunFileWithReplacementDac(
+			filename, colonSeparatedArgs, myOutputUgen, fromStreamingAssets );
+	}
+
+
+
+
+	// ----------------------------------------------------
 	// name: SetInt
 	// desc: set the value of external int variableName
 	// ----------------------------------------------------

@@ -37,6 +37,38 @@ public class ChuckMainInstance : MonoBehaviour {
 
 
 
+	// ----------------------------------------------------
+	// name: RunFile
+	// desc: add a new ChucK program to this VM, from
+	//       filename. 
+	//       (fromStreamingAssets == true -->
+	//       prepend the location of the StreamingAssets
+	//       folder to the filename)
+	// ----------------------------------------------------
+	public bool RunFile( string filename, bool fromStreamingAssets = true )
+	{
+		return Chuck.Manager.RunFile( myChuckId, filename, fromStreamingAssets );
+	}
+
+
+
+
+
+	// ----------------------------------------------------
+	// name: RunFile
+	// desc: add a new ChucK program to this VM, from
+	//       filename, with colonSeparatedArgs.
+	//       (fromStreamingAssets == true -->
+	//       prepend the location of the StreamingAssets
+	//       folder to the filename)
+	// ----------------------------------------------------
+	public bool RunFile( string filename, string colonSeparatedArgs, bool fromStreamingAssets = true )
+	{
+		return Chuck.Manager.RunFile( myChuckId, filename, colonSeparatedArgs, fromStreamingAssets );
+	}
+
+
+
 
 	// ----------------------------------------------------
 	// name: SetInt
@@ -534,6 +566,16 @@ public class ChuckMainInstance : MonoBehaviour {
 	public bool RunCodeWithReplacementDac( string code, string replacementDac )
 	{
 		return Chuck.Manager.RunCodeWithReplacementDac( myChuckId, code, replacementDac );
+	}
+
+	public bool RunFileWithReplacementDac( string filename, string replacementDac, bool fromStreamingAssets )
+	{
+		return Chuck.Manager.RunFileWithReplacementDac( myChuckId, filename, replacementDac, fromStreamingAssets );
+	}
+
+	public bool RunFileWithReplacementDac( string filename, string args, string replacementDac, bool fromStreamingAssets )
+	{
+		return Chuck.Manager.RunFileWithReplacementDac( myChuckId, filename, args, replacementDac, fromStreamingAssets );
 	}
 
 	private void OnDestroy()

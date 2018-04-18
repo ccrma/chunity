@@ -126,6 +126,16 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.RunCode( myChuckId, code );
 	}
 
+	public bool RunFile( string filename, bool fromStreamingAssets = true )
+	{
+		return Chuck.Manager.RunFile( myChuckId, filename, fromStreamingAssets );
+	}
+
+	public bool RunFile( string filename, string colonSeparatedArgs, bool fromStreamingAssets = true )
+	{
+		return Chuck.Manager.RunFile( myChuckId, filename, colonSeparatedArgs, fromStreamingAssets );
+	}
+
 	public bool SetInt( string variableName, System.Int64 value )
 	{
 		return Chuck.Manager.SetInt( myChuckId, variableName, value );

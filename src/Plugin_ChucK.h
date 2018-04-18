@@ -11,6 +11,10 @@ extern "C" {
 namespace ChucK_For_Unity {
     UNITY_INTERFACE_EXPORT bool runChuckCode( unsigned int chuckID, const char * code );
     UNITY_INTERFACE_EXPORT bool runChuckCodeWithReplacementDac( unsigned int chuckID, const char * code, const char * replacement_dac );
+    UNITY_INTERFACE_EXPORT bool runChuckFile( unsigned int chuckID, const char * filename );
+    UNITY_INTERFACE_EXPORT bool runChuckFileWithReplacementDac( unsigned int chuckID, const char * filename, const char * replacement_dac );
+    UNITY_INTERFACE_EXPORT bool runChuckFileWithArgs( unsigned int chuckID, const char * filename, const char * args );
+    UNITY_INTERFACE_EXPORT bool runChuckFileWithArgsWithReplacementDac( unsigned int chuckID, const char * filename, const char * args, const char * replacement_dac );
     
     UNITY_INTERFACE_EXPORT bool setChuckInt( unsigned int chuckID, const char * name, t_CKINT val );
     UNITY_INTERFACE_EXPORT bool getChuckInt( unsigned int chuckID, const char * name, void (* callback)(t_CKINT) );
