@@ -460,7 +460,6 @@ public class ChuckSubInstance : MonoBehaviour {
 	private bool running = false;
 	private int myNumChannels = 2;
 	private int myBufferLength;
-	private float[] myOutBuffer;
 	private float[] myMonoBuffer;
 	private AudioSource mySource;
 	private bool isMuted;
@@ -476,7 +475,6 @@ public class ChuckSubInstance : MonoBehaviour {
 		int numBuffers;
 		AudioSettings.GetDSPBufferSize( out myBufferLength, out numBuffers );
 
-		myOutBuffer = new float[myBufferLength * myNumChannels];
 		myMonoBuffer = new float[myBufferLength];
 
 		// setup group for reliable ordering
@@ -547,9 +545,7 @@ public class ChuckSubInstance : MonoBehaviour {
 		// check whether channels is correct
 		if( channels != myNumChannels )
 		{
-			// sadness -- num channels has changed so we must reconstruct myOutBuffer
 			myNumChannels = channels;
-			myOutBuffer = new float[myBufferLength * myNumChannels];
 		}
 
 		// update num samples seen
