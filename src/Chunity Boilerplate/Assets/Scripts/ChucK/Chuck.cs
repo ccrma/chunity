@@ -127,7 +127,13 @@ public class Chuck
 	{
 		if( fromStreamingAssets )
 		{
-			filename = Path.Combine( Application.streamingAssetsPath, filename );
+			// Path.Combine() does the wrong thing on Windows for me --
+            // Application.streamingAssetsPath has forward slashes, but
+            // Path.Combine() uses a back-slash so it thinks the first
+            // letter of filename is an unknown escape sequence.
+            // --> just manually construct it instead, I guess. 
+			// filename = Path.Combine( Application.streamingAssetsPath, filename );
+            filename = Application.streamingAssetsPath + '/' + filename;
 		}
 		return runChuckFile( chuckId, filename );
 	}
@@ -136,7 +142,13 @@ public class Chuck
 	{
 		if( fromStreamingAssets )
 		{
-			filename = Path.Combine( Application.streamingAssetsPath, filename );
+			// Path.Combine() does the wrong thing on Windows for me --
+            // Application.streamingAssetsPath has forward slashes, but
+            // Path.Combine() uses a back-slash so it thinks the first
+            // letter of filename is an unknown escape sequence.
+            // --> just manually construct it instead, I guess. 
+			// filename = Path.Combine( Application.streamingAssetsPath, filename );
+            filename = Application.streamingAssetsPath + '/' + filename;
 		}
 		return runChuckFileWithReplacementDac( chuckId, filename, replacementDac );
 	}
@@ -158,7 +170,13 @@ public class Chuck
 	{
 		if( fromStreamingAssets )
 		{
-			filename = Path.Combine( Application.streamingAssetsPath, filename );
+			// Path.Combine() does the wrong thing on Windows for me --
+            // Application.streamingAssetsPath has forward slashes, but
+            // Path.Combine() uses a back-slash so it thinks the first
+            // letter of filename is an unknown escape sequence.
+            // --> just manually construct it instead, I guess. 
+			// filename = Path.Combine( Application.streamingAssetsPath, filename );
+            filename = Application.streamingAssetsPath + '/' + filename;
 		}
 		return runChuckFileWithArgs( chuckId, filename, args );
 	}
@@ -167,7 +185,13 @@ public class Chuck
 	{
 		if( fromStreamingAssets )
 		{
-			filename = Path.Combine( Application.streamingAssetsPath, filename );
+            // Path.Combine() does the wrong thing on Windows for me --
+            // Application.streamingAssetsPath has forward slashes, but
+            // Path.Combine() uses a back-slash so it thinks the first
+            // letter of filename is an unknown escape sequence.
+            // --> just manually construct it instead, I guess. 
+			// filename = Path.Combine( Application.streamingAssetsPath, filename );
+            filename = Application.streamingAssetsPath + '/' + filename;
 		}
 		return runChuckFileWithArgsWithReplacementDac( chuckId, filename, args, replacementDac );
 	}

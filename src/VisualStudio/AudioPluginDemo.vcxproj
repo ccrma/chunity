@@ -205,6 +205,7 @@ copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClCompile Include="..\AudioPluginUtil.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_absyn.cpp" />
+    <ClCompile Include="..\chuck\src\core\chuck_carrier.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_compile.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_dl.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_emit.cpp" />

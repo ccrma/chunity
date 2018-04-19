@@ -263,7 +263,7 @@ namespace ChucK_For_Unity
     
     // int array methods
     UNITY_INTERFACE_EXPORT bool setExternalIntArray( unsigned int chuckID,
-        const char * name, t_CKINT arrayValues[], uint numValues )
+        const char * name, t_CKINT arrayValues[], unsigned int numValues )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
@@ -331,7 +331,7 @@ namespace ChucK_For_Unity
     
     // float array methods
     UNITY_INTERFACE_EXPORT bool setExternalFloatArray( unsigned int chuckID,
-        const char * name, t_CKFLOAT arrayValues[], uint numValues )
+        const char * name, t_CKFLOAT arrayValues[], unsigned int numValues )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         

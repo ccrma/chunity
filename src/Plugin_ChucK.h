@@ -34,7 +34,7 @@ namespace ChucK_For_Unity {
     UNITY_INTERFACE_EXPORT bool getExternalUGenSamples( unsigned int chuckID, const char * name, SAMPLE * buffer, int numSamples );
     
     // int array methods
-    UNITY_INTERFACE_EXPORT bool setExternalIntArray( unsigned int chuckID, const char * name, t_CKINT arrayValues[], uint numValues );
+    UNITY_INTERFACE_EXPORT bool setExternalIntArray( unsigned int chuckID, const char * name, t_CKINT arrayValues[], unsigned int numValues );
     UNITY_INTERFACE_EXPORT bool getExternalIntArray( unsigned int chuckID, const char * name, void (* callback)(t_CKINT[], t_CKUINT));
     UNITY_INTERFACE_EXPORT bool setExternalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, t_CKINT value );
     UNITY_INTERFACE_EXPORT bool getExternalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(t_CKINT) );
@@ -43,7 +43,7 @@ namespace ChucK_For_Unity {
     // TODO: set entire dict, add to dict in batch; get entire dict
     
     // float array methods
-    UNITY_INTERFACE_EXPORT bool setExternalFloatArray( unsigned int chuckID, const char * name, t_CKFLOAT arrayValues[], uint numValues );
+    UNITY_INTERFACE_EXPORT bool setExternalFloatArray( unsigned int chuckID, const char * name, t_CKFLOAT arrayValues[], unsigned int numValues );
     UNITY_INTERFACE_EXPORT bool getExternalFloatArray( unsigned int chuckID, const char * name, void (* callback)(t_CKFLOAT[], t_CKUINT));
     UNITY_INTERFACE_EXPORT bool setExternalFloatArrayValue( unsigned int chuckID, const char * name, unsigned int index, t_CKFLOAT value );
     UNITY_INTERFACE_EXPORT bool getExternalFloatArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(t_CKFLOAT) );
