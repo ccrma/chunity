@@ -175,7 +175,7 @@ to add ChucK to any existing Unity project.</p>
 
 <p>Now, let's write our first ChucK script in Unity!</p>
 <p>Here's a new ChucK script. It's sent to the ChucK plugin using <br />
-   <span class="mono2">GetComponent&lt;ChuckInstance&gt;().RunCode</span>, where the argument
+   <span class="mono2">GetComponent&lt;ChuckSubInstance&gt;().RunCode</span>, where the argument
    is a string with ChucK code that will be compiled and run on the fly.</p>
 <p>This particular ChucK script connects a sine wave to the output,
    then sets its frequency randomly between 300 Hz and 1000 Hz every 100 ms, forever.</p>
@@ -187,7 +187,7 @@ to add ChucK to any existing Unity project.</p>
 	SetCountText();
 	winText.text = "";
 
-	GetComponent&lt;ChuckInstance&gt;().RunCode(@"
+	GetComponent&lt;ChuckSubInstance&gt;().RunCode(@"
 		SinOsc foo => dac;
 		while( true )
 		{
@@ -196,7 +196,7 @@ to add ChucK to any existing Unity project.</p>
 		}
 	");
 }</code></pre>
-
+<br />
 <p>Let's test it! Enter play mode.</p>
 <img class="tutorialimg" src="./images/tutorial1/9.png" width=600 />
 
