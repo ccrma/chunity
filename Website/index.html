@@ -3,7 +3,7 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>ChucK - [Unity: Tutorials]</title>
 <link rel="stylesheet" type="text/css" href="./css/style.css">
-
+<link rel="stylesheet" type="text/css" href="./css/prism.css">
 </head>
 <body bgcolor="#ffffff" text="#000000">
 <center>
@@ -101,14 +101,17 @@ to add ChucK to any existing Unity project.</p>
 <h2><strong>Setup</strong></h2>
 <ol>
 <li>
-<p>First, you'll need to add the <a href="./files/chunity.zip" download>necessary files</a> into the project. 
-    Unzip this file and copy its files to your project hierarchy, mimicking the folder structure.
-    Make sure to use the same spelling for the folders <span class="mono2">Plugins</span>, <span class="mono2">Resources</span>, 
-    and <span class="mono2">StreamingAssets</span>, since these are folders that Unity treats specially because of their names.
+<p>First, you'll need to add the <a href="./files/Chunity.unitypackage" download>necessary files</a> into the project. 
+    Add this package to your project via the <span class="mono2">Assets > Import Package</span> menu.
 </p>
-<img class="tutorialimg" src="./images/tutorial1/1.png" width=300 />
+<img class="tutorialimg" src="./images/tutorial1/1.png" width=600 />
+<p>
+    You will see something like this. Make sure to import all of the files. The names of the folders <span class="mono2">Plugins</span>, <span class="mono2">Resources</span>, 
+    and <span class="mono2">StreamingAssets</span> are especially important, since these are folders that Unity treats specially because of their names.
+</p>
+<img class="tutorialimg" src="./images/tutorial1/2.png" width=700 />
 
-<p>Next, restart Unity so that the plugins are loaded correctly.</p>
+<p>If you are replacing an older version of Chunity, restart Unity so that the new plugins are loaded correctly.</p>
 <img class="tutorialimg" src="./images/tutorial1/restart.png" width=500 />
 
 
@@ -119,24 +122,55 @@ to add ChucK to any existing Unity project.</p>
 <p>Next, we'll add an instance of ChucK to our scene. This tutorial will cover how to add ChucK to an individual
    game object. To use ChucK as a plugin in an Audio Mixer, see the <a href="./with-plugins">Plugin Tutorials</a>.</p>
 
+<p>First, we need to add a global game object to hold our scene's <span class="mono2">ChuckMainInstance</span>. 
+   All objects that play ChucK code will contain a reference to this object.
+   (It's possible to have as many of these in a scene as you need, but in practice, this is only for
+   special circumstances like accessing two different microphones.)
+</p>
+<p>Here, I have created a new empty game object called <span class="mono2">TheChuck</span> and I am adding the
+   <span class="mono2">ChuckMainInstance</span> component to it.</p>
+<img class="tutorialimg" src="./images/tutorial1/3.png" width=600 />
+
+<p>Doing so will automatically add an <span class="mono2">Audio Source</span> to the object.
+   This is used to fetch the microphone input correctly. You can ignore it. 
+   (If you want to play audio files in ChucK, you
+   should not use this Audio Source but should instead follow the directions in the <a href="#audiofiles">Audio Files</a> tutorial.)
+</p><p>   You can also ignore the <span class="mono2">Microphone Identifier</span> field,
+   unless you want to use a microphone different than your system's default microphone.
+   (In that case, put some substring of the name of the microphone into this field.)
+</p>
+<img class="tutorialimg" src="./images/tutorial1/4.png" width=500 />
+
+<p>Now that we have created a <span class="mono2">ChuckMainInstance</span> for our scene, we can
+   begin creating <span class="mono2">ChuckSubInstances</span> on game objects in our scene.
+</p>
+
 <p>Pick the game object you want to add ChucK to. In this case, I will add it to my <span class="mono2">Player</span> object.</p>
-<p>Add a <span class="mono2">Chuck Instance</span> script to this game object.</p>
-<img class="tutorialimg" src="./images/tutorial1/2.png" width=400 />
+<p>Add a <span class="mono2">ChuckSubInstance</span> script to this game object.</p>
 
 <p>By adding this script, an <span class="mono2">Audio Source</span> will also be added to your game object.
    This Audio Source is used by ChucK to function correctly. (If you want to play audio files in ChucK, you
    should not use this Audio Source but should instead follow the directions in the <a href="#audiofiles">Audio Files</a> tutorial.)</p>
-<img class="tutorialimg" src="./images/tutorial1/3.png" width=400 />
+
+<img class="tutorialimg" src="./images/tutorial1/5.png" width=800 />
+
+<p>The next step is to give this component a reference to the <span class="mono2">ChuckMainInstance</span>
+   we created earlier. Drag it into the <span class="mono2">Chuck Main Instance</span> slot on the new
+   <span class="mono2">ChuckSubInstance</span> component.
+</p>
+<img class="tutorialimg" src="./images/tutorial1/6.png" width=600 />
+
 <p>If you are using ChucK spatially, you can edit the 3D Sound options of this Audio Source. Since we are not using this 
    ChucK spatially, we can leave all the settings alone. Now we are done adding a ChucK Instance to our scene!</p>
 </li>
+<img class="tutorialimg" src="./images/tutorial1/7.png" width=400 />
 
 <li>
 <p>Next, let's access this ChucK plugin through a Unity C# script.</p>
 
 <p>Since I am adding ChucK to my Roll a Ball project (<a target="_blank" href="https://unity3d.com/learn/tutorials/projects/roll-ball-tutorial">&#10144;Official Unity Tutorial</a>),
    I'll add ChucK to my PlayerController script. This script operates on the same object I added the ChucK Instance to.</p>
-<img class="tutorialimg" src="./images/tutorial1/4.png" width=300 />
+<img class="tutorialimg" src="./images/tutorial1/8.png" width=300 />
 
 
 <p>Now, let's write our first ChucK script in Unity!</p>
@@ -146,10 +180,25 @@ to add ChucK to any existing Unity project.</p>
 <p>This particular ChucK script connects a sine wave to the output,
    then sets its frequency randomly between 300 Hz and 1000 Hz every 100 ms, forever.</p>
 <p>(Note: <span class="mono2">@""</span> denotes a multi-line string.)</p>
-<img class="tutorialimg" src="./images/tutorial1/5.png" width=500 />
+<pre data-line="8-14" class="line-numbers"><code class="language-csharp">void Start()
+{
+	rb = GetComponent&lt;Rigidbody&gt;();
+	count = 0;
+	SetCountText();
+	winText.text = "";
+
+	GetComponent&lt;ChuckInstance&gt;().RunCode(@"
+		SinOsc foo => dac;
+		while( true )
+		{
+			Math.random2f( 300, 1000 ) => foo.freq;
+			100::ms => now;
+		}
+	");
+}</code></pre>
 
 <p>Let's test it! Enter play mode.</p>
-<img class="tutorialimg" src="./images/tutorial1/6.png" width=600 />
+<img class="tutorialimg" src="./images/tutorial1/9.png" width=600 />
 
 <p>And you can hear audio! (Check the ChuckInstance script to see the audio levels for the instance while the game is in Play Mode.)</p>
 
@@ -597,5 +646,5 @@ to add ChucK to any existing Unity project.</p>
 
 </center>
 
-
+<script src="./js/prism.js"></script>
 </body></html>
