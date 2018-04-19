@@ -6,11 +6,9 @@ public class ChuckExecutionOrder : Editor
 	static ChuckExecutionOrder()
 	{
 		// Get the name of the script we want to change it's execution order
-		string chuckInstance = typeof(ChuckInstance).Name;
 		string chuckMainInstance = typeof(ChuckMainInstance).Name;
 		string chuckSubInstance = typeof(ChuckSubInstance).Name;
 
-		SetExecutionOrder( chuckInstance, -30000 );
 		SetExecutionOrder( chuckMainInstance, -29000 );
 		SetExecutionOrder( chuckSubInstance, -28000 );
 
