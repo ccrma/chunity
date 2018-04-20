@@ -269,7 +269,9 @@ to add ChucK to any existing Unity project.</p>
 
 <!-- TODO: consider figuring out how to format the {0} a different color. 
      It's not supported natively by the code highlighter I'm using. -->
-<pre data-line="9-16" class="line-numbers"><code class="language-csharp">void OnTriggerEnter( Collider other )
+<!-- TODO: make this look not terrible with the background colors;
+     it is very hard to see the highlight when it's white/blue.   -->
+<pre data-line="9,11-12,15" class="line-numbers"><code class="language-csharp">void OnTriggerEnter( Collider other )
 {
 	if( other.gameObject.CompareTag( "Pick Up" ) )
 	{
@@ -305,8 +307,10 @@ to add ChucK to any existing Unity project.</p>
    of the left and right channels according to the direction between the audio
    listener and the source of audio, but will not use HRTFs or change the spectral
    content of the source of audio in any way.</p>
+<!-- 
 <p>(There is another script to use if you'd like to use your own Spatializer Audio Plugin.
    More on that to come later.)</p>
+ -->
 
 <ol>
 <li>
@@ -316,14 +320,14 @@ to add ChucK to any existing Unity project.</p>
    one of these objects from the Hierarchy pane.</p>
 <img class="tutorialimg" src="./images/tutorial3/1.png" width=800 />
 
-<p>Add a ChucK instance to this object.</p>
-<img class="tutorialimg" src="./images/tutorial3/2.png" width=800 />
+<p>Add a ChuckSubInstance to this object.</p>
+<img class="tutorialimg" src="./images/tutorial3/2.png" width=600 />
 
 <p>And select the <span class="mono2">spatialize</span> option!</p>
 <img class="tutorialimg" src="./images/tutorial3/3.png" width=400 />
 
 <p>Note that an <span class="mono2">AudioSource</span> has been added as a result of
-   adding the ChucK Instance script. ChucK uses this AudioSource to capture spatialization
+   adding the ChuckSubInstance script. ChucK uses this AudioSource to capture spatialization
    data. ChucK will use the AudioClip, Play On Awake, Loop, and Spatial Blend fiels, setting
    them automatically whenever the scene is run. (If you'd like to play an audio file, use
    <a href="#audiofiles">audio files in ChucK</a> instead.)</p>
@@ -347,7 +351,20 @@ to add ChucK to any existing Unity project.</p>
 
 <p>We write ChucK code for a spatialized ChucK instance in exactly the same way as for a 
    non-spatialized ChucK instance!</p>
-<img class="tutorialimg" src="./images/tutorial3/8.png" width=600 />
+<pre class="line-numbers"><code class="language-csharp">public class PickupAudio : MonoBehaviour
+{
+	void Start()
+	{
+		GetComponent&lt;ChuckSubInstance&gt;().RunCode(@"
+			TriOsc spatialOsc => dac;
+			while( true )
+			{
+				Math.random2f( 300, 1000 ) => spatialOsc.freq;
+				50::ms => now;
+			}
+		" );
+	}
+}</code></pre>
 
 </li>
 
@@ -401,7 +418,15 @@ to add ChucK to any existing Unity project.</p>
 <p>Since we want to create a behavior that is turned on only for some
    Pick Ups, we'll add a new public boolean that controls whether the behavior
    is turned on or off.</p>
-<img class="tutorialimg" src="./images/tutorial3/18.png" width=500 />
+<pre data-line="3" class="line-numbers"><code class="language-csharp">public class Rotator : MonoBehaviour
+{
+	public bool rotateRandomly = false;
+
+	void Update()
+	{
+		transform.Rotate( new Vector3( 15, 30, 45 ) * Time.deltaTime );
+	}
+}</code></pre>
 
 <p>Next, we'll add a new <span class="mono2">Vector3</span> local variable to 
    the <span class="mono2">Update()</span> function. If the <span class="mono2">rotateRandomly</span>
@@ -413,7 +438,28 @@ to add ChucK to any existing Unity project.</p>
    started modifying this script.
    Finally, we'll modify the call to <span class="mono2">transform.Rotate</span>
    to take our new <span class="mono2">rotateAmount</span> variable.</p>
-<img class="tutorialimg" src="./images/tutorial3/19.png" width=400 />
+<pre  class="line-numbers"><code class="language-csharp">void Update()
+{
+	// choose rotation
+	Vector3 rotateAmount;
+	if( rotateRandomly )
+	{
+		// vector where x, y, z all in [100, 800)
+		rotateAmount = new Vector3(
+			Random.Range( 100, 800 ),
+			Random.Range( 100, 800 ),
+			Random.Range( 100, 800 )
+		);
+	}
+	else
+	{
+		// original rotation vector
+		rotateAmount = new Vector3( 15, 30, 45 );
+	}
+
+	// apply rotation
+	transform.Rotate( rotateAmount * Time.deltaTime );
+}</code></pre>
 
 <p>The last thing to do is to set the new Rotate Randomly boolean to be checked on
    for the Pick Up we spatialized earlier.</p>
@@ -445,22 +491,36 @@ to add ChucK to any existing Unity project.</p>
 
 <p>Since I'd like to play this file when the Player collides with another game object,
    I'll add an <span class="mono2">OnCollisionEnter()</span> method to my Player class.</p>
-<img class="tutorialimg" src="./images/tutorial4/2.png" width=400 />
 
 <p>To determine what range of possible values the collision's velocity magnitude 
    can take on, I'll use Unity's Debug Log to print out the value, enter play
    mode, and cause collisions with the game walls at a variety of velocities.</p>
-<img class="tutorialimg" src="./images/tutorial4/3.png" width=500 />
+
+<pre class="line-numbers"><code class="language-csharp">void OnCollisionEnter( Collision collision )
+{
+	float intensity = collision.relativeVelocity.magnitude;
+
+	Debug.Log( intensity );
+}</code></pre>
+
 
 <p>Based on this experiment, it looks like the relevant range of my <span class="mono2">intensity</span>
    variable will be roughly <span class="mono2">[0, 16]</span>.</p>
-<img class="tutorialimg" src="./images/tutorial4/4.png" width=600 />
+<img class="tutorialimg" src="./images/tutorial4/2.png" width=600 />
 
 <p>I'll scale the intensity down to roughly <span class="mono2">[0, 1]</span> by dividing it by 
    <span class="mono2">16</span>, then clamp it to exactly <span class="mono2">[0, 1]</span>.
    Finally, I'll square this value so that the sound changes quadratically with an increase in velocity,
    rather than linearly. This will help especially fast collisions to stand out more.</p>
-<img class="tutorialimg" src="./images/tutorial4/5.png" width=650 />
+<pre class="line-numbers"><code class="language-csharp">void OnCollisionEnter( Collision collision )
+{
+	// map and clamp from [0, 16] to [0, 1]
+	float intensity = Mathf.Clamp01( collision.relativeVelocity.magnitude / 16 );
+
+	// square it to make the ramp upward more dramatic
+	intensity = intensity * intensity;
+}</code></pre>
+
 
 <p>Finally, I'll add my ChucK code. The intensity parameter is inserted just as in the
    <a href="#unityvariables1">Using Unity Variables(1)</a> tutorial. Note that when
@@ -470,7 +530,36 @@ to add ChucK to any existing Unity project.</p>
    <span class="mono2">me.dir()</span> ChucK expression refers automatically to the 
    <span class="mono2">StreamingAssets</span> folder for code that is run using 
    <span class="mono2">ChuckInstance.RunCode()</span>.</p>
-<img class="tutorialimg" src="./images/tutorial4/6.png" width=675 />
+
+<pre data-line="10-11,17,20" class="line-numbers"><code class="language-csharp">void OnCollisionEnter( Collision collision )
+{
+	// map and clamp from [0, 16] to [0, 1]
+	float intensity = Mathf.Clamp01( collision.relativeVelocity.magnitude / 16 );
+
+	// square it to make the ramp upward more dramatic
+	intensity = intensity * intensity;
+
+	GetComponent&lt;ChuckSubInstance&gt;().RunCode( string.Format( @"
+		SndBuf impactBuf => dac;
+		me.dir() + ""impact.wav"" => impactBuf.read;
+
+		// start at the beginning of the clip
+		0 => impactBuf.pos;
+	
+		// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
+		1.5 - {0} + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
+
+		// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
+		0.05 + 0.95 * {0} => impactBuf.gain;
+
+		// pass time so that the file plays
+		impactBuf.length() / impactBuf.rate() => now;
+
+	", intensity ) );
+}</code></pre>
+
+
+
 <p>It's that simple to write ChucK scripts that use audio files in Unity! Just add your
    audio files to the <span class="mono2">StreamingAssets</span> folder and access their
    filenames in ChucK using <span class="mono2">me.dir()</span>.</p>
@@ -485,7 +574,29 @@ to add ChucK to any existing Unity project.</p>
    automatically appear in the Unity console.</p>
 <p>For example, this ChucK script computes a value with a random error added to it,
    then prints the resulting value to the console.</p>
-<img class="tutorialimg" src="./images/tutorial5/1.png" width=750 />
+
+<pre data-line="8-11" class="line-numbers"><code class="language-csharp">GetComponent&lt;ChuckSubInstance&gt;().RunCode( string.Format( @"
+	SndBuf impactBuf => dac;
+	me.dir() + ""impact.wav"" => impactBuf.read;
+
+	// start at the beginning of the clip
+	0 => impactBuf.pos;
+			
+	// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
+	1.5 - {0} + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
+			
+	chout <= ""Rate is "" <= impactBuf.rate() <= IO.newline();
+
+	// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
+	0.05 + 0.95 * {0} => impactBuf.gain;
+
+	// pass time so that the file plays
+	impactBuf.length() / impactBuf.rate() => now;
+
+", intensity ) );</code></pre>
+
+
+
 <p></p>
 <img class="tutorialimg" src="./images/tutorial5/2.png" width=400 />
 

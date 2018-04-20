@@ -262,8 +262,8 @@ pre[data-line] {
 /* background color: solid OR gradient if possible */
 /* saturation: 20% --> 5%? maybe not */
 /* hue: 24->212? looks much better to me */
-	background: hsla(212, 20%, 50%,.08);
-	background: linear-gradient(to right, hsla(212, 20%, 50%,.1) 70%, hsla(212, 20%, 50%,0));
+	background: hsla(24, 20%, 50%,.08);
+	background: linear-gradient(to right, hsla(24, 20%, 50%,.1) 70%, hsla(24, 20%, 50%,0));
 
 	pointer-events: none;
 
