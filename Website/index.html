@@ -200,7 +200,7 @@ to add ChucK to any existing Unity project.</p>
 <p>Let's test it! Enter play mode.</p>
 <img class="tutorialimg" src="./images/tutorial1/9.png" width=600 />
 
-<p>And you can hear audio! (Check the ChuckInstance script to see the audio levels for the instance while the game is in Play Mode.)</p>
+<p>And you can hear audio! (Check the ChuckSubInstance script to see the audio levels for the instance while the game is in Play Mode.)</p>
 
 
 <p><strong>Congratulations!</strong> You now have ChucK working inside of a Unity project!!</p>
@@ -218,19 +218,36 @@ to add ChucK to any existing Unity project.</p>
    wrote a script that plays a sine wave with a randomly-changing frequency
    forever. Let's change that script into something a bit more appropriate
    for our Roll a Ball game.</p>
-<p>First, delete the original call to <span class="mono2">ChuckInstance.RunCode()</span>
+<p>First, delete the original call to <span class="mono2">ChuckSubInstance.RunCode()</span>
    so that our original ChucK script doesn't play anymore.</p>
 <p>Now, I want to write a script that plays every time our Player object
    picks up a Pick Up object. This will go in the <span class="mono2">OnTriggerEnter</span>
    function, where we detect collisions with trigger objects.</p>
-<img class="tutorialimg" src="./images/tutorial2/1.png" width=450 />
+
+<pre data-line="9-16" class="line-numbers"><code class="language-csharp">void OnTriggerEnter( Collider other )
+{
+	if( other.gameObject.CompareTag( "Pick Up" ) )
+	{
+		other.gameObject.SetActive( false );
+		count = count + 1;
+		SetCountText();
+
+		GetComponent&lt;ChuckSubInstance&gt;().RunCode(@"
+			SinOsc foo => dac;
+			repeat( 5 )
+			{
+				Math.random2f( 300, 1000 ) => foo.freq;
+				100::ms => now;
+			}
+		");
+	}
+}</code></pre>
 
 <p>Here, I've added a new ChucK script in that function. It runs directly after
    we increment the count of how many pickup objects have been picked up so far.
    It's very similar to the first script, but only plays 5 different frequencies
    instead of running forever. ( <span class="mono2">repeat( 5 )</span> instead
    of <span class="mono2">while( true )</span> ).</p>
-<img class="tutorialimg" src="./images/tutorial2/2.png" width=500 />
 
 <p>This is a good start, but it's not very interesting. How about we make it repeat
    a number of times according to the current <span class="mono2">count</span>?</p>
@@ -249,7 +266,27 @@ to add ChucK to any existing Unity project.</p>
    <span class="mono2">{{</span> and <span class="mono2">}}</span>, then wrap the
    code string in a call to <span class="mono2">string.Format()</span> and include
    <span class="mono2">count</span> as the second argument.</p>
-<img class="tutorialimg" src="./images/tutorial2/3.png" width=600 />
+
+<!-- TODO: consider figuring out how to format the {0} a different color. 
+     It's not supported natively by the code highlighter I'm using. -->
+<pre data-line="9-16" class="line-numbers"><code class="language-csharp">void OnTriggerEnter( Collider other )
+{
+	if( other.gameObject.CompareTag( "Pick Up" ) )
+	{
+		other.gameObject.SetActive( false );
+		count = count + 1;
+		SetCountText();
+
+		GetComponent&lt;ChuckSubInstance&gt;().RunCode( string.Format( @"
+			SinOsc foo => dac;
+			repeat( {0} )
+			{{
+				Math.random2f( 300, 1000 ) => foo.freq;
+				100::ms => now;
+			}}
+		", count ) );
+	}
+}</pre></code>
 
 <p>It's that simple to write and launch ChucK code that responds to a Unity event
    and uses values from current Unity variables!</p>
