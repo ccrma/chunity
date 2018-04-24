@@ -615,7 +615,36 @@ to add ChucK to any existing Unity project.</p>
    tutorial. This ChucK script plays an audio file and exits immediately afterward. The script
    is compiled and run every time the Player object has a collision.</p>
 
-<img class="tutorialimg" src="./images/tutorial6/1.png" width=700 />
+<pre class="line-numbers"><code class="language-csharp">void OnCollisionEnter( Collision collision )
+{
+	// map and clamp from [0, 16] to [0, 1]
+	float intensity = Mathf.Clamp01( collision.relativeVelocity.magnitude / 16 );
+
+	// square it to make the ramp upward more dramatic
+	intensity = intensity * intensity;
+
+	GetComponent&lt;ChuckSubInstance&gt;().RunCode( string.Format( @"
+		SndBuf impactBuf => dac;
+		me.dir() + ""impact.wav"" => impactBuf.read;
+
+		// start at the beginning of the clip
+		0 => impactBuf.pos;
+			
+		// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
+		1.5 - {0} + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
+	
+		chout <= ""Rate is "" <= impactBuf.rate() <= IO.newline();
+
+		// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
+		0.05 + 0.95 * {0} => impactBuf.gain;
+
+		// pass time so that the file plays
+		impactBuf.length() / impactBuf.rate() => now;
+
+		", intensity ) );
+	}
+}</code></pre>
+
 
 <p>In this tutorial, I will translate this script into one that is compiled and run once when
    the scene is opened. The new version of the script will trigger the audio file as a result
@@ -623,12 +652,60 @@ to add ChucK to any existing Unity project.</p>
 
 <p>The first thing to do is move the script from <span class="mono2">OnCollisionEnter()</span>
    to <span class="mono2">Start()</span>.</p>
-<img class="tutorialimg" src="./images/tutorial6/2.png" width=700 />
+
+<pre class="line-numbers"><code class="language-csharp">void Start()
+{
+	rb = GetComponent&lt;Rigidbody&gt;();
+	count = 0;
+	SetCountText();
+	winText.text = "";
+
+	GetComponent&lt;ChuckSubInstance&gt;().RunCode( string.Format( @"
+		SndBuf impactBuf => dac;
+		me.dir() + ""impact.wav"" => impactBuf.read;
+
+		// start at the beginning of the clip
+		0 => impactBuf.pos;
+		
+		// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
+		1.5 - {0} + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
+			
+		chout <= ""Rate is "" <= impactBuf.rate() <= IO.newline();
+
+		// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
+		0.05 + 0.95 * {0} => impactBuf.gain;
+
+		// pass time so that the file plays
+		impactBuf.length() / impactBuf.rate() => now;
+
+	", intensity ) );
+}</code></pre>
 
 <p>Next, remove the call to <span class="mono2">string.Format</span> and replace all
    of the format locations in the string with a new variable, <span class="mono2">intensity</span>.
    Wrap the entire script into a function called <span class="mono2">playImpact(&nbsp;float&nbsp;intensity&nbsp;)</span>.</p>
-<img class="tutorialimg" src="./images/tutorial6/3.png" width=700 />
+<pre class="line-numbers" data-line="2,11,16"><code class="language-csharp">GetComponent&lt;ChuckSubInstance&gt;().RunCode( @"
+	fun void playImpact( float intensity )
+	{
+		SndBuf impactBuf => dac;
+		me.dir() + ""impact.wav"" => impactBuf.read;
+
+		// start at the beginning of the clip
+		0 => impactBuf.pos;
+				
+		// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
+		1.5 - intensity + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
+			
+		chout <= ""Rate is "" <= impactBuf.rate() <= IO.newline();
+
+		// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
+		0.05 + 0.95 * intensity => impactBuf.gain;
+
+		// pass time so that the file plays
+		impactBuf.length() / impactBuf.rate() => now;
+	}
+" );
+</code></pre>
 
 <p>Now, let's add the external variables we will use to signal when this function should be called.
    We will set the value of an <span class="mono2">external float</span> from Unity, and then we
@@ -637,7 +714,31 @@ to add ChucK to any existing Unity project.</p>
 <p>These variables are specified just like regular variables, but with the <span class="mono2">external</span>
    keyword. Note that only global variables can be <span class="mono2">external</span>, and currently the
    only variable types supported are int, float, and Event.</p>
-<img class="tutorialimg" src="./images/tutorial6/4.png" width=700 />
+<pre class="line-numbers" data-line="22-23"><code class="language-csharp">GetComponent&lt;ChuckSubInstance&gt;().RunCode( @"
+	fun void playImpact( float intensity )
+	{
+		SndBuf impactBuf => dac;
+		me.dir() + ""impact.wav"" => impactBuf.read;
+
+		// start at the beginning of the clip
+		0 => impactBuf.pos;
+		
+		// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
+		1.5 - intensity + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
+		
+		chout <= ""Rate is "" <= impactBuf.rate() <= IO.newline();
+
+		// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
+		0.05 + 0.95 * intensity => impactBuf.gain;
+
+		// pass time so that the file plays
+		impactBuf.length() / impactBuf.rate() => now;
+	}
+	
+	external float impactIntensity;
+	external Event impactHappened;
+" );</code></pre>
+
 
 <p>Let's write the code that uses these variables. To wait for an Event to fire,
    we simply chuck the event to <span class="mono2">now</span>. To call the <span class="mono2">playImpact</span>
@@ -646,14 +747,56 @@ to add ChucK to any existing Unity project.</p>
 <p>So, forever (&nbsp;<span class="mono2">while(&nbsp;true&nbsp;)</span>&nbsp;), we will wait for an 
    <span class="mono2">impactHappened</span> event, and then call <span class="mono2">playImpact</span>
    with the value stored in <span class="mono2">impactIntensity</span>.</p>
-<img class="tutorialimg" src="./images/tutorial6/5.png" width=700 />
+<pre class="line-numbers" data-line="25-29"><code class="language-csharp">GetComponent&lt;ChuckSubInstance&gt;().RunCode( @"
+	fun void playImpact( float intensity )
+	{
+		SndBuf impactBuf => dac;
+		me.dir() + ""impact.wav"" => impactBuf.read;
+
+		// start at the beginning of the clip
+		0 => impactBuf.pos;
+		
+		// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
+		1.5 - intensity + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
+		
+		chout <= ""Rate is "" <= impactBuf.rate() <= IO.newline();
+
+		// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
+		0.05 + 0.95 * intensity => impactBuf.gain;
+
+		// pass time so that the file plays
+		impactBuf.length() / impactBuf.rate() => now;
+	}
+	
+	external float impactIntensity;
+	external Event impactHappened;
+
+	while( true )
+	{
+		impactHappened => now;
+		spork ~ playImpact( impactIntensity );
+	}
+" );</code></pre>
+
 
 <p>Finally, in the <span class="mono2">OnCollisionEnter</span> function, after we compute 
    the collision's intensity, we first set the value of the float <span class="mono2">impactIntensity</span>
    and then broadcast the event <span class="mono2">impactHappened</span>. These functions take the string
    name of the ChucK plugin as the first argument and the name of the external variable as the second argument,
    since each ChucK plugin has its own namespace of external variables.</p>
-<img class="tutorialimg" src="./images/tutorial6/6.png" width=700 />
+<pre class="line-numbers" data-line="9-11"><code class="language-csharp">void OnCollisionEnter( Collision collision )
+{
+	// map and clamp from [0, 16] to [0, 1]
+	float intensity = Mathf.Clamp01( collision.relativeVelocity.magnitude / 16 );
+
+	// square it to make the ramp upward more dramatic
+	intensity = intensity * intensity;
+
+	// set the intensity and fire the event
+	GetComponent&lt;ChuckSubInstance&gt;().SetFloat( "impactIntensity", intensity );
+	GetComponent&lt;ChuckSubInstance&gt;().BroadcastEvent( "impactHappened" );
+}</code></pre>
+
 <p>Congratulations! You've written a script using external variables. This practice allows you to write
    slightly more efficient code, since you won't need to send a new script to the ChucK compiler every time you want
    to generate sound.</p>
