@@ -2,8 +2,8 @@
 <!-- saved from url=(0052)http://chuck.stanford.edu/doc/language/overview.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>ChucK - [Unity: Tutorials]</title>
-<link rel="stylesheet" type="text/css" href="./css/style.css">
-<link rel="stylesheet" type="text/css" href="./css/prism.css">
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<link rel="stylesheet" type="text/css" href="../css/prism.css">
 </head>
 <body bgcolor="#ffffff" text="#000000">
 <center>
@@ -18,13 +18,13 @@
 <div id="chuck_header">
 <center>
 <h1>
-<strong>ChucK</strong> : Unity &gt; Tutorials
+<strong>ChucK</strong> : Chunity &gt; Tutorials
 </h1>
 
 <table border="0">
 <tbody><tr><td>
   	<div id="chuck_revision">
-	version: 1.3.x.x (chimera)
+	version: 1.4.x.x (numchucks)
   	</div>
   	
 </td></tr>
@@ -44,7 +44,7 @@
 	<table border="0"><tbody><tr><td>
 	<center>
 	<div class="chuck_nav_bar">	
-  (up): <a href="">up link</a> | (next): <a href="">next link</a> &gt; 
+  (up): <a href="..">chunity</a> <!-- | (next): <a href="">next link</a> &gt;  -->
 	</div>
 	</center>  
 	</td></tr></tbody></table>
@@ -86,7 +86,7 @@ This guide documents how to use the language in the Unity game engine environmen
 <p>
 These tutorials start from a working Roll a Ball game (<a target="_blank" href="https://unity3d.com/learn/tutorials/projects/roll-ball-tutorial">&#10144;Official Unity Tutorial</a>).<br />
 You are encouraged to follow that tutorial first if you are unfamiliar with working in Unity.
-If you'd rather not go through the Roll a Ball tutorial, you can download <a href="./files/Roll-a-ball_without_audio.zip" download>the resulting project</a>.
+If you'd rather not go through the Roll a Ball tutorial, you can download <a href="../files/Roll-a-ball_without_audio.zip" download>the resulting project</a>.
 </p>
 
 <p>If you know your way around Unity, you'll probably do fine following the below tutorials
@@ -101,18 +101,18 @@ to add ChucK to any existing Unity project.</p>
 <h2><strong>Setup</strong></h2>
 <ol>
 <li>
-<p>First, you'll need to add the <a href="./files/Chunity.unitypackage" download>necessary files</a> into the project. 
+<p>First, you'll need to add the <a href="../files/Chunity.unitypackage" download>necessary files</a> into the project. 
     Add this package to your project via the <span class="mono2">Assets > Import Package</span> menu.
 </p>
-<img class="tutorialimg" src="./images/tutorial1/1.png" width=600 />
+<img class="tutorialimg" src="../images/tutorial1/1.png" width=600 />
 <p>
     You will see something like this. Make sure to import all of the files. The names of the folders <span class="mono2">Plugins</span>, <span class="mono2">Resources</span>, 
     and <span class="mono2">StreamingAssets</span> are especially important, since these are folders that Unity treats specially because of their names.
 </p>
-<img class="tutorialimg" src="./images/tutorial1/2.png" width=700 />
+<img class="tutorialimg" src="../images/tutorial1/2.png" width=700 />
 
 <p>If you are replacing an older version of Chunity, restart Unity so that the new plugins are loaded correctly.</p>
-<img class="tutorialimg" src="./images/tutorial1/restart.png" width=500 />
+<img class="tutorialimg" src="../images/tutorial1/restart.png" width=500 />
 
 
 <p>Now, you've finished adding the necessary files to use ChucK in your project! <br /><br /><br /></p>
@@ -120,7 +120,7 @@ to add ChucK to any existing Unity project.</p>
 
 <li>
 <p>Next, we'll add an instance of ChucK to our scene. This tutorial will cover how to add ChucK to an individual
-   game object. To use ChucK as a plugin in an Audio Mixer, see the <a href="./with-plugins">Plugin Tutorials</a>.</p>
+   game object. To use ChucK as a plugin in an Audio Mixer, see the <a href="../with-plugins">Plugin Tutorials</a>.</p>
 
 <p>First, we need to add a global game object to hold our scene's <span class="mono2">ChuckMainInstance</span>. 
    All objects that play ChucK code will contain a reference to this object.
@@ -129,7 +129,7 @@ to add ChucK to any existing Unity project.</p>
 </p>
 <p>Here, I have created a new empty game object called <span class="mono2">TheChuck</span> and I am adding the
    <span class="mono2">ChuckMainInstance</span> component to it.</p>
-<img class="tutorialimg" src="./images/tutorial1/3.png" width=600 />
+<img class="tutorialimg" src="../images/tutorial1/3.png" width=600 />
 
 <p>Doing so will automatically add an <span class="mono2">Audio Source</span> to the object.
    This is used to fetch the microphone input correctly. You can ignore it. 
@@ -139,7 +139,7 @@ to add ChucK to any existing Unity project.</p>
    unless you want to use a microphone different than your system's default microphone.
    (In that case, put some substring of the name of the microphone into this field.)
 </p>
-<img class="tutorialimg" src="./images/tutorial1/4.png" width=500 />
+<img class="tutorialimg" src="../images/tutorial1/4.png" width=500 />
 
 <p>Now that we have created a <span class="mono2">ChuckMainInstance</span> for our scene, we can
    begin creating <span class="mono2">ChuckSubInstances</span> on game objects in our scene.
@@ -152,25 +152,25 @@ to add ChucK to any existing Unity project.</p>
    This Audio Source is used by ChucK to function correctly. (If you want to play audio files in ChucK, you
    should not use this Audio Source but should instead follow the directions in the <a href="#audiofiles">Audio Files</a> tutorial.)</p>
 
-<img class="tutorialimg" src="./images/tutorial1/5.png" width=800 />
+<img class="tutorialimg" src="../images/tutorial1/5.png" width=800 />
 
 <p>The next step is to give this component a reference to the <span class="mono2">ChuckMainInstance</span>
    we created earlier. Drag it into the <span class="mono2">Chuck Main Instance</span> slot on the new
    <span class="mono2">ChuckSubInstance</span> component.
 </p>
-<img class="tutorialimg" src="./images/tutorial1/6.png" width=600 />
+<img class="tutorialimg" src="../images/tutorial1/6.png" width=600 />
 
 <p>If you are using ChucK spatially, you can edit the 3D Sound options of this Audio Source. Since we are not using this 
    ChucK spatially, we can leave all the settings alone. Now we are done adding a ChucK Instance to our scene!</p>
 </li>
-<img class="tutorialimg" src="./images/tutorial1/7.png" width=400 />
+<img class="tutorialimg" src="../images/tutorial1/7.png" width=400 />
 
 <li>
 <p>Next, let's access this ChucK plugin through a Unity C# script.</p>
 
 <p>Since I am adding ChucK to my Roll a Ball project (<a target="_blank" href="https://unity3d.com/learn/tutorials/projects/roll-ball-tutorial">&#10144;Official Unity Tutorial</a>),
    I'll add ChucK to my PlayerController script. This script operates on the same object I added the ChucK Instance to.</p>
-<img class="tutorialimg" src="./images/tutorial1/8.png" width=300 />
+<img class="tutorialimg" src="../images/tutorial1/8.png" width=300 />
 
 
 <p>Now, let's write our first ChucK script in Unity!</p>
@@ -198,7 +198,7 @@ to add ChucK to any existing Unity project.</p>
 }</code></pre>
 <br />
 <p>Let's test it! Enter play mode.</p>
-<img class="tutorialimg" src="./images/tutorial1/9.png" width=600 />
+<img class="tutorialimg" src="../images/tutorial1/9.png" width=600 />
 
 <p>And you can hear audio! (Check the ChuckSubInstance script to see the audio levels for the instance while the game is in Play Mode.)</p>
 
@@ -318,13 +318,13 @@ to add ChucK to any existing Unity project.</p>
 
 <p>I'd like for one of my Pick Up objects to create spatialized sound, so I'll select
    one of these objects from the Hierarchy pane.</p>
-<img class="tutorialimg" src="./images/tutorial3/1.png" width=800 />
+<img class="tutorialimg" src="../images/tutorial3/1.png" width=800 />
 
 <p>Add a ChuckSubInstance to this object.</p>
-<img class="tutorialimg" src="./images/tutorial3/2.png" width=600 />
+<img class="tutorialimg" src="../images/tutorial3/2.png" width=600 />
 
 <p>And select the <span class="mono2">spatialize</span> option!</p>
-<img class="tutorialimg" src="./images/tutorial3/3.png" width=400 />
+<img class="tutorialimg" src="../images/tutorial3/3.png" width=400 />
 
 <p>Note that an <span class="mono2">AudioSource</span> has been added as a result of
    adding the ChuckSubInstance script. ChucK uses this AudioSource to capture spatialization
@@ -332,10 +332,10 @@ to add ChucK to any existing Unity project.</p>
    them automatically whenever the scene is run. (If you'd like to play an audio file, use
    <a href="#audiofiles">audio files in ChucK</a> instead.)</p>
 <p>You can use the 3D sound settings to adjust how your ChucK script is spatialized.</p>
-<img class="tutorialimg" src="./images/tutorial3/4.png" width=400 />
+<img class="tutorialimg" src="../images/tutorial3/4.png" width=400 />
 
 <p>In particular, I am going to change my maximum distance to be 40, since my scene is rather small.</p>
-<img class="tutorialimg" src="./images/tutorial3/5.png" width=400 />
+<img class="tutorialimg" src="../images/tutorial3/5.png" width=400 />
 <p>Now, the ChucK instance is all set up for spatial audio!<br /><br/></p>
 </li>
 
@@ -344,10 +344,10 @@ to add ChucK to any existing Unity project.</p>
 <p>I'll add a new script called <span class="mono2">PickupAudio</span> to my
    pickup object -- the same object that has the <span class="mono2">ChuckInstance</span>
    component from the last step.</p>
-<img class="tutorialimg" src="./images/tutorial3/6.png" width=800 />
+<img class="tutorialimg" src="../images/tutorial3/6.png" width=800 />
 
 <p>(Don't forget to move your new script to the <span class="mono2">Scripts</span> folder!)</p>
-<img class="tutorialimg" src="./images/tutorial3/7.png" width=300 />
+<img class="tutorialimg" src="../images/tutorial3/7.png" width=300 />
 
 <p>We write ChucK code for a spatialized ChucK instance in exactly the same way as for a 
    non-spatialized ChucK instance!</p>
@@ -372,13 +372,13 @@ to add ChucK to any existing Unity project.</p>
 <p>Let's test our new script to see if it's working!</p>
 <p>When my Audio Listener has an the Audio Source on its right, then the spatialized audio output is louder
    in the left channel than the right.</p>
-<img class="tutorialimg" src="./images/tutorial3/9.png" width=600 />
+<img class="tutorialimg" src="../images/tutorial3/9.png" width=600 />
 
 <p>And, when my Audio Listener is on the left side of an Audio Source, the spatialized audio
    is louder on the right channel than the left! The reason that the audio is so quiet in both cases is
    that the Audio Listener is on our scene's Camera, so in both cases the Audio Listener is actually pretty
    far away from the Audio Source.</p>
-<img class="tutorialimg" src="./images/tutorial3/10.png" width=600 />
+<img class="tutorialimg" src="../images/tutorial3/10.png" width=600 />
 <p>Congratulations! You've just set up your first spatial audio script in Unity using ChucK!<br /><br /><br /></p>
 </li>
 
@@ -389,28 +389,28 @@ to add ChucK to any existing Unity project.</p>
 <p>I'll start by making the spatialized Pick Up a different color.</p>
 <p>Highlight the Pick Up material in the Project pane.
    This material is what gives the Pick Ups their yellow color.</p>
-<img class="tutorialimg" src="./images/tutorial3/11.png" width=300 />
+<img class="tutorialimg" src="../images/tutorial3/11.png" width=300 />
 
 <p>Duplicate it using CTRL-D (Windows) or CMD-D (OS X).</p>
-<img class="tutorialimg" src="./images/tutorial3/12.png" width=300 />
+<img class="tutorialimg" src="../images/tutorial3/12.png" width=300 />
 
 <p>Give the duplicated material a new name. I'll call mine Spatial Pick Up.</p>
-<img class="tutorialimg" src="./images/tutorial3/13.png" width=250 />
+<img class="tutorialimg" src="../images/tutorial3/13.png" width=250 />
 
 <p>Next, I'll change the color of my new material by editing the Albedo property.</p>
-<img class="tutorialimg" src="./images/tutorial3/14.png" width=400 />
+<img class="tutorialimg" src="../images/tutorial3/14.png" width=400 />
 
 <p>There! Now, any object using the Spatial Pick Up material will be colored green.</p>
-<img class="tutorialimg" src="./images/tutorial3/15.png" width=400 />
+<img class="tutorialimg" src="../images/tutorial3/15.png" width=400 />
 
 <p>Apply the new material to the Pick Up we added spatialization to by dragging
    the material from the Project pane onto the Pick Up in the Hierarchy pane.</p>
-<img class="tutorialimg" src="./images/tutorial3/16.png" width=250 />
+<img class="tutorialimg" src="../images/tutorial3/16.png" width=250 />
 
 <p>Now, the Pick Up looks different! But, I still don't think that its visual
    appearance corresponds very well with the sound of a triangle wave oscillator
    with a rapidly-changing frequency...</p>
-<img class="tutorialimg" src="./images/tutorial3/17.png" width=700 />
+<img class="tutorialimg" src="../images/tutorial3/17.png" width=700 />
 
 <p>Let's change this by adding a rapid movement to the spatial Pick Up!</p>
 <p>We'll do this by modifying the existing <span class="mono2">Rotator</span>
@@ -463,15 +463,15 @@ to add ChucK to any existing Unity project.</p>
 
 <p>The last thing to do is to set the new Rotate Randomly boolean to be checked on
    for the Pick Up we spatialized earlier.</p>
-<img class="tutorialimg" src="./images/tutorial3/20.png" width=500 />
+<img class="tutorialimg" src="../images/tutorial3/20.png" width=500 />
 
 <p>When you've done that, it will look like this for the spatial Pick Up, but will
    remain unchecked for the rest of the Pick Ups.</p>
-<img class="tutorialimg" src="./images/tutorial3/21.png" width=400 />
+<img class="tutorialimg" src="../images/tutorial3/21.png" width=400 />
 
 <p>Now, the spatial Pick Up looks really visually distinct, and its movement aligns
    well with the audio it is emitting!</p>
-<img class="tutorialimg" src="./images/tutorial3/22.png" width=700 />
+<img class="tutorialimg" src="../images/tutorial3/22.png" width=700 />
 <p>Congratulations! You've finished integrating spatial audio into a ChucK project! </p>
 </li>
 </ol>
@@ -487,7 +487,7 @@ to add ChucK to any existing Unity project.</p>
    during runtime, it must be located inside of a special folder called <span class="mono2">StreamingAssets</span>.
    Create this folder in your Project pane and put an audio file you'd like to
    use inside it. My audio file is called <span class="mono2">impact.wav</span>.</p>
-<img class="tutorialimg" src="./images/tutorial4/1.png" width=300 />
+<img class="tutorialimg" src="../images/tutorial4/1.png" width=300 />
 
 <p>Since I'd like to play this file when the Player collides with another game object,
    I'll add an <span class="mono2">OnCollisionEnter()</span> method to my Player class.</p>
@@ -506,7 +506,7 @@ to add ChucK to any existing Unity project.</p>
 
 <p>Based on this experiment, it looks like the relevant range of my <span class="mono2">intensity</span>
    variable will be roughly <span class="mono2">[0, 16]</span>.</p>
-<img class="tutorialimg" src="./images/tutorial4/2.png" width=600 />
+<img class="tutorialimg" src="../images/tutorial4/2.png" width=600 />
 
 <p>I'll scale the intensity down to roughly <span class="mono2">[0, 1]</span> by dividing it by 
    <span class="mono2">16</span>, then clamp it to exactly <span class="mono2">[0, 1]</span>.
@@ -598,7 +598,7 @@ to add ChucK to any existing Unity project.</p>
 
 
 <p></p>
-<img class="tutorialimg" src="./images/tutorial5/2.png" width=400 />
+<img class="tutorialimg" src="../images/tutorial5/2.png" width=400 />
 
 </div>
 
@@ -810,7 +810,7 @@ to add ChucK to any existing Unity project.</p>
    <span class="mono2">AudioAnalyzer</span> because it will be analyzing all the audio that comes out of the 
    <span class="mono2">dac</span> on this ChuckInstance.</p>
 
-<img class="tutorialimg" src="./images/tutorial8/1.png" width=500 />
+<img class="tutorialimg" src="../images/tutorial8/1.png" width=500 />
 
 <p>In this new Unity class, I add a variable to store a float from ChucK. This is <span class="mono2">
    double mostRecentDacLoudness</span>. (Note that ChucK <span class="mono2">float</span>s correspond to Unity 
@@ -946,7 +946,7 @@ to add ChucK to any existing Unity project.</p>
    process all audio in ChucK.</p>
 <p>For example, if I add the <span class="mono2">Bitcrusher.chug</span> ChuGin to
    my Chugins folder...</p>
-<img class="tutorialimg" src="./images/tutorial7/1.png" width=350 />
+<img class="tutorialimg" src="../images/tutorial7/1.png" width=350 />
 
 <p>... then, I can write ChucK scripts using the Bitcrusher UGen!</p>
 <p>Here, I've modified the <a href="#audiofiles">Audio File</a> impact script
@@ -995,10 +995,10 @@ to add ChucK to any existing Unity project.</p>
    you can write <a target="_blank" href="http://faust.grame.fr/">Faust</a> signal processing code 
    in ChucK using the Faust ChuGin!</p>
 <p>Just add the Faust.chug Chugin to your StreamingAssets folder...</p>
-<img class="tutorialimg" src="./images/tutorial7/3.png" width=300 />
+<img class="tutorialimg" src="../images/tutorial7/3.png" width=300 />
 
 <p>... and then, you can write Faust code inside your ChucK code inside your Unity code!</p>
-<img class="tutorialimg" src="./images/tutorial7/4.png" width=500 />
+<img class="tutorialimg" src="../images/tutorial7/4.png" width=500 />
 <p>Wow! That's Fausttastic!</p>
 -->
 <p>Thanks for following these tutorials. Good luck ChucKing in Unity!</p>
@@ -1022,7 +1022,7 @@ to add ChucK to any existing Unity project.</p>
 	<table border="0"><tbody><tr><td>
 	<center>
 	<div class="chuck_nav_bar">	
-  (up): <a href="">up link</a> | (next): <a href="">next link</a> &gt; 
+  (up): <a href="..">chunity</a> <!-- | (next): <a href="">next link</a> &gt;  -->
 	</div>
 	</center>  
 	</td></tr></tbody></table>
@@ -1050,5 +1050,5 @@ to add ChucK to any existing Unity project.</p>
 
 </center>
 
-<script src="./js/prism.js"></script>
+<script src="../js/prism.js"></script>
 </body></html>
