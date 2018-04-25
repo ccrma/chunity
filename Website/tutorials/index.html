@@ -342,7 +342,7 @@ to add ChucK to any existing Unity project.</p>
 <li>
 <p>Now, let's write a script to use the new spatialized ChucK instance.</p>
 <p>I'll add a new script called <span class="mono2">PickupAudio</span> to my
-   pickup object -- the same object that has the <span class="mono2">ChuckInstance</span>
+   pickup object -- the same object that has the <span class="mono2">ChuckSubInstance</span>
    component from the last step.</p>
 <img class="tutorialimg" src="../images/tutorial3/6.png" width=800 />
 
@@ -529,7 +529,7 @@ to add ChucK to any existing Unity project.</p>
 <p>The sound file itself is accessed via its filename. Note that in Unity, the
    <span class="mono2">me.dir()</span> ChucK expression refers automatically to the 
    <span class="mono2">StreamingAssets</span> folder for code that is run using 
-   <span class="mono2">ChuckInstance.RunCode()</span>.</p>
+   <span class="mono2">ChuckSubInstance.RunCode()</span>.</p>
 
 <pre data-line="10-11,17,20" class="line-numbers"><code class="language-csharp">void OnCollisionEnter( Collision collision )
 {
@@ -606,9 +606,10 @@ to add ChucK to any existing Unity project.</p>
 <h2><strong>Using Unity Variables (2): ChucK External Variables</strong></h2>
 <p>This tutorial documents ChucK external variables. Using this type of variable 
    allows you to set and get the values of ChucK variables after a ChucK script
-   is already running. Currently, it can be applied to ints and floats. It can
+   is already running. Currently, it can be applied to ints, floats, and strings. It can
    also be applied to Events, for which the relevant actions are signaling and
-   broadcasting the event.</p>
+   broadcasting the event. We are always adding support for more types of external
+   variables!</p>
 <p>This tutorial will also go over writing a function in ChucK and running that
    function in a new shred (the word for threads in ChucK).</p>
 <p>Let's start with the ChucK script that we wrote in the <a href="#audiofiles">Audio Files</a>
@@ -713,7 +714,7 @@ to add ChucK to any existing Unity project.</p>
    that it should play an impact using the value stored in the external float.</p>
 <p>These variables are specified just like regular variables, but with the <span class="mono2">external</span>
    keyword. Note that only global variables can be <span class="mono2">external</span>, and currently the
-   only variable types supported are int, float, and Event.</p>
+   only variable types supported are int, float, string, Event, UGen, int array, and float array.</p>
 <pre class="line-numbers" data-line="22-23"><code class="language-csharp">GetComponent&lt;ChuckSubInstance&gt;().RunCode( @"
 	fun void playImpact( float intensity )
 	{
@@ -806,9 +807,9 @@ to add ChucK to any existing Unity project.</p>
 <h2><strong>Getting ChucK External Variables</strong></h2>
 <p>Now let's look at how to get back out the values of external variables! 
    You might want to do this if you want to do some analysis of your audio in ChucK and use the results in Unity.</p>
-<p>Let's start by adding a new script onto the same game object where our ChuckInstance is. I'll call my script
+<p>Let's start by adding a new script onto the same game object where our ChuckSubInstance is. I'll call my script
    <span class="mono2">AudioAnalyzer</span> because it will be analyzing all the audio that comes out of the 
-   <span class="mono2">dac</span> on this ChuckInstance.</p>
+   <span class="mono2">dac</span> on this ChuckSubInstance.</p>
 
 <img class="tutorialimg" src="../images/tutorial8/1.png" width=500 />
 
@@ -820,7 +821,7 @@ to add ChucK to any existing Unity project.</p>
    I compute the loudness of the <span class="mono2">dac</span> using an RMS Unit Analyzer ("UAna"),
    I store the result in <span class="mono2">dacLoudness</span>.</p>
 <p>Then, in the Unity <span class="mono2">Update()</span> function, I call <span class="mono2">GetFloat</span> with the name
-   of the float I'd like to get and a function that will be called for the ChuckInstance to send back the value of the float. 
+   of the float I'd like to get and a function that will be called for the ChuckSubInstance to send back the value of the float. 
    The name of the function is <span class="mono2">GetDacLoudnessCallback</span>. I pass this function using a 
    <span class="mono2">Chuck.FloatCallback</span> (here, <span class="mono2">myGetLoudnessCallback</span>), constructed
    in the Start function.</p>
@@ -832,7 +833,7 @@ to add ChucK to any existing Unity project.</p>
 <pre class="line-numbers" data-line="3,5,15,27-28,38,41-45"><code class="language-csharp">public class AudioAnalyzer : MonoBehaviour
 {
 	double mostRecentDacLoudness;
-	ChuckInstance myChuck;
+	ChuckSubInstance myChuck;
 	Chuck.FloatCallback myGetLoudnessCallback;
 
 	void Start()
