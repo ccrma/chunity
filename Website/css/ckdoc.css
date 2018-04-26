@@ -1,0 +1,172 @@
+@import url(../chuck.css);
+
+.libindex { 
+	margin : 10px;
+}
+
+.briefdesc { 
+	width : 100%;
+}
+
+.intro { 
+
+}
+
+.ckexample { 
+	border: 1px solid gray;
+	background : #f0f0f0;
+	padding-left : 10px;
+	margin: 20px;
+}
+
+
+.library { 
+
+	margin : 0px;
+	margin-bottom: 30px;
+}
+
+
+.exportlist { 
+	padding : 5px;
+	
+}
+
+.ugen { 
+	font-size: 10pt;
+	font-family: sans-serif;
+	border: 2px solid #808080;
+	background: #fdfdfd;
+	margin : 10px;
+	width : 500px;
+	padding : 0px;
+	margin-bottom: 30px;
+}
+
+.ugen h3 { 
+	font-size: 120%;
+	font-weight: 400;
+	padding: 0.5em;
+	background: #f0fff0;
+	margin: 0px;
+}
+
+td h3 : hover { 
+	background: #f8f8d0;
+}
+
+tr.ugen td { 
+	border-top : 2px solid #b0b0b0;
+}
+
+tr.ugen td h3 { 
+	padding-top: 5px;
+	padding-bottom: 5px;
+	background: #e0f0e0;
+	height: 100%;
+}
+
+
+.name { 
+	font-size: 100%;
+	font-weight: 800;
+}	
+
+.heading { 
+	color: #40a040;
+}	
+
+.ugen h4 { 
+	background: #ffe0e0;
+	margin : 0px;
+	font-size : 110%;
+}
+
+.data { 
+	margin: 0em;
+	font-size: 90%;
+	background : #f8f8f8;
+}
+
+.comments { 
+	margin : 0px;
+	padding : 0.5em;
+	background : #e8e8e8;
+}
+
+.comments ul { 
+	margin : 0px; 
+	margin-left : 1em;
+	padding : 0px;
+	list-style-type : square;
+}
+
+.comment, .comments li { 
+	margin-left: 0;
+	font-style: italic;
+}
+
+tr { 
+	margin : 5px;
+}
+
+td.comments { 
+	width:70%;
+	margin : 5px;
+	padding : 5px;
+}
+
+.members { 
+	margin: 0px;
+	padding: 0.5em;
+	background : #f0f0f0;
+}
+
+.members ul { 
+	margin : 1em;
+	margin-left : 1em;
+}
+
+li.members { 
+	left : 10px;
+}
+
+li.members b { 
+	font-weight : 800;
+}
+
+.export { 
+	font-size: 10pt;
+	font-family: sans-serif;
+	border: 1px solid #808080;
+	background: #fdfdfd;
+	margin : 5px;
+	width : 620px;
+	padding : 0px;
+	margin-bottom: 15px;
+}
+
+.export h3 { 
+	font-weight: 400;
+	padding : 2px;
+	margin : 0.5em;
+	font-size: 110%;
+}
+.arg { 
+	font-weight: 800;
+}
+
+.morecomments {
+	font-family: monospace;
+	font-size: 90%;
+	margin: .5em 2em;
+}
+
+.greentext {
+    color: #33aa33;
+}
+
+.bold {
+    font-weight:bold;
+}
+
