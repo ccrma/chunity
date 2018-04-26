@@ -170,3 +170,10 @@ li.members b {
     font-weight:bold;
 }
 
+h3.function-name {
+    padding-left: 22px;
+    text-indent: -20px;
+    line-height: 1.4;
+}
+
+

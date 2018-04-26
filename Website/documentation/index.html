@@ -100,15 +100,232 @@ while( true )
 }
 </div></div>
  -->
-<div class="export"><h3>
-<a class="heading" name="fabs">[function]</a>:
+<!-- Running code -->
+<h2 class="greentext">Running Code</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">RunCode</b> ( string <span class="bold arg">code</span> );</h3>
 <div class="comments"><ul>
 <li>add a new ChucK program to this VM</li>
-<li><span class="bold arg">code</span>: the literal text of the program to run
+<li><span class="bold arg">code</span>: the literal text of the program to run</li>
+</ul></div></div>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">RunFile</b> ( string <span class="bold arg">filename</span>, bool <span class="bold arg">fromStreamingAssets</span> = true  );</h3>
+<div class="comments"><ul>
+<li>add a new ChucK program to this VM, from filename</li>
+<li><span class="bold arg">filename</span>: the location of the file to run</li>
+<li><span class="bold arg">fromStreamingAssets</span>: if true, <span class="bold arg">filename</span> is relative to the path of the StreamingAssets folder</li>
 </ul></div></div>
 
 
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">RunFile</b> ( string <span class="bold arg">filename</span>, string <span class="bold arg">colonSeparatedArgs</span>, bool <span class="bold arg">fromStreamingAssets</span> = true );</h3>
+<div class="comments"><ul>
+<li>add a new ChucK program to this VM, from filename</li>
+<li><span class="bold arg">filename</span>: the location of the file to run</li>
+<li><span class="bold arg">colonSeparatedArgs</span>: the arguments to pass to the ChucK file, joined together by colons</li>
+<li><span class="bold arg">fromStreamingAssets</span>: if true, <span class="bold arg">filename</span> is relative to the path of the StreamingAssets folder</li>
+</ul></div></div>
+
+
+
+<!-- External ints -->
+<br /><h2 class="greentext">External Ints</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SetInt</b> ( string <span class="bold arg">variableName</span>, System.Int64 <span class="bold arg">value</span> );</h3>
+<div class="comments"><ul>
+<li>set the value of external int variableName</li>
+<li><span class="bold arg">variableName</span>: the name of the external int to set</li>
+<li><span class="bold arg">value</span>: the value to set it to. this is a System.Int64 because ChucK ints are 64 bit integers</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetInt</b> ( string <span class="bold arg">variableName</span>, Chuck.IntCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>eventually call the callback with the value of external int variableName</li>
+<li><span class="bold arg">variableName</span>: the name of the external int to get</li>
+<li><span class="bold arg">callback</span>: the function to call when we know the value</li>
+</ul></div></div>
+
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+Chuck.IntCallback <b class="name">CreateGetIntCallback</b> ( Action< System.Int64 > <span class="bold arg">callbackFunction</span> );</h3>
+<div class="comments"><ul>
+<li>constructs the callback necessary for GetInt. you should store this callback yourself to avoid it being garbage collected</li>
+<li><span class="bold arg">callbackFunction</span>: the function to call when ChucK has the value of your GetInt operation. this is a function that has one argument, a System.Int64</li>
+</ul></div></div>
+
+
+<!-- External floats -->
+<br /><h2 class="greentext">External Floats</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SetFloat</b> ( string <span class="bold arg">variableName</span>, double <span class="bold arg">value</span> );</h3>
+<div class="comments"><ul>
+<li>set the value of external float variableName</li>
+<li><span class="bold arg">variableName</span>: the name of the external float to set</li>
+<li><span class="bold arg">value</span>: the value to set it to. this is a double because ChucK floats are 64-bit (i.e. a "double" in C++ and C#)</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetFloat</b> ( string <span class="bold arg">variableName</span>, Chuck.FloatCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>eventually call the callback with the value of external float variableName</li>
+<li><span class="bold arg">variableName</span>: the name of the external float to get</li>
+<li><span class="bold arg">callback</span>: the function to call when we know the value</li>
+</ul></div></div>
+
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+Chuck.FloatCallback <b class="name">CreateGetFloatCallback</b> ( Action< double > <span class="bold arg">callbackFunction</span> );</h3>
+<div class="comments"><ul>
+<li>constructs the callback necessary for GetFloat. you should store this callback yourself to avoid it being garbage collected</li>
+<li><span class="bold arg">callbackFunction</span>: the function to call when ChucK has the value of your GetFloat operation. this is a function that has one argument, a double</li>
+</ul></div></div>
+
+
+
+<!-- External strings -->
+<br /><h2 class="greentext">External Strings</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SetString</b> ( string <span class="bold arg">variableName</span>, string <span class="bold arg">value</span> );</h3>
+<div class="comments"><ul>
+<li>set the value of external string variableName</li>
+<li><span class="bold arg">variableName</span>: the name of the external string to set</li>
+<li><span class="bold arg">value</span>: the value to set it to</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetString</b> ( string <span class="bold arg">variableName</span>, Chuck.StringCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>eventually call the callback with the value of external string variableName</li>
+<li><span class="bold arg">variableName</span>: the name of the external string to get</li>
+<li><span class="bold arg">callback</span>: the function to call when we know the value</li>
+</ul></div></div>
+
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+Chuck.StringCallback <b class="name">CreateGetStringCallback</b> ( Action< string > <span class="bold arg">callbackFunction</span> );</h3>
+<div class="comments"><ul>
+<li>constructs the callback necessary for GetString. you should store this callback yourself to avoid it being garbage collected</li>
+<li><span class="bold arg">callbackFunction</span>: the function to call when ChucK has the value of your GetString operation. this is a function that has one argument, a string</li>
+</ul></div></div>
+
+
+
+<!-- External Events -->
+<br /><h2 class="greentext">External Events</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SignalEvent</b> ( string <span class="bold arg">variableName</span> );</h3>
+<div class="comments"><ul>
+<li>calls .signal() on external Event variableName (i.e. awake the next listener)</li>
+<li><span class="bold arg">variableName</span>: the name of the external Event to signal</li>
+</ul></div></div>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">BroadcastEvent</b> ( string <span class="bold arg">variableName</span> );</h3>
+<div class="comments"><ul>
+<li>calls .broadcast() on external Event variableName (i.e. awake all listeners)</li>
+<li><span class="bold arg">variableName</span>: the name of the external Event to broadcast</li>
+</ul></div></div>
+
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">ListenForChuckEventOnce</b> ( string <span class="bold arg">variableName</span>, Chuck.VoidCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>calls the callback the next time that external Event variableName signals it</li>
+<li><span class="bold arg">variableName</span>: the name of the external Event to listen to</li>
+<li><span class="bold arg">callback</span>: the function to call when the external Event signals</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">StartListeningForChuckEvent</b> ( string <span class="bold arg">variableName</span>, Chuck.VoidCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>calls the callback every time that external Event variableName signals it (until cancelled)</li>
+<li><span class="bold arg">variableName</span>: the name of the external Event to listen to</li>
+<li><span class="bold arg">callback</span>: the function to call when the external Event signals</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">StopListeningForChuckEvent</b> ( string <span class="bold arg">variableName</span>, Chuck.VoidCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>stop calling the callback registered to external Event variableName</li>
+<li><span class="bold arg">variableName</span>: the name of the external Event to listen to</li>
+<li><span class="bold arg">callback</span>: the function to stop calling when the external Event signals</li>
+</ul></div></div>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+Chuck.VoidCallback <b class="name">CreateVoidCallback</b> ( Action <span class="bold arg">callbackFunction</span> );</h3>
+<div class="comments"><ul>
+<li>constructs the callback necessary for external Events. you should store this callback yourself to avoid it being garbage collected</li>
+<li><span class="bold arg">callbackFunction</span>: the function to call when the ChucK Event signals. this is a function that has no arguments</li>
+</ul></div></div>
+
+
+
+
+
+<!-- External int arrays -->
+<br /><h2 class="greentext">External Int Arrays</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SetInt</b> ( string <span class="bold arg">variableName</span>, System.Int64 <span class="bold arg">value</span> );</h3>
+<div class="comments"><ul>
+<li>set the value of external int variableName</li>
+<li><span class="bold arg">variableName</span>: the name of the external int to set</li>
+<li><span class="bold arg">value</span>: the value to set it to. this is a System.Int64 because ChucK ints are 64 bit integers</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetInt</b> ( string <span class="bold arg">variableName</span>, Chuck.IntCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>eventually call the callback with the value of external int variableName</li>
+<li><span class="bold arg">variableName</span>: the name of the external int to get</li>
+<li><span class="bold arg">callback</span>: the function to call when we know the value</li>
+</ul></div></div>
+
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+Chuck.IntCallback <b class="name">CreateGetIntCallback</b> ( Action< System.Int64 > <span class="bold arg">callbackFunction</span> );</h3>
+<div class="comments"><ul>
+<li>constructs the callback necessary for GetInt. you should store this callback yourself to avoid it being garbage collected</li>
+<li><span class="bold arg">callbackFunction</span>: the function to call when ChucK has the value of your GetInt operation. this is a function that has one argument, a System.Int64</li>
+</ul></div></div>
+
+
+
+<!-- DON'T FORGET GetUniqueVariableName -->
+<!-- DON'T FORGET ChuckSubInstance.SetRunning -->
 
 
 <div class="export"><h3>
