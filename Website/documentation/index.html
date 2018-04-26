@@ -56,6 +56,7 @@
 
 <div id="lang_topic_body">
 
+<!-- TODO intro / table of contents to leap to the various sections below -->
 
 <h1><strong>ChuckMainInstance / ChuckSubInstance</strong></h1>
 <p>
@@ -63,19 +64,6 @@ These libraries have identical APIs. In most cases, you will be sending commands
 to a ChuckSubInstance, which will send on those commands to whichever ChuckMainInstance
 it refers to, but you can also send commands directly to a ChuckMainInstance.</p>
 
-<!-- TODO: ChuckMainInstance / ChuckSubInstance -->
-<!-- TODO: ChuckMainInstance microphoneIdentifier -->
-<!-- TODO: The helper classes:
-           ChuckEventListener
-           ChuckIntSyncer
-           ChuckFloatSyncer
-           ChuckStringSyncer
-           TheChuck
-           -->
-<!-- This should be it, right? All the other scripts in the boilerplate
-     are example scripts. And, users should not need to use the Chuck.cs class directly.
-     I can put "create get float" etc only in the first one, because the users
-     will not need Chuck.X for those cus it's duplicated. -->
 
 <!-- <font class="greentext" size="3">namespace: <b>Std</b></font> -->
 
@@ -136,11 +124,11 @@ bool <b class="name">RunFile</b> ( string <span class="bold arg">filename</span>
 <br /><h2 class="greentext">External Ints</h2>
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
-bool <b class="name">SetInt</b> ( string <span class="bold arg">variableName</span>, System.Int64 <span class="bold arg">value</span> );</h3>
+bool <b class="name">SetInt</b> ( string <span class="bold arg">variableName</span>, long <span class="bold arg">value</span> );</h3>
 <div class="comments"><ul>
 <li>set the value of external int variableName</li>
 <li><span class="bold arg">variableName</span>: the name of the external int to set</li>
-<li><span class="bold arg">value</span>: the value to set it to. this is a System.Int64 because ChucK ints are 64 bit integers</li>
+<li><span class="bold arg">value</span>: the value to set it to. this is a long because ChucK ints are 64 bit integers</li>
 </ul></div></div>
 
 
@@ -157,10 +145,10 @@ bool <b class="name">GetInt</b> ( string <span class="bold arg">variableName</sp
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
-Chuck.IntCallback <b class="name">CreateGetIntCallback</b> ( Action< System.Int64 > <span class="bold arg">callbackFunction</span> );</h3>
+Chuck.IntCallback <b class="name">CreateGetIntCallback</b> ( Action< long > <span class="bold arg">callbackFunction</span> );</h3>
 <div class="comments"><ul>
 <li>constructs the callback necessary for GetInt. you should store this callback yourself to avoid it being garbage collected</li>
-<li><span class="bold arg">callbackFunction</span>: the function to call when ChucK has the value of your GetInt operation. this is a function that has one argument, a System.Int64</li>
+<li><span class="bold arg">callbackFunction</span>: the function to call when ChucK has the value of your GetInt operation. this is a function that has one argument, a long</li>
 </ul></div></div>
 
 
@@ -295,20 +283,20 @@ Chuck.VoidCallback <b class="name">CreateVoidCallback</b> ( Action <span class="
 <br /><h2 class="greentext">External Int Arrays</h2>
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
-bool <b class="name">SetInt</b> ( string <span class="bold arg">variableName</span>, System.Int64 <span class="bold arg">value</span> );</h3>
+bool <b class="name">SetIntArray</b> ( string <span class="bold arg">variableName</span>, long[] <span class="bold arg">values</span> );</h3>
 <div class="comments"><ul>
-<li>set the value of external int variableName</li>
-<li><span class="bold arg">variableName</span>: the name of the external int to set</li>
-<li><span class="bold arg">value</span>: the value to set it to. this is a System.Int64 because ChucK ints are 64 bit integers</li>
+<li>set all values at once of external int variableName[]</li>
+<li><span class="bold arg">variableName</span>: the name of the external int array to set</li>
+<li><span class="bold arg">value</span>: the values to assign to this array. these are longs because ChucK ints are 64 bit integers</li>
 </ul></div></div>
 
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
-bool <b class="name">GetInt</b> ( string <span class="bold arg">variableName</span>, Chuck.IntCallback <span class="bold arg">callback</span> );</h3>
+bool <b class="name">GetIntArray</b> ( string <span class="bold arg">variableName</span>, Chuck.IntArrayCallback <span class="bold arg">callback</span> );</h3>
 <div class="comments"><ul>
-<li>eventually call the callback with the value of external int variableName</li>
-<li><span class="bold arg">variableName</span>: the name of the external int to get</li>
+<li>eventually call the callback with the value of external int variableName[]</li>
+<li><span class="bold arg">variableName</span>: the name of the external int array to get</li>
 <li><span class="bold arg">callback</span>: the function to call when we know the value</li>
 </ul></div></div>
 
@@ -316,95 +304,212 @@ bool <b class="name">GetInt</b> ( string <span class="bold arg">variableName</sp
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
-Chuck.IntCallback <b class="name">CreateGetIntCallback</b> ( Action< System.Int64 > <span class="bold arg">callbackFunction</span> );</h3>
+Chuck.IntArrayCallback <b class="name">CreateGetIntArrayCallback</b> ( Action< long[], ulong > <span class="bold arg">callbackFunction</span> );</h3>
 <div class="comments"><ul>
-<li>constructs the callback necessary for GetInt. you should store this callback yourself to avoid it being garbage collected</li>
-<li><span class="bold arg">callbackFunction</span>: the function to call when ChucK has the value of your GetInt operation. this is a function that has one argument, a System.Int64</li>
+<li>constructs the callback necessary for GetIntArray. you should store this callback yourself to avoid it being garbage collected</li>
+<li><span class="bold arg">callbackFunction</span>: the function to call when ChucK has the value of your GetIntArray operation. this is a function that has two arguments, a long array (the values) and an unsigned long (the number of values)</li>
 </ul></div></div>
 
 
 
-<!-- DON'T FORGET GetUniqueVariableName -->
-<!-- DON'T FORGET ChuckSubInstance.SetRunning -->
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SetIntArrayValue</b> ( string <span class="bold arg">variableName</span>, uint <span class="bold arg">index</span>, long <span class="bold arg">value</span> );</h3>
+<div class="comments"><ul>
+<li>set the value of external int variableName[index]</li>
+<li><span class="bold arg">variableName</span>: the name of the external int array to set a value in</li>
+<li><span class="bold arg">index</span>: the index of the array at which to set the value</li>
+<li><span class="bold arg">value</span>: the value to assign to this index on this array. this is a long because ChucK ints are 64 bit integers</li>
+</ul></div></div>
 
 
-<div class="export"><h3>
-<a class="heading" name="fabs">[function]</a>: 
-float <b class="name">fabs</b> ( float <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>returns absolute value of floating point number</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="rand">[function]</a>: 
-int <b class="name">rand</b> (  ); // soon-to-be-deprecated; use Math.random() </h3>
-<div class="comments"><ul><li>generates random integer</li><li>(NOTE: soon-to-be-deprecated; use Math.random())</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="rand2">[function]</a>: 
-int <b class="name">rand2</b> ( int <b class="arg">min</b>, int <b class="arg">max</b> ); // soon-to-be-deprecated; use Math.random2()</h3>
-<div class="comments"><ul><li>generates random integer in the range [min, max]</li>
-<li>(NOTE: soon-to-be-deprecated; use Math.random2())</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="randf">[function]</a>: 
-float <b class="name">randf</b> (  ); // soon-to-be-deprecated; use Math.randomf()</h3>
-<div class="comments"><ul><li>generates random floating point number in the range [-1, 1]</li>
-<li>(Note: soon-to-be-deprecated; use Math.randomf())</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="rand2f">[function]</a>: 
-float <b class="name">rand2f</b> ( float <b class="arg">min</b>, float <b class="arg">max</b> ); // soon-to-be-deprecated; use 
-Math.random2f()</h3>
-<div class="comments"><ul><li>generates random floating point number in the range [min, max]</li>
-<li>(NOTE: soon-to-be-deprecated; use Math.random2f())</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="sgn">[function]</a>: 
-float <b class="name">sgn</b> ( float <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>computes the sign of the input as -1.0 (negative), 0 (zero), or 
-1.0 (positive)</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="system">[function]</a>: 
-int <b class="name">system</b> ( string <b class="arg">cmd</b> );</h3>
-<div class="comments"><ul><li>pass a command to be executed in the shell</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="atoi">[function]</a>: 
-int <b class="name">atoi</b> ( string <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>converts ascii (string) to integer (int)</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="atof">[function]</a>: 
-float <b class="name">atof</b> ( string <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>converts ascii (string) to floating point value (float)</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="getenv">[function]</a>: 
-string <b class="name">getenv</b> ( string <b class="arg">key</b> );</h3>
-<div class="comments"><ul><li>returns the value of an environment variable, such as of "PATH"</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="setenv">[function]</a>: 
-int <b class="name">setenv</b> ( string <b class="arg">key</b>, string <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>sets environment variable named 'key' to 'value'</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="mtof">[function]</a>: 
-float <b class="name">mtof</b> ( float <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>converts a MIDI note number to frequency (Hz)</li>
-<li>note the input value is of type 'float' (supports fractional note number)</li></ul>
-</div>
-</div><div class="export"><h3>
-<a class="heading" name="ftom">[function]</a>: 
-float <b class="name">ftom</b> ( float <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>converts frequency (Hz) to MIDI note number space</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="powtodb">[function]</a>: 
-float <b class="name">powtodb</b> ( float <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>converts signal power ratio to decibels (dB)</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="rmstodb">[function]</a>: 
-float <b class="name">rmstodb</b> ( float <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>converts linear amplitude to decibels (dB)</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="dbtopow">[function]</a>: 
-float <b class="name">dbtopow</b> ( float <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>converts decibels (dB) to signal power ratio</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="dbtorms">[function]</a>: 
-float <b class="name">dbtorms</b> ( float <b class="arg">value</b> );</h3>
-<div class="comments"><ul><li>converts decibles (dB) to linear amplitude</li></ul></div>
-</div>
-<!--- end ulib_std.html --->
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetIntArrayValue</b> ( string <span class="bold arg">variableName</span>, uint <span class="bold arg">index</span>, Chuck.IntCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>eventually call the callback with the value of external int variableName[index]</li>
+<li><span class="bold arg">variableName</span>: the name of the external int array to get a value from</li>
+<li><span class="bold arg">index</span>: the index of the array at which to get the value</li>
+<li><span class="bold arg">callback</span>: the function to call when we know the value</li>
+</ul></div></div>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SetAssociativeIntArrayValue</b> ( string <span class="bold arg">variableName</span>, string <span class="bold arg">key</span>, long <span class="bold arg">value</span> );</h3>
+<div class="comments"><ul>
+<li>set the value of external int variableName[key]</li>
+<li><span class="bold arg">variableName</span>: the name of the external int array to set a value in</li>
+<li><span class="bold arg">key</span>: the key of the associative array for which to set the value</li>
+<li><span class="bold arg">value</span>: the value to assign to this key on this array. this is a long because ChucK ints are 64 bit integers</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetAssociativeIntArrayValue</b> ( string <span class="bold arg">variableName</span>, string <span class="bold arg">key</span>, Chuck.IntCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>eventually call the callback with the value of external int variableName[key]</li>
+<li><span class="bold arg">variableName</span>: the name of the external int array to get a value from</li>
+<li><span class="bold arg">key</span>: the key of the associative array for which to get the value</li>
+<li><span class="bold arg">callback</span>: the function to call when we know the value</li>
+</ul></div></div>
+
+
+
+
+
+
+<!-- External float arrays -->
+<br /><h2 class="greentext">External Float Arrays</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SetFloatArray</b> ( string <span class="bold arg">variableName</span>, double[] <span class="bold arg">values</span> );</h3>
+<div class="comments"><ul>
+<li>set all values at once of external float variableName[]</li>
+<li><span class="bold arg">variableName</span>: the name of the external float array to set</li>
+<li><span class="bold arg">value</span>: the values to assign to this array. these are doubles because ChucK floats are 64-bit</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetFloatArray</b> ( string <span class="bold arg">variableName</span>, Chuck.FloatArrayCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>eventually call the callback with the value of external float variableName[]</li>
+<li><span class="bold arg">variableName</span>: the name of the external float array to get</li>
+<li><span class="bold arg">callback</span>: the function to call when we know the value</li>
+</ul></div></div>
+
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+Chuck.FloatArrayCallback <b class="name">CreateGetFloatArrayCallback</b> ( Action< double[], ulong > <span class="bold arg">callbackFunction</span> );</h3>
+<div class="comments"><ul>
+<li>constructs the callback necessary for GetFloatArray. you should store this callback yourself to avoid it being garbage collected</li>
+<li><span class="bold arg">callbackFunction</span>: the function to call when ChucK has the value of your GetFloatArray operation. this is a function that has two arguments, a double array (the values) and an unsigned long (the number of values)</li>
+</ul></div></div>
+
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SetFloatArrayValue</b> ( string <span class="bold arg">variableName</span>, uint <span class="bold arg">index</span>, double <span class="bold arg">value</span> );</h3>
+<div class="comments"><ul>
+<li>set the value of external float variableName[index]</li>
+<li><span class="bold arg">variableName</span>: the name of the external float array to set a value in</li>
+<li><span class="bold arg">index</span>: the index of the array at which to set the value</li>
+<li><span class="bold arg">value</span>: the value to assign to this index on this array. this is a double because ChucK floats are 64-bit</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetFloatArrayValue</b> ( string <span class="bold arg">variableName</span>, uint <span class="bold arg">index</span>, Chuck.FloatCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>eventually call the callback with the value of external float variableName[index]</li>
+<li><span class="bold arg">variableName</span>: the name of the external float array to get a value from</li>
+<li><span class="bold arg">index</span>: the index of the array at which to get the value</li>
+<li><span class="bold arg">callback</span>: the function to call when we know the value</li>
+</ul></div></div>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">SetAssociativeFloatArrayValue</b> ( string <span class="bold arg">variableName</span>, string <span class="bold arg">key</span>, double <span class="bold arg">value</span> );</h3>
+<div class="comments"><ul>
+<li>set the value of external float variableName[key]</li>
+<li><span class="bold arg">variableName</span>: the name of the external float array to set a value in</li>
+<li><span class="bold arg">key</span>: the key of the associative array for which to set the value</li>
+<li><span class="bold arg">value</span>: the value to assign to this key on this array. this is a double because ChucK floats are 64-bit</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetAssociativeFloatArrayValue</b> ( string <span class="bold arg">variableName</span>, string <span class="bold arg">key</span>, Chuck.FloatCallback <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>eventually call the callback with the value of external float variableName[key]</li>
+<li><span class="bold arg">variableName</span>: the name of the external float array to get a value from</li>
+<li><span class="bold arg">key</span>: the key of the associative array for which to get the value</li>
+<li><span class="bold arg">callback</span>: the function to call when we know the value</li>
+</ul></div></div>
+
+
+
+
+<br /><h2 class="greentext">Miscellaneous</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+bool <b class="name">GetUniqueVariableName</b> ( string <span class="bold arg">prefix</span> = "v" );</h3>
+<div class="comments"><ul>
+<li>returns a string which is guaranteed not to be the name of a variable already returned by this function.
+use this function to generate names for external variables for scripts that are run many times, since
+external variables are shared by all scripts running on a VM</li>
+<li><span class="bold arg">prefix</span>: the variable name will start with this string, and end in a number. 
+if you don't specify a prefix, then "v" is used. choosing a prefix is mostly useful for debugging purposes</li>
+</ul></div></div>
+
+
+
+<br /><h2 class="greentext">Specific to ChuckMainInstance</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[value]</a>:
+string <b class="name">microphoneIdentifier</b></h3>
+<div class="comments"><ul>
+<li>this ChuckMainInstance will use the first microphone whose name contains this string. if this is not specified,
+your system's default microphone is used</li>
+</ul></div></div>
+
+
+<br /><h2 class="greentext">Specific to ChuckSubInstance</h2>
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[value]</a>:
+ChuckMainInstance <b class="name">chuckMainInstance</b></h3>
+<div class="comments"><ul>
+<li>all ChuckSubInstances must have a reference to a ChuckMainInstance, with which they share a VM and
+a set of external variables. if this is not specified, then Chunity will look for a ChuckMainInstance with a TheChuck
+component attached. if that also fails, then your ChuckSubInstance will not work</li>
+</ul></div></div>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[value]</a>:
+bool <b class="name">spatialize</b></h3>
+<div class="comments"><ul>
+<li>if this bool is true, then the ChuckSubInstance will be spatialized to the location of its GameObject. if this
+bool is false, then the ChuckSubInstance will not be spatialized and will be delivered directly to your audio output</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">SetRunning</b> ( bool <span class="bold arg">r</span> );</h3>
+<div class="comments"><ul>
+<li>set whether the ChuckSubInstance is currently outputting sound</li>
+</ul></div></div>
+
+
+
+
+
+<!--- end ChuckMain/SubInstance --->
+
+
+
+
+<!-- TODO: The helper classes:
+           ChuckEventListener
+           ChuckIntSyncer
+           ChuckFloatSyncer
+           ChuckStringSyncer
+           TheChuck
+           -->
+<!-- This should be it, right? All the other scripts in the boilerplate
+     are example scripts. And, users should not need to use the Chuck.cs class directly.
+     I can put "create get float" etc only in the first one, because the users
+     will not need Chuck.X for those cus it's duplicated. -->
+
+
+
 <br>
 
 <hr width="10%">
