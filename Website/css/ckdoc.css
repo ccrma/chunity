@@ -91,6 +91,7 @@ tr.ugen td h3 {
 .comments { 
 	margin : 0px;
 	padding : 0.5em;
+	padding-left : 12px;
 	background : #e8e8e8;
 }
 
