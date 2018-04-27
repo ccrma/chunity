@@ -40,7 +40,7 @@ namespace ChucK_For_Unity
     
     std::map< unsigned int, ChucK * > chuck_instances;
     std::map< unsigned int, EffectData::Data * > data_instances;
-    std::string chuck_external_data_dir;
+    std::string chuck_global_data_dir;
 
 
 
@@ -146,7 +146,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return chuck_instances[chuckID]->setExternalInt( name, val );
+        return chuck_instances[chuckID]->setGlobalInt( name, val );
     }
     
     
@@ -155,7 +155,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return chuck_instances[chuckID]->getExternalInt( name, callback );
+        return chuck_instances[chuckID]->getGlobalInt( name, callback );
     }
     
     
@@ -164,7 +164,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return chuck_instances[chuckID]->setExternalFloat( name, val );
+        return chuck_instances[chuckID]->setGlobalFloat( name, val );
     }
     
     
@@ -173,7 +173,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return chuck_instances[chuckID]->getExternalFloat( name, callback );
+        return chuck_instances[chuckID]->getGlobalFloat( name, callback );
     }
     
     
@@ -182,7 +182,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return chuck_instances[chuckID]->setExternalString( name, val );
+        return chuck_instances[chuckID]->setGlobalString( name, val );
     }
     
     
@@ -191,7 +191,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return chuck_instances[chuckID]->getExternalString( name, callback );
+        return chuck_instances[chuckID]->getGlobalString( name, callback );
     }
     
     
@@ -200,7 +200,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return chuck_instances[chuckID]->signalExternalEvent( name );
+        return chuck_instances[chuckID]->signalGlobalEvent( name );
     }
     
     
@@ -209,7 +209,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
-        return chuck_instances[chuckID]->broadcastExternalEvent( name );
+        return chuck_instances[chuckID]->broadcastGlobalEvent( name );
     }
     
     
@@ -218,7 +218,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->listenForExternalEvent(
+        return chuck_instances[chuckID]->listenForGlobalEvent(
             name, callback, FALSE );
     }
     
@@ -228,7 +228,7 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->listenForExternalEvent(
+        return chuck_instances[chuckID]->listenForGlobalEvent(
             name, callback, TRUE );
     }
     
@@ -238,17 +238,17 @@ namespace ChucK_For_Unity
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->stopListeningForExternalEvent(
+        return chuck_instances[chuckID]->stopListeningForGlobalEvent(
             name, callback );
     }
     
     
-    UNITY_INTERFACE_EXPORT bool getExternalUGenSamples( unsigned int chuckID,
+    UNITY_INTERFACE_EXPORT bool getGlobalUGenSamples( unsigned int chuckID,
         const char * name, SAMPLE * buffer, int numSamples )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        if( !chuck_instances[chuckID]->getExternalUGenSamples(
+        if( !chuck_instances[chuckID]->getGlobalUGenSamples(
             name, buffer, numSamples ) )
         {
             // failed. fill with zeroes.
@@ -262,136 +262,136 @@ namespace ChucK_For_Unity
     
     
     // int array methods
-    UNITY_INTERFACE_EXPORT bool setExternalIntArray( unsigned int chuckID,
+    UNITY_INTERFACE_EXPORT bool setGlobalIntArray( unsigned int chuckID,
         const char * name, t_CKINT arrayValues[], unsigned int numValues )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->setExternalIntArray(
+        return chuck_instances[chuckID]->setGlobalIntArray(
             name, arrayValues, numValues );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool getExternalIntArray( unsigned int chuckID,
+    UNITY_INTERFACE_EXPORT bool getGlobalIntArray( unsigned int chuckID,
         const char * name, void (* callback)(t_CKINT[], t_CKUINT))
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->getExternalIntArray(
+        return chuck_instances[chuckID]->getGlobalIntArray(
             name, callback );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool setExternalIntArrayValue( unsigned int chuckID,
+    UNITY_INTERFACE_EXPORT bool setGlobalIntArrayValue( unsigned int chuckID,
         const char * name, unsigned int index, t_CKINT value )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->setExternalIntArrayValue(
+        return chuck_instances[chuckID]->setGlobalIntArrayValue(
             name, index, value );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool getExternalIntArrayValue( unsigned int chuckID,
+    UNITY_INTERFACE_EXPORT bool getGlobalIntArrayValue( unsigned int chuckID,
         const char * name, unsigned int index, void (* callback)(t_CKINT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->getExternalIntArrayValue(
+        return chuck_instances[chuckID]->getGlobalIntArrayValue(
             name, index, callback );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool setExternalAssociativeIntArrayValue(
+    UNITY_INTERFACE_EXPORT bool setGlobalAssociativeIntArrayValue(
         unsigned int chuckID, const char * name, char * key, t_CKINT value )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->setExternalAssociativeIntArrayValue(
+        return chuck_instances[chuckID]->setGlobalAssociativeIntArrayValue(
             name, key, value );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool getExternalAssociativeIntArrayValue(
+    UNITY_INTERFACE_EXPORT bool getGlobalAssociativeIntArrayValue(
         unsigned int chuckID, const char * name, char * key,
         void (* callback)(t_CKINT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->getExternalAssociativeIntArrayValue(
+        return chuck_instances[chuckID]->getGlobalAssociativeIntArrayValue(
             name, key, callback );
     }
     
     
     
     // float array methods
-    UNITY_INTERFACE_EXPORT bool setExternalFloatArray( unsigned int chuckID,
+    UNITY_INTERFACE_EXPORT bool setGlobalFloatArray( unsigned int chuckID,
         const char * name, t_CKFLOAT arrayValues[], unsigned int numValues )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->setExternalFloatArray(
+        return chuck_instances[chuckID]->setGlobalFloatArray(
             name, arrayValues, numValues );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool getExternalFloatArray( unsigned int chuckID,
+    UNITY_INTERFACE_EXPORT bool getGlobalFloatArray( unsigned int chuckID,
         const char * name, void (* callback)(t_CKFLOAT[], t_CKUINT))
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->getExternalFloatArray(
+        return chuck_instances[chuckID]->getGlobalFloatArray(
             name, callback );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool setExternalFloatArrayValue( unsigned int chuckID,
+    UNITY_INTERFACE_EXPORT bool setGlobalFloatArrayValue( unsigned int chuckID,
         const char * name, unsigned int index, t_CKFLOAT value )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->setExternalFloatArrayValue(
+        return chuck_instances[chuckID]->setGlobalFloatArrayValue(
             name, index, value );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool getExternalFloatArrayValue( unsigned int chuckID,
+    UNITY_INTERFACE_EXPORT bool getGlobalFloatArrayValue( unsigned int chuckID,
         const char * name, unsigned int index, void (* callback)(t_CKFLOAT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->getExternalFloatArrayValue(
+        return chuck_instances[chuckID]->getGlobalFloatArrayValue(
             name, index, callback );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool setExternalAssociativeFloatArrayValue(
+    UNITY_INTERFACE_EXPORT bool setGlobalAssociativeFloatArrayValue(
         unsigned int chuckID, const char * name, char * key, t_CKFLOAT value )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->setExternalAssociativeFloatArrayValue(
+        return chuck_instances[chuckID]->setGlobalAssociativeFloatArrayValue(
             name, key, value );
     }
     
     
     
-    UNITY_INTERFACE_EXPORT bool getExternalAssociativeFloatArrayValue(
+    UNITY_INTERFACE_EXPORT bool getGlobalAssociativeFloatArrayValue(
         unsigned int chuckID, const char * name, char * key,
         void (* callback)(t_CKFLOAT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         
-        return chuck_instances[chuckID]->getExternalAssociativeFloatArrayValue(
+        return chuck_instances[chuckID]->getGlobalAssociativeFloatArrayValue(
             name, key, callback );
     }
     
@@ -427,7 +427,7 @@ namespace ChucK_For_Unity
     
     UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir )
     {
-        chuck_external_data_dir = std::string( dir );
+        chuck_global_data_dir = std::string( dir );
         return true;
     }
     
@@ -456,12 +456,12 @@ namespace ChucK_For_Unity
             chuck->setParam( CHUCK_PARAM_VM_HALT, (t_CKINT) 0 );
             chuck->setParam( CHUCK_PARAM_DUMP_INSTRUCTIONS, (t_CKINT) 0 );
             // directory for compiled.code
-            chuck->setParam( CHUCK_PARAM_WORKING_DIRECTORY, chuck_external_data_dir );
+            chuck->setParam( CHUCK_PARAM_WORKING_DIRECTORY, chuck_global_data_dir );
             // directories to search for chugins and auto-run ck files
             std::list< std::string > chugin_search;
-            chugin_search.push_back( chuck_external_data_dir + "/Chugins" );
-            chugin_search.push_back( chuck_external_data_dir + "/ChuGins" );
-            chugin_search.push_back( chuck_external_data_dir + "/chugins" );
+            chugin_search.push_back( chuck_global_data_dir + "/Chugins" );
+            chugin_search.push_back( chuck_global_data_dir + "/ChuGins" );
+            chugin_search.push_back( chuck_global_data_dir + "/chugins" );
             chuck->setParam( CHUCK_PARAM_USER_CHUGIN_DIRECTORIES, chugin_search );
             
             // initialize and start

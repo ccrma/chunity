@@ -31,24 +31,24 @@ namespace ChucK_For_Unity {
     UNITY_INTERFACE_EXPORT bool startListeningForChuckEvent( unsigned int chuckID, const char * name, void (* callback)(void) );
     UNITY_INTERFACE_EXPORT bool stopListeningForChuckEvent( unsigned int chuckID, const char * name, void (* callback)(void) );
     
-    UNITY_INTERFACE_EXPORT bool getExternalUGenSamples( unsigned int chuckID, const char * name, SAMPLE * buffer, int numSamples );
+    UNITY_INTERFACE_EXPORT bool getGlobalUGenSamples( unsigned int chuckID, const char * name, SAMPLE * buffer, int numSamples );
     
     // int array methods
-    UNITY_INTERFACE_EXPORT bool setExternalIntArray( unsigned int chuckID, const char * name, t_CKINT arrayValues[], unsigned int numValues );
-    UNITY_INTERFACE_EXPORT bool getExternalIntArray( unsigned int chuckID, const char * name, void (* callback)(t_CKINT[], t_CKUINT));
-    UNITY_INTERFACE_EXPORT bool setExternalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, t_CKINT value );
-    UNITY_INTERFACE_EXPORT bool getExternalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(t_CKINT) );
-    UNITY_INTERFACE_EXPORT bool setExternalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, t_CKINT value );
-    UNITY_INTERFACE_EXPORT bool getExternalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(t_CKINT) );
+    UNITY_INTERFACE_EXPORT bool setGlobalIntArray( unsigned int chuckID, const char * name, t_CKINT arrayValues[], unsigned int numValues );
+    UNITY_INTERFACE_EXPORT bool getGlobalIntArray( unsigned int chuckID, const char * name, void (* callback)(t_CKINT[], t_CKUINT));
+    UNITY_INTERFACE_EXPORT bool setGlobalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, t_CKINT value );
+    UNITY_INTERFACE_EXPORT bool getGlobalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(t_CKINT) );
+    UNITY_INTERFACE_EXPORT bool setGlobalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, t_CKINT value );
+    UNITY_INTERFACE_EXPORT bool getGlobalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(t_CKINT) );
     // TODO: set entire dict, add to dict in batch; get entire dict
     
     // float array methods
-    UNITY_INTERFACE_EXPORT bool setExternalFloatArray( unsigned int chuckID, const char * name, t_CKFLOAT arrayValues[], unsigned int numValues );
-    UNITY_INTERFACE_EXPORT bool getExternalFloatArray( unsigned int chuckID, const char * name, void (* callback)(t_CKFLOAT[], t_CKUINT));
-    UNITY_INTERFACE_EXPORT bool setExternalFloatArrayValue( unsigned int chuckID, const char * name, unsigned int index, t_CKFLOAT value );
-    UNITY_INTERFACE_EXPORT bool getExternalFloatArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(t_CKFLOAT) );
-    UNITY_INTERFACE_EXPORT bool setExternalAssociativeFloatArrayValue( unsigned int chuckID, const char * name, char * key, t_CKFLOAT value );
-    UNITY_INTERFACE_EXPORT bool getExternalAssociativeFloatArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(t_CKFLOAT) );
+    UNITY_INTERFACE_EXPORT bool setGlobalFloatArray( unsigned int chuckID, const char * name, t_CKFLOAT arrayValues[], unsigned int numValues );
+    UNITY_INTERFACE_EXPORT bool getGlobalFloatArray( unsigned int chuckID, const char * name, void (* callback)(t_CKFLOAT[], t_CKUINT));
+    UNITY_INTERFACE_EXPORT bool setGlobalFloatArrayValue( unsigned int chuckID, const char * name, unsigned int index, t_CKFLOAT value );
+    UNITY_INTERFACE_EXPORT bool getGlobalFloatArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(t_CKFLOAT) );
+    UNITY_INTERFACE_EXPORT bool setGlobalAssociativeFloatArrayValue( unsigned int chuckID, const char * name, char * key, t_CKFLOAT value );
+    UNITY_INTERFACE_EXPORT bool getGlobalAssociativeFloatArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(t_CKFLOAT) );
     
     
     UNITY_INTERFACE_EXPORT bool initChuckInstance( unsigned int chuckID, unsigned int sampleRate );
