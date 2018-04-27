@@ -60,36 +60,15 @@
 
 <h1><strong>ChuckMainInstance / ChuckSubInstance</strong></h1>
 <p>
-These libraries have identical APIs. In most cases, you will be sending commands
+These components have identical APIs. In most cases, you will be sending commands
 to a ChuckSubInstance, which will send on those commands to whichever ChuckMainInstance
 it refers to, but you can also send commands directly to a ChuckMainInstance.</p>
 
+<!-- TODO: example code? -->
 
-<!-- <font class="greentext" size="3">namespace: <b>Std</b></font> -->
-
-
-<!-- 
-<br><br>
-<b>Std</b> is a standard library in ChucK, which includes utility functions random number generation,
-unit conversions, and absolute value.
-<br>
- -->
-<!--- begin ulib_std.html --->
-<!-- 
-
-<div class="example"><br>[example]<br>
-<div class="code">// infinite time-loop
-while( true )
-{
-  // generate random float (and print)
-  &lt;&lt;&lt; Std.rand2f( 100.0, 1000.0 ) &gt;&gt;&gt;;
-  // wait a bit
-  50::ms =&gt; now;
-}
-</div></div>
- -->
+<div>
 <!-- Running code -->
-<h2 class="greentext">Running Code</h2>
+<br /><h2 class="greentext">Running Code</h2>
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">RunCode</b> ( string <span class="bold arg">code</span> );</h3>
@@ -487,7 +466,7 @@ void <b class="name">SetRunning</b> ( bool <span class="bold arg">r</span> );</h
 <li>set whether the ChuckSubInstance is currently outputting sound</li>
 </ul></div></div>
 
-
+</div>
 
 
 
