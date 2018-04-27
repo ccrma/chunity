@@ -72,7 +72,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SetInt
-	// desc: set the value of external int variableName
+	// desc: set the value of global int variableName
 	// ----------------------------------------------------
 	public bool SetInt( string variableName, System.Int64 value )
 	{
@@ -97,7 +97,7 @@ public class ChuckMainInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	// name: GetInt
 	// desc: eventually call the callback with the value 
-	//       of external int variableName
+	//       of global int variableName
 	// ----------------------------------------------------
 	public bool GetInt( string variableName, Chuck.IntCallback callback )
 	{
@@ -109,7 +109,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SetFloat
-	// desc: set the value of external float variableName
+	// desc: set the value of global float variableName
 	// ----------------------------------------------------
 	public bool SetFloat( string variableName, double value )
 	{
@@ -134,7 +134,7 @@ public class ChuckMainInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	// name: GetFloat
 	// desc: eventually call the callback with the value 
-	//       of external float variableName
+	//       of global float variableName
 	// ----------------------------------------------------
 	public bool GetFloat( string variableName, Chuck.FloatCallback callback )
 	{
@@ -146,7 +146,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SetString
-	// desc: set the value of external string variableName
+	// desc: set the value of global string variableName
 	// ----------------------------------------------------
 	public bool SetString( string variableName, System.String value )
 	{
@@ -171,7 +171,7 @@ public class ChuckMainInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	// name: GetString
 	// desc: eventually call the callback with the value 
-	//       of external string variableName
+	//       of global string variableName
 	// ----------------------------------------------------
 	public bool GetString( string variableName, Chuck.StringCallback callback )
 	{
@@ -183,7 +183,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SignalEvent
-	// desc: call .signal() on external Event variableName
+	// desc: call .signal() on global Event variableName
 	//       (awake the next listener)
 	// ----------------------------------------------------
 	public bool SignalEvent( string variableName )
@@ -196,7 +196,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: BroadcastEvent
-	// desc: call .broadcast() on external Event variableName
+	// desc: call .broadcast() on global Event variableName
 	//       (awake all listeners)
 	// ----------------------------------------------------
 	public bool BroadcastEvent( string variableName )
@@ -223,7 +223,7 @@ public class ChuckMainInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	// name: ListenForChuckEventOnce
 	// desc: call the callback only the next time that
-	//       external Event variableName signals it
+	//       global Event variableName signals it
 	// ----------------------------------------------------
 	public bool ListenForChuckEventOnce( string variableName, Chuck.VoidCallback callback )
 	{
@@ -236,8 +236,8 @@ public class ChuckMainInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	// name: StartListeningForChuckEvent
 	// desc: call the callback every time that 
-	//       external Event variableName signals it
-	//       (until canceled)
+	//       global Event variableName signals it
+	//       (until cancelled)
 	// ----------------------------------------------------
 	public bool StartListeningForChuckEvent( string variableName, Chuck.VoidCallback callback )
 	{
@@ -250,7 +250,7 @@ public class ChuckMainInstance : MonoBehaviour {
 	// ----------------------------------------------------
 	// name: StopListeningForChuckEvent
 	// desc: cancel the callback registered to 
-	//       external Event variableName
+	//       global Event variableName
 	// ----------------------------------------------------
 	public bool StopListeningForChuckEvent( string variableName, Chuck.VoidCallback callback )
 	{
@@ -274,7 +274,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SetIntArray
-	// desc: set the value of external int variableName[]
+	// desc: set the value of global int variableName[]
 	// ----------------------------------------------------
 	public bool SetIntArray( string variableName, long[] values )
 	{
@@ -286,7 +286,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: GetIntArray
-	// desc: get the value of external int variableName[]
+	// desc: get the value of global int variableName[]
 	// ----------------------------------------------------
 	public bool GetIntArray( string variableName, Chuck.IntArrayCallback callback )
 	{
@@ -298,7 +298,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SetIntArrayValue
-	// desc: set the value of external int variableName[index]
+	// desc: set the value of global int variableName[index]
 	// ----------------------------------------------------
 	public bool SetIntArrayValue( string variableName, uint index, long value )
 	{
@@ -310,7 +310,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: GetIntArrayValue
-	// desc: get the value of external int variableName[index]
+	// desc: get the value of global int variableName[index]
 	// ----------------------------------------------------
 	public bool GetIntArrayValue( string variableName, uint index, Chuck.IntCallback callback )
 	{
@@ -322,7 +322,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SetAssociativeIntArrayValue
-	// desc: set the value of external int variableName[key]
+	// desc: set the value of global int variableName[key]
 	// ----------------------------------------------------
 	public bool SetAssociativeIntArrayValue( string variableName, string key, long value )
 	{
@@ -334,7 +334,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: GetAssociativeIntArrayValue
-	// desc: get the value of external int variableName[key]
+	// desc: get the value of global int variableName[key]
 	// ----------------------------------------------------
 	public bool GetAssociativeIntArrayValue( string variableName, string key, Chuck.IntCallback callback )
 	{
@@ -358,7 +358,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SetFloatArray
-	// desc: set the value of external float variableName[]
+	// desc: set the value of global float variableName[]
 	// ----------------------------------------------------
 	public bool SetFloatArray( string variableName, double[] values )
 	{
@@ -370,7 +370,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: GetFloatArray
-	// desc: get the value of external float variableName[]
+	// desc: get the value of global float variableName[]
 	// ----------------------------------------------------
 	public bool GetFloatArray( string variableName, Chuck.FloatArrayCallback callback )
 	{
@@ -382,7 +382,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SetFloatArrayValue
-	// desc: set the value of external float variableName[index]
+	// desc: set the value of global float variableName[index]
 	// ----------------------------------------------------
 	public bool SetFloatArrayValue( string variableName, uint index, double value )
 	{
@@ -394,7 +394,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: GetFloatArrayValue
-	// desc: get the value of external float variableName[index]
+	// desc: get the value of global float variableName[index]
 	// ----------------------------------------------------
 	public bool GetFloatArrayValue( string variableName, uint index, Chuck.FloatCallback callback )
 	{
@@ -406,7 +406,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: SetAssociativeFloatArrayValue
-	// desc: set the value of external float variableName[key]
+	// desc: set the value of global float variableName[key]
 	// ----------------------------------------------------
 	public bool SetAssociativeFloatArrayValue( string variableName, string key, double value )
 	{
@@ -418,7 +418,7 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	// ----------------------------------------------------
 	// name: GetAssociativeFloatArrayValue
-	// desc: get the value of external float variableName[key]
+	// desc: get the value of global float variableName[key]
 	// ----------------------------------------------------
 	public bool GetAssociativeFloatArrayValue( string variableName, string key, Chuck.FloatCallback callback )
 	{

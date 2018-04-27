@@ -13,15 +13,15 @@ public class MyRunCodeStopper : MonoBehaviour {
 	void Update () {
 		if( Input.GetKeyDown( "space" ) )
 		{
-			RunMyCode();
+			GetComponent<ChuckSubInstance>().BroadcastEvent( "myCodeStopper" );
 		}
 	}
 
 	void RunMyCode()
 	{
 		GetComponent<ChuckSubInstance>().RunCode(@"
-			// name of external event
-			external Event myCodeStopper;
+			// name of global event
+			global Event myCodeStopper;
 
 			// broadcast, so that anyone else listening will be stopped
 			myCodeStopper.broadcast();

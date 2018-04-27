@@ -22,15 +22,15 @@ public class GetIntExample : MonoBehaviour {
 		myGetTheIntCallback = myChuck.CreateGetIntCallback( GetTheInt );
 
 		myChuck.RunCode(@"
-			external int myExternalInt;
+			global int myGlobalInt;
 			while( true )
 			{
-				Math.random2( 300, 1000 ) => myExternalInt;
+				Math.random2( 300, 1000 ) => myGlobalInt;
 				10::ms => now;
 			}
 		");
 
-		myChuck.GetInt( "myExternalInt", myGetTheIntCallback );
+		myChuck.GetInt( "myGlobalInt", myGetTheIntCallback );
 	}
 	
 	// Update is called once per frame
@@ -44,7 +44,7 @@ public class GetIntExample : MonoBehaviour {
 			Debug.Log( "the new value is: " + theNewValue.ToString() );
 
 			// call callback again
-			myChuck.GetInt( "myExternalInt", myGetTheIntCallback );
+			myChuck.GetInt( "myGlobalInt", myGetTheIntCallback );
 		}
 	}
 

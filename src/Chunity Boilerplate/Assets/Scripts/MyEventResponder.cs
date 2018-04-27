@@ -17,9 +17,9 @@ public class MyEventResponder : MonoBehaviour {
 		// create the callback we will pass
 		myCallback = Chuck.CreateVoidCallback( CallbackFunction );
 
-		// run code: make an external event, and every 250 ms, broadcast it to all listeners
+		// run code: make a global event, and every 250 ms, broadcast it to all listeners
 		myChuck.RunCode( @"
-			external Event notifier;
+			global Event notifier;
 			while( true )
 			{
 				notifier.broadcast();

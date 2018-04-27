@@ -16,8 +16,8 @@ public class StringGetSetter : MonoBehaviour {
 		myCallback = Chuck.CreateGetStringCallback( GetTheString );
 
 		myChuck.RunCode( @"
-			external string filename;
-			external Event playTheFile;
+			global string filename;
+			global Event playTheFile;
 
 			playTheFile => now;
 
@@ -42,12 +42,12 @@ public class StringGetSetter : MonoBehaviour {
 			myChuck.BroadcastEvent( "playTheFile" );
 			myChuck.GetString( "filename", myCallback );
 		}	
+		Debug.Log( "the most recently fetched string is: " + gottenString );
 	}
 
 
 	void GetTheString( string s )
 	{
 		gottenString = s;
-		Debug.Log( "Hey I fetched a string! It's " + s );
 	}
 }

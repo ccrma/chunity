@@ -6,6 +6,7 @@ public class MyMouseInput : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		//Chuck.SetLogLevel( Chuck.LogLevel.Info );
 		GetComponent<ChuckSubInstance>().RunCode(@"
 			// name: mouse-fm.ck
 			// desc: uses first X/Y axes of a mouse to control mf and index for FM

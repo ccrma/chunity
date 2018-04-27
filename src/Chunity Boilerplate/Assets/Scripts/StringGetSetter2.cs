@@ -14,8 +14,8 @@ public class StringGetSetter2 : MonoBehaviour {
 		myChuck = GetComponent<ChuckSubInstance>();
 
 		myChuck.RunCode( @"
-			external string filename;
-			external Event playTheFile;
+			global string filename;
+			global Event playTheFile;
 
 			playTheFile => now;
 

@@ -11,7 +11,7 @@ public class EventResponder : MonoBehaviour
 
         // broadcast "notifier" every 250 ms
         myChuck.RunCode( @"
-            external Event notifier;
+            global Event notifier;
             while( true )
             {
                 notifier.broadcast();

@@ -15,8 +15,8 @@ public class ArrayPlayer2 : MonoBehaviour {
 		myChuck = GetComponent<ChuckSubInstance>();
 		myChuck.RunCode( @"
 			TriOsc myOsc;
-			[60] @=> external int myNotes[];
-			external Event playMyNotes;
+			[60] @=> global int myNotes[];
+			global Event playMyNotes;
 			
 			while( true )
 			{

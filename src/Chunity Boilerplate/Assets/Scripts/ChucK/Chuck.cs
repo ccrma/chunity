@@ -449,7 +449,7 @@ public class Chuck
 	public bool GetUGenSamples( System.UInt32 chuckID, System.String name,
 		float[] buffer, System.Int32 numSamples )
 	{
-		return getExternalUGenSamples( chuckID, name, buffer, numSamples );
+		return getGlobalUGenSamples( chuckID, name, buffer, numSamples );
 	}
 
 	public static Chuck.IntArrayCallback CreateGetIntArrayCallback( Action< long[], ulong > callbackFunction )
@@ -472,7 +472,7 @@ public class Chuck
 
 	public bool SetIntArray( System.UInt32 chuckId, string variableName, long[] values )
 	{
-		return setExternalIntArray( chuckId, variableName, values, (uint) values.Length );
+		return setGlobalIntArray( chuckId, variableName, values, (uint) values.Length );
 	}
 
 	public bool GetIntArray( string chuckName, string variableName, Chuck.IntArrayCallback callback )
@@ -490,7 +490,7 @@ public class Chuck
 
 	public bool GetIntArray( System.UInt32 chuckId, string variableName, Chuck.IntArrayCallback callback )
 	{
-		return getExternalIntArray( chuckId, variableName, callback );
+		return getGlobalIntArray( chuckId, variableName, callback );
 	}
 
 	public bool SetIntArrayValue( string chuckName, string variableName, uint index, long value )
@@ -508,7 +508,7 @@ public class Chuck
 
 	public bool SetIntArrayValue( System.UInt32 chuckId, string variableName, uint index, long value )
 	{
-		return setExternalIntArrayValue( chuckId, variableName, index, value );
+		return setGlobalIntArrayValue( chuckId, variableName, index, value );
 	}
 
 	public bool GetIntArrayValue( string chuckName, string variableName, uint index, Chuck.IntCallback callback )
@@ -526,7 +526,7 @@ public class Chuck
 
 	public bool GetIntArrayValue( System.UInt32 chuckId, string variableName, uint index, Chuck.IntCallback callback )
 	{
-		return getExternalIntArrayValue( chuckId, variableName, index, callback );
+		return getGlobalIntArrayValue( chuckId, variableName, index, callback );
 	}
 
 	public bool SetAssociativeIntArrayValue( string chuckName, string variableName, string key, long value )
@@ -544,7 +544,7 @@ public class Chuck
 
 	public bool SetAssociativeIntArrayValue( System.UInt32 chuckId, string variableName, string key, long value )
 	{
-		return setExternalAssociativeIntArrayValue( chuckId, variableName, key, value );
+		return setGlobalAssociativeIntArrayValue( chuckId, variableName, key, value );
 	}
 
 	public bool GetAssociativeIntArrayValue( string chuckName, string variableName, string key, Chuck.IntCallback callback )
@@ -562,7 +562,7 @@ public class Chuck
 
 	public bool GetAssociativeIntArrayValue( System.UInt32 chuckId, string variableName, string key, Chuck.IntCallback callback )
 	{
-		return getExternalAssociativeIntArrayValue( chuckId, variableName, key, callback );
+		return getGlobalAssociativeIntArrayValue( chuckId, variableName, key, callback );
 	}
 
 	public static Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action< double[], ulong > callbackFunction )
@@ -585,7 +585,7 @@ public class Chuck
 
 	public bool SetFloatArray( System.UInt32 chuckId, string variableName, double[] values )
 	{
-		return setExternalFloatArray( chuckId, variableName, values, (uint) values.Length );
+		return setGlobalFloatArray( chuckId, variableName, values, (uint) values.Length );
 	}
 
 	public bool GetFloatArray( string chuckName, string variableName, Chuck.FloatArrayCallback callback )
@@ -603,7 +603,7 @@ public class Chuck
 
 	public bool GetFloatArray( System.UInt32 chuckId, string variableName, Chuck.FloatArrayCallback callback )
 	{
-		return getExternalFloatArray( chuckId, variableName, callback );
+		return getGlobalFloatArray( chuckId, variableName, callback );
 	}
 
 	public bool SetFloatArrayValue( string chuckName, string variableName, uint index, double value )
@@ -621,7 +621,7 @@ public class Chuck
 
 	public bool SetFloatArrayValue( System.UInt32 chuckId, string variableName, uint index, double value )
 	{
-		return setExternalFloatArrayValue( chuckId, variableName, index, value );
+		return setGlobalFloatArrayValue( chuckId, variableName, index, value );
 	}
 
 	public bool GetFloatArrayValue( string chuckName, string variableName, uint index, Chuck.FloatCallback callback )
@@ -639,7 +639,7 @@ public class Chuck
 
 	public bool GetFloatArrayValue( System.UInt32 chuckId, string variableName, uint index, Chuck.FloatCallback callback )
 	{
-		return getExternalFloatArrayValue( chuckId, variableName, index, callback );
+		return getGlobalFloatArrayValue( chuckId, variableName, index, callback );
 	}
 
 	public bool SetAssociativeFloatArrayValue( string chuckName, string variableName, string key, double value )
@@ -657,7 +657,7 @@ public class Chuck
 
 	public bool SetAssociativeFloatArrayValue( System.UInt32 chuckId, string variableName, string key, double value )
 	{
-		return setExternalAssociativeFloatArrayValue( chuckId, variableName, key, value );
+		return setGlobalAssociativeFloatArrayValue( chuckId, variableName, key, value );
 	}
 
 	public bool GetAssociativeFloatArrayValue( string chuckName, string variableName, string key, Chuck.FloatCallback callback )
@@ -675,7 +675,7 @@ public class Chuck
 
 	public bool GetAssociativeFloatArrayValue( System.UInt32 chuckId, string variableName, string key, Chuck.FloatCallback callback )
 	{
-		return getExternalAssociativeFloatArrayValue( chuckId, variableName, key, callback );
+		return getGlobalAssociativeFloatArrayValue( chuckId, variableName, key, callback );
 	}
 
 	public enum LogLevel {
@@ -752,7 +752,7 @@ public class Chuck
 		System.UInt32 numFrames, System.UInt32 inChannels, System.UInt32 outChannels );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool getExternalUGenSamples( System.UInt32 chuckID, System.String name,
+	private static extern bool getGlobalUGenSamples( System.UInt32 chuckID, System.String name,
 		float[] buffer, System.Int32 numSamples );
 
 	[DllImport (PLUGIN_NAME)]
@@ -807,40 +807,40 @@ public class Chuck
 	private static extern bool stopListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setExternalIntArray( System.UInt32 chuckID, System.String name, long[] arrayValues, uint numValues );
+	private static extern bool setGlobalIntArray( System.UInt32 chuckID, System.String name, long[] arrayValues, uint numValues );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool getExternalIntArray( System.UInt32 chuckID, System.String name, IntArrayCallback callback);
+	private static extern bool getGlobalIntArray( System.UInt32 chuckID, System.String name, IntArrayCallback callback);
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setExternalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, long value );
+	private static extern bool setGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, long value );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool getExternalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, IntCallback callback );
+	private static extern bool getGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, IntCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setExternalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, long value );
+	private static extern bool setGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, long value );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool getExternalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, IntCallback callback );
+	private static extern bool getGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, IntCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setExternalFloatArray( System.UInt32 chuckID, System.String name, double[] arrayValues, uint numValues );
+	private static extern bool setGlobalFloatArray( System.UInt32 chuckID, System.String name, double[] arrayValues, uint numValues );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool getExternalFloatArray( System.UInt32 chuckID, System.String name, FloatArrayCallback callback);
+	private static extern bool getGlobalFloatArray( System.UInt32 chuckID, System.String name, FloatArrayCallback callback);
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setExternalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, double value );
+	private static extern bool setGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, double value );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool getExternalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, FloatCallback callback );
+	private static extern bool getGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, FloatCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool setExternalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, double value );
+	private static extern bool setGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, double value );
 
 	[DllImport (PLUGIN_NAME)]
-	private static extern bool getExternalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, FloatCallback callback );
+	private static extern bool getGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, FloatCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setChoutCallback( System.UInt32 chuckID, MyLogCallback callback );
@@ -881,7 +881,7 @@ public class Chuck
 		// Store exposed parameter names -> ids
 		ids = new Dictionary< string, System.UInt32 >();
 
-		// Store external ints -> callbacks to avoid garbage collection of callbacks
+		// Store global callbacks to avoid garbage collection of callbacks
 		intCallbacks = new Dictionary< string, IntCallback >();
 		floatCallbacks = new Dictionary< string, FloatCallback >();
 		stringCallbacks = new Dictionary< string, StringCallback >();

@@ -23,9 +23,9 @@ public class Advancer : MonoBehaviour {
 		myPos = 0;
 
 		myChuck.RunCode( @"
-			1 => external float timeStep;
-			external float pos;
-			external Event notifier;
+			1 => global float timeStep;
+			global float pos;
+			global Event notifier;
 
 			fun void updatePos() {{
 				timeStep::second => dur currentTimeStep;
