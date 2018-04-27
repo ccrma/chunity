@@ -78,7 +78,7 @@ This guide documents how to use the language in the Unity game engine environmen
 <li><a href="#spatialization">Spatialization</a></li>
 <li><a href="#audiofiles">Audio Files</a></li>
 <li><a href="#console">Printing to the Unity Console</a></li>
-<li><a href="#unityvariables2">Using Unity Variables (2): ChucK External Variables</a></li>
+<li><a href="#unityvariables2">Using Unity Variables (2): ChucK Global Variables</a></li>
 <li><a href="#chugins">Chugins</a></li>
 </ul>
 
@@ -665,8 +665,8 @@ oscToSpatialize => rightChannel;</pre>
 </div>
 
 <div id="unityvariables2" class="lang_subtopic_body">
-<h2><strong>Using Unity Variables (2): ChucK External Variables</strong></h2>
-<p>This tutorial documents ChucK external variables. Using this type of variable 
+<h2><strong>Using Unity Variables (2): ChucK Global Variables</strong></h2>
+<p>This tutorial documents ChucK global variables. Using this type of variable 
    allows you to set and get the values of ChucK variables after a ChucK script
    is already running. Currently, it can be applied to ints and floats. It can
    also be applied to Events, for which the relevant actions are signaling and
@@ -681,7 +681,7 @@ oscToSpatialize => rightChannel;</pre>
 
 <p>In this tutorial, I will translate this script into one that is compiled and run once when
    the scene is opened. The new version of the script will trigger the audio file as a result
-   of communication with Unity using ChucK external variables.</p>
+   of communication with Unity using ChucK global variables.</p>
 
 <p>The first thing to do is move the script from <span class="mono2">OnCollisionEnter()</span>
    to <span class="mono2">Start()</span>.</p>
@@ -692,12 +692,12 @@ oscToSpatialize => rightChannel;</pre>
    Wrap the entire script into a function called <span class="mono2">playImpact(&nbsp;float&nbsp;intensity&nbsp;)</span>.</p>
 <img class="tutorialimg" src="./images/tutorial6/3.png" width=600 />
 
-<p>Now, let's add the external variables we will use to signal when this function should be called.
-   We will set the value of an <span class="mono2">external float</span> from Unity, and then we
-   will signal an <span class="mono2">external Event</span> from Unity to tell the ChucK script
-   that it should play an impact using the value stored in the external float.</p>
-<p>These variables are specified just like regular variables, but with the <span class="mono2">external</span>
-   keyword. Note that only global variables can be <span class="mono2">external</span>, and currently the
+<p>Now, let's add the global variables we will use to signal when this function should be called.
+   We will set the value of an <span class="mono2">global float</span> from Unity, and then we
+   will signal an <span class="mono2">global Event</span> from Unity to tell the ChucK script
+   that it should play an impact using the value stored in the global float.</p>
+<p>These variables are specified just like regular variables, but with the <span class="mono2">global</span>
+   keyword. Note that only global variables can be <span class="mono2">global</span>, and currently the
    only variable types supported are int, float, and Event.</p>
 <img class="tutorialimg" src="./images/tutorial6/4.png" width=600 />
 
@@ -713,10 +713,10 @@ oscToSpatialize => rightChannel;</pre>
 <p>Finally, in the <span class="mono2">OnCollisionEnter</span> function, after we compute 
    the collision's intensity, we first set the value of the float <span class="mono2">impactIntensity</span>
    and then broadcast the event <span class="mono2">impactHappened</span>. These functions take the string
-   name of the ChucK plugin as the first argument and the name of the external variable as the second argument,
-   since each ChucK plugin has its own namespace of external variables.</p>
+   name of the ChucK plugin as the first argument and the name of the global variable as the second argument,
+   since each ChucK plugin has its own namespace of global variables.</p>
 <img class="tutorialimg" src="./images/tutorial6/6.png" width=600 />
-<p>Congratulations! You've written a script using external variables. This practice allows you to write
+<p>Congratulations! You've written a script using global variables. This practice allows you to write
    slightly more efficient code, since you won't need to send a new script to the ChucK compiler every time you want
    to generate sound.</p>
 </div>
