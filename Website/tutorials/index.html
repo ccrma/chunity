@@ -187,14 +187,14 @@ to add ChucK to any existing Unity project.</p>
 	SetCountText();
 	winText.text = "";
 
-	GetComponent&lt;ChuckSubInstance&gt;().RunCode(@"
+	<span class="bold">GetComponent&lt;ChuckSubInstance&gt;().RunCode(@"
 		SinOsc foo => dac;
 		while( true )
 		{
 			Math.random2f( 300, 1000 ) => foo.freq;
 			100::ms => now;
 		}
-	");
+	");</span>
 }</code></pre>
 <br />
 <p>Let's test it! Enter play mode.</p>
@@ -232,14 +232,14 @@ to add ChucK to any existing Unity project.</p>
 		count = count + 1;
 		SetCountText();
 
-		GetComponent&lt;ChuckSubInstance&gt;().RunCode(@"
+		<span class="bold">GetComponent&lt;ChuckSubInstance&gt;().RunCode(@"
 			SinOsc foo => dac;
 			repeat( 5 )
 			{
 				Math.random2f( 300, 1000 ) => foo.freq;
 				100::ms => now;
 			}
-		");
+		");</span>
 	}
 }</code></pre>
 
@@ -279,13 +279,13 @@ to add ChucK to any existing Unity project.</p>
 		count = count + 1;
 		SetCountText();
 
-		GetComponent&lt;ChuckSubInstance&gt;().RunCode( string.Format( @"
+		GetComponent&lt;ChuckSubInstance&gt;().RunCode( <span class="bold">string.Format( @"</span>
 			SinOsc foo => dac;
-			repeat( {0} )
-			{{
+			<span class="bold">repeat( {0} )
+			{{</span>
 				Math.random2f( 300, 1000 ) => foo.freq;
 				100::ms => now;
-			}}
+			<span class="bold">}}</span>
 		", count ) );
 	}
 }</pre></code>
@@ -420,7 +420,7 @@ to add ChucK to any existing Unity project.</p>
    is turned on or off.</p>
 <pre data-line="3" class="line-numbers"><code class="language-csharp">public class Rotator : MonoBehaviour
 {
-	public bool rotateRandomly = false;
+	<span class="bold">public bool rotateRandomly = false;</span>
 
 	void Update()
 	{
@@ -531,7 +531,7 @@ to add ChucK to any existing Unity project.</p>
    <span class="mono2">StreamingAssets</span> folder for code that is run using 
    <span class="mono2">ChuckSubInstance.RunCode()</span>.</p>
 
-<pre data-line="10-11,17,20" class="line-numbers"><code class="language-csharp">void OnCollisionEnter( Collision collision )
+<pre data-line="10-11,16-20" class="line-numbers"><code class="language-csharp">void OnCollisionEnter( Collision collision )
 {
 	// map and clamp from [0, 16] to [0, 1]
 	float intensity = Mathf.Clamp01( collision.relativeVelocity.magnitude / 16 );
@@ -540,17 +540,17 @@ to add ChucK to any existing Unity project.</p>
 	intensity = intensity * intensity;
 
 	GetComponent&lt;ChuckSubInstance&gt;().RunCode( string.Format( @"
-		SndBuf impactBuf => dac;
-		me.dir() + ""impact.wav"" => impactBuf.read;
+		<span class="bold">SndBuf impactBuf => dac;
+		me.dir() + ""impact.wav"" => impactBuf.read;</span>
 
 		// start at the beginning of the clip
 		0 => impactBuf.pos;
 	
 		// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
-		1.5 - {0} + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
+		<span class="bold">1.5 - {0} + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;</span>
 
 		// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
-		0.05 + 0.95 * {0} => impactBuf.gain;
+		<span class="bold">0.05 + 0.95 * {0} => impactBuf.gain;</span>
 
 		// pass time so that the file plays
 		impactBuf.length() / impactBuf.rate() => now;
@@ -585,7 +585,7 @@ to add ChucK to any existing Unity project.</p>
 	// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
 	1.5 - {0} + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
 			
-	chout <= ""Rate is "" <= impactBuf.rate() <= IO.newline();
+	<span class="bold">chout <= ""Rate is "" <= impactBuf.rate() <= IO.newline();</span>
 
 	// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
 	0.05 + 0.95 * {0} => impactBuf.gain;
@@ -685,8 +685,8 @@ to add ChucK to any existing Unity project.</p>
 <p>Next, remove the call to <span class="mono2">string.Format</span> and replace all
    of the format locations in the string with a new variable, <span class="mono2">intensity</span>.
    Wrap the entire script into a function called <span class="mono2">playImpact(&nbsp;float&nbsp;intensity&nbsp;)</span>.</p>
-<pre class="line-numbers" data-line="2,11,16"><code class="language-csharp">GetComponent&lt;ChuckSubInstance&gt;().RunCode( @"
-	fun void playImpact( float intensity )
+<pre class="line-numbers" data-line="2,10-16"><code class="language-csharp">GetComponent&lt;ChuckSubInstance&gt;().RunCode( @"
+	<span class="bold">fun void playImpact( float intensity )</span>
 	{
 		SndBuf impactBuf => dac;
 		me.dir() + ""impact.wav"" => impactBuf.read;
@@ -695,12 +695,12 @@ to add ChucK to any existing Unity project.</p>
 		0 => impactBuf.pos;
 				
 		// set rate: least intense is fast, most intense is slow; range 0.4 to 1.6
-		1.5 - intensity + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;
+		<span class="bold">1.5 - intensity + Math.random2f( -0.1, 0.1 ) => impactBuf.rate;</span>
 			
 		chout <= ""Rate is "" <= impactBuf.rate() <= IO.newline();
 
 		// set gain: least intense is quiet, most intense is loud; range 0.05 to 1
-		0.05 + 0.95 * intensity => impactBuf.gain;
+		<span class="bold">0.05 + 0.95 * intensity => impactBuf.gain;</span>
 
 		// pass time so that the file plays
 		impactBuf.length() / impactBuf.rate() => now;
@@ -736,8 +736,8 @@ to add ChucK to any existing Unity project.</p>
 		impactBuf.length() / impactBuf.rate() => now;
 	}
 	
-	global float impactIntensity;
-	global Event impactHappened;
+	<span class="bold">global float impactIntensity;
+	global Event impactHappened;</span>
 " );</code></pre>
 
 
@@ -772,11 +772,11 @@ to add ChucK to any existing Unity project.</p>
 	global float impactIntensity;
 	global Event impactHappened;
 
-	while( true )
+	<span class="bold">while( true )
 	{
 		impactHappened => now;
 		spork ~ playImpact( impactIntensity );
-	}
+	}</span>
 " );</code></pre>
 
 
@@ -785,6 +785,7 @@ to add ChucK to any existing Unity project.</p>
    and then broadcast the event <span class="mono2">impactHappened</span>. These functions take the string
    name of the ChucK plugin as the first argument and the name of the global variable as the second argument,
    since each ChucK plugin has its own namespace of global variables.</p>
+<!--  TODO: prism bold -->
 <pre class="line-numbers" data-line="9-11"><code class="language-csharp">void OnCollisionEnter( Collision collision )
 {
 	// map and clamp from [0, 16] to [0, 1]
@@ -794,8 +795,8 @@ to add ChucK to any existing Unity project.</p>
 	intensity = intensity * intensity;
 
 	// set the intensity and fire the event
-	GetComponent&lt;ChuckSubInstance&gt;().SetFloat( "impactIntensity", intensity );
-	GetComponent&lt;ChuckSubInstance&gt;().BroadcastEvent( "impactHappened" );
+	<span class="bold">GetComponent&lt;ChuckSubInstance&gt;().SetFloat( "impactIntensity", intensity );
+	GetComponent&lt;ChuckSubInstance&gt;().BroadcastEvent( "impactHappened" );</span>
 }</code></pre>
 
 <p>Congratulations! You've written a script using global variables. This practice allows you to write
@@ -830,11 +831,11 @@ to add ChucK to any existing Unity project.</p>
    so if you want to do something other than a <span class="mono2">Debug.Log</span>, you will need to store
    the value in this way and use it somewhere else, such as in <span class="mono2">Update()</span> or
    <span class="mono2">FixedUpdate()</span>.</p>
-<pre class="line-numbers" data-line="3,5,15,27-28,38,41-45"><code class="language-csharp">public class AudioAnalyzer : MonoBehaviour
+<pre class="line-numbers" data-line="3-5,15,27-28,38,41-45"><code class="language-csharp">public class AudioAnalyzer : MonoBehaviour
 {
-	double mostRecentDacLoudness;
+	<span class="bold">double mostRecentDacLoudness;</span>
 	ChuckSubInstance myChuck;
-	Chuck.FloatCallback myGetLoudnessCallback;
+	<span class="bold">Chuck.FloatCallback myGetLoudnessCallback;</span>
 
 	void Start()
 	{
@@ -844,7 +845,7 @@ to add ChucK to any existing Unity project.</p>
 		);
 
 		myChuck.RunCode( @"
-			global float dacLoudness;
+			<span class="bold">global float dacLoudness;</span>
 			
 			dac => FFT fft =^ RMS rms => blackhole;
 
@@ -857,7 +858,7 @@ to add ChucK to any existing Unity project.</p>
 				rms.upchuck() @=> UAnaBlob data;
 
 				// store value in global variable
-				data.fval(0) => dacLoudness;
+				<span class="bold">data.fval(0) => dacLoudness;</span>
 
 				// advance time
 				fft.size()::samp => now;
@@ -867,12 +868,12 @@ to add ChucK to any existing Unity project.</p>
 
 	void Update()
 	{
-		myChuck.GetFloat( "dacLoudness", myGetLoudnessCallback );
+		<span class="bold">myChuck.GetFloat( "dacLoudness", myGetLoudnessCallback );</span>
 	}
 
-	void GetDacLoudnessCallbackFunction( double dacLoudness )
+	void GetDacLoudnessCallbackFunction( <span class="bold">double dacLoudness</span> )
 	{
-		mostRecentDacLoudness = dacLoudness;
+		<span class="bold">mostRecentDacLoudness = dacLoudness;</span>
 		Debug.Log( "got a value for dac loudness: " + dacLoudness.ToString( "0.000" ) );
 	}
 }</code></pre>
@@ -890,7 +891,7 @@ to add ChucK to any existing Unity project.</p>
 <pre class="line-numbers" data-line="4,30-31,37"><code class="language-csharp">public class AudioAnalyzer : MonoBehaviour
 {
 	ChuckSubInstance myChuck;
-	ChuckFloatSyncer myGetLoudnessSyncer;
+	<span class="bold">ChuckFloatSyncer myGetLoudnessSyncer;</span>
 
 	void Start()
 	{
@@ -916,14 +917,14 @@ to add ChucK to any existing Unity project.</p>
 			}	
 		" );
 
-		myGetLoudnessSyncer = gameObject.AddComponent&lt;ChuckFloatSyncer&gt;();
-		myGetLoudnessSyncer.SyncFloat( myChuck, "dacLoudness" );
+		<span class="bold">myGetLoudnessSyncer = gameObject.AddComponent&lt;ChuckFloatSyncer&gt;();
+		myGetLoudnessSyncer.SyncFloat( myChuck, "dacLoudness" );</span>
 	}
 
 	void Update()
 	{
 		Debug.Log( "most recent dac loudness: " + 
-			myGetLoudnessSyncer.GetCurrentValue().ToString( "0.000" )
+			<span class="bold">myGetLoudnessSyncer.GetCurrentValue()</span>.ToString( "0.000" )
 		);
 	}
 }</code></pre>
@@ -958,7 +959,7 @@ to add ChucK to any existing Unity project.</p>
 <pre class="line-numbers" data-line="4,18-21,24"><code class="language-csharp">GetComponent&lt;ChuckSubInstance&gt;().RunCode( @"
 	fun void playImpact( float intensity )
 	{
-		SndBuf impactBuf => Bitcrusher bc => dac;
+		SndBuf impactBuf => <span class="bold">Bitcrusher bc</span> => dac;
 		me.dir() + ""impact.wav"" => impactBuf.read;
 
 		// start at the beginning of the clip
@@ -973,12 +974,12 @@ to add ChucK to any existing Unity project.</p>
 		0.05 + 0.95 * intensity => impactBuf.gain;
 
 		// bitcrusher settings
-		0.5 => bc.gain;
+		<span class="bold">0.5 => bc.gain;
 		7 => bc.bits;
-		3 => bc.downsampleFactor;
+		3 => bc.downsampleFactor;</span>
 
 		// pass time so that the file plays
-		impactBuf.length() / impactBuf.rate() + 5::second => now;
+		impactBuf.length() / impactBuf.rate() + <span class="bold">5::second</span> => now;
 	}
 	
 	global float impactIntensity;

@@ -263,8 +263,8 @@ pre[data-line] {
 /* saturation: 20% --> 5%? maybe not */
 /* hue: 24->212? looks much better to me */
 /* actually, yellow (58, 100, 50) looks pretty great! */
-	background: hsla(58, 100%, 50%,.15);
-	background: linear-gradient(to right, hsla(58, 100%, 50%,.2) 70%, hsla(58, 100%, 50%,0));
+	background: hsla(58, 0%, 65%,.15);
+	background: linear-gradient(to right, hsla(58, 0%, 65%,.2) 70%, hsla(58, 0%, 65%,0));
 
 	pointer-events: none;
 
