@@ -15,6 +15,25 @@
 #include <unistd.h>
 #endif
 
+extern "C"
+{
+    // If exported by a plugin, this function will be called when the plugin is loaded.
+    void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces)
+    {
+        // Things that need to be common to ALL ChucK instances will be loaded here
+        // (This seems to be called reliably.)
+    }
+    
+    // If exported by a plugin, this function will be called when the plugin is about to be unloaded.
+    void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
+    {
+        // Things that need to be common to ALL ChucK instances will be unloaded here
+        // (I don't think this is being called. See https://medium.com/@bengreenier/building-native-unity-plugins-with-visual-studio-8f470e5af9ca )
+        ChucK::globalCleanup();
+    }
+
+}
+
 namespace ChucK_For_Unity
 {
     enum Param
@@ -47,6 +66,7 @@ namespace ChucK_For_Unity
     // C# "string" corresponds to passing char *
     UNITY_INTERFACE_EXPORT bool runChuckCode( unsigned int chuckID, const char * code )
     {
+        std::cout << "runChuckCode called -- this print statement verifies I am seeing logs at all." << std::endl;
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
         // don't want to replace dac
@@ -575,22 +595,6 @@ namespace ChucK_For_Unity
         data_instances[id] = data;
         
         return true;
-    }
-    
-    
-    // Called when the plugin is loaded.
-    void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginLoad(IUnityInterfaces* unityInterfaces)
-    {
-        // Things that need to be common to ALL ChucK instances will be loaded here
-        // (I am pretty sure this is not called or is not called reliably.)
-    }
-    
-    
-    // Called when the plugin is about to be unloaded.
-    void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
-    {
-        // Things that need to be common to ALL ChucK instances will be unloaded here
-        ChucK::globalCleanup();
     }
     
 
