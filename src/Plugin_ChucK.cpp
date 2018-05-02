@@ -66,7 +66,6 @@ namespace ChucK_For_Unity
     // C# "string" corresponds to passing char *
     UNITY_INTERFACE_EXPORT bool runChuckCode( unsigned int chuckID, const char * code )
     {
-        std::cout << "runChuckCode called -- this print statement verifies I am seeing logs at all." << std::endl;
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
         // don't want to replace dac
