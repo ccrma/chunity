@@ -31,7 +31,6 @@ public class MyEventResponder : MonoBehaviour {
 		myChuck.StartListeningForChuckEvent( "notifier", myCallback );
 	}
 
-
 	void CallbackFunction()
 	{
 		// store a message that the callback function was called

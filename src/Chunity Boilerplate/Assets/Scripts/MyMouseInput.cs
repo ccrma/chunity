@@ -52,6 +52,7 @@ public class MyMouseInput : MonoBehaviour {
 			// infinite time loop
 			while( true )
 			{
+//<<< ""waiting for the hid event "" >>>;
 			    // wait on event
 			    hi => now;
 //<<< ""event to now happened "" >>>;
@@ -65,7 +66,7 @@ public class MyMouseInput : MonoBehaviour {
 			            //else if( msg.which == 1 ) msg.fdata => a1;
 			            msg.deltaY * .001 + a1 => a1;
 			            set( base, a0, a1, a2 );
-//						<<< ""is mouse motion"">>>;
+						<<< ""is mouse motion"">>>;
 			        }
 
 			        else if( msg.isButtonDown() )
