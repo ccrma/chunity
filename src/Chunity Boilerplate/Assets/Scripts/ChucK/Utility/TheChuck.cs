@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class TheChuck : MonoBehaviour
 {
-	public static ChuckMainInstance theChuck = null;
+	public static ChuckMainInstance instance = null;
 
 	void Awake()
 	{
-		if( theChuck == null )
+        if( instance == null )
 		{
-			theChuck = GetComponent<ChuckMainInstance>();
+            instance = GetComponent<ChuckMainInstance>();
 		}
 	}
 }
