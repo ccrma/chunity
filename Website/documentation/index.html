@@ -471,21 +471,160 @@ void <b class="name">SetRunning</b> ( bool <span class="bold arg">r</span> );</h
 
 
 <!--- end ChuckMain/SubInstance --->
+<br />
+<hr width="40%">
+<br />
+
+
+<h1><strong>TheChuck</strong></h1>
+<p>If you add a <span class="bold">TheChuck</span> component to a game object
+with a <span class="bold">ChuckMainInstance</span> component, then you will
+not need to set the <span class="bold">chuckMainInstance</span> field of any new 
+<span class="bold">ChuckSubInstances</span> you spawn; they will instead refer
+to the game object that has a <span class="bold">TheChuck</span> attached.</p>
 
 
 
+<br />
+<hr width="40%">
+<br />
 
-<!-- TODO: The helper classes:
-           ChuckEventListener
-           ChuckIntSyncer
-           ChuckFloatSyncer
-           ChuckStringSyncer
-           TheChuck
-           -->
-<!-- This should be it, right? All the other scripts in the boilerplate
-     are example scripts. And, users should not need to use the Chuck.cs class directly.
-     I can put "create get float" etc only in the first one, because the users
-     will not need Chuck.X for those cus it's duplicated. -->
+
+<h1><strong>Helper Components</strong></h1>
+<p>
+These components can be used by adding them to a GameObject at runtime.
+They are useful for dealing with global ChucK variables without having
+to write callbacks that are called from the audio thread.</p>
+
+<!-- TODO add an example -->
+
+<br /><h2 class="greentext">ChuckEventListener</h2>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">ListenForEvent</b> ( ChuckSubInstance <span class="bold arg">chuck</span>, string <span class="bold arg">eventToListenFor</span>, Action <span class="bold arg">callback</span> );</h3>
+<div class="comments"><ul>
+<li>start checking <span class="bold arg">chuck</span> for global Event <span class="bold arg">eventToListenFor</span> 
+so that <span class="bold arg">callback</span> will be called during Update() whenever 
+<span class="bold arg">eventToListenFor</span> broadcasts</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">StopListening</b> ();</h3>
+<div class="comments"><ul>
+<li>stops calling the callback that was previously set up with <span class="bold arg">ListenForEvent</span> on this component</li>
+</ul></div></div>
+
+
+
+<br /><h2 class="greentext">ChuckIntSyncer</h2>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">SyncInt</b> ( ChuckSubInstance <span class="bold arg">chuck</span>, string <span class="bold arg">intToSync</span> );</h3>
+<div class="comments"><ul>
+<li>start checking <span class="bold arg">chuck</span> for global int <span class="bold arg">intToSync</span> 
+so that later, you can get its value whenever you want</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">StopSyncing</b> ();</h3>
+<div class="comments"><ul>
+<li>stops syncing the int that was previously set up with <span class="bold arg">SyncInt</span> on this component</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+int <b class="name">GetCurrentValue</b> ();</h3>
+<div class="comments"><ul>
+<li>returns the most recently fetched value for your synced int</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">SetNewValue</b> ( int <span class="bold arg">newValue</span> );</h3>
+<div class="comments"><ul>
+<li>sets the value of the currently syncing int to <span class="bold arg">newValue</span></li>
+</ul></div></div>
+
+
+
+<br /><h2 class="greentext">ChuckFloatSyncer</h2>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">SyncFloat</b> ( ChuckSubInstance <span class="bold arg">chuck</span>, string <span class="bold arg">floatToSync</span> );</h3>
+<div class="comments"><ul>
+<li>start checking <span class="bold arg">chuck</span> for global float <span class="bold arg">floatToSync</span> 
+so that later, you can get its value whenever you want</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">StopSyncing</b> ();</h3>
+<div class="comments"><ul>
+<li>stops syncing the float that was previously set up with <span class="bold arg">SyncFloat</span> on this component</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+float <b class="name">GetCurrentValue</b> ();</h3>
+<div class="comments"><ul>
+<li>returns the most recently fetched value for your synced float</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">SetNewValue</b> ( float <span class="bold arg">newValue</span> );</h3>
+<div class="comments"><ul>
+<li>sets the value of the currently syncing float to <span class="bold arg">newValue</span></li>
+</ul></div></div>
+
+
+
+<br /><h2 class="greentext">ChuckStringSyncer</h2>
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">SyncString</b> ( ChuckSubInstance <span class="bold arg">chuck</span>, string <span class="bold arg">stringToSync</span> );</h3>
+<div class="comments"><ul>
+<li>start checking <span class="bold arg">chuck</span> for global string <span class="bold arg">stringToSync</span> 
+so that later, you can get its value whenever you want</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">StopSyncing</b> ();</h3>
+<div class="comments"><ul>
+<li>stops syncing the string that was previously set up with <span class="bold arg">SyncString</span> on this component</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+string <b class="name">GetCurrentValue</b> ();</h3>
+<div class="comments"><ul>
+<li>returns the most recently fetched value for your synced string</li>
+</ul></div></div>
+
+
+<div class="export">
+<h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
+void <b class="name">SetNewValue</b> ( string <span class="bold arg">newValue</span> );</h3>
+<div class="comments"><ul>
+<li>sets the value of the currently syncing string to <span class="bold arg">newValue</span></li>
+</ul></div></div>
+
 
 
 
