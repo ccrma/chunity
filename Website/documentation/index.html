@@ -679,7 +679,7 @@ void Start()
     myEventListener = gameObject.AddComponent&lt;ChuckEventListener&gt;();
 
     // call my callback every time notifier broadcasts
-    myEventListener.ListenForEvent( myChuck, "notifier", MyEventReaction );
+    myEventListener.<span class="bold">ListenForEvent</span>( myChuck, "notifier", MyEventReaction );
 }
 
 // this function will be called from the Update() thread
@@ -710,6 +710,32 @@ void <b class="name">StopListening</b> ();</h3>
 
 
 <br /><h2 id="chuckintsyncer" class="greentext">ChuckIntSyncer</h2>
+
+<p>ChuckIntSyncer is a helper component that makes it easier to write programs
+like the example in <a href="#globalints">Global Ints</a>.</p>
+
+<pre data-line="2,11-15,21" class="line-numbers"><code class="language-csharp">ChuckSubInstance myChuck;
+ChuckIntSyncer myIntSyncer;
+
+void Start()
+{
+    myChuck = GetComponent&lt;ChuckSubInstance&gt;();
+    myChuck.RunCode( @"
+        global int myGlobalInt;
+        // ...
+    " );
+    // create a callback to use with GetInt in Update()
+    myIntSyncer = gameObject.AddComponent&lt;ChuckIntSyncer&gt;();
+
+    // start syncing
+    myIntSyncer.<span class="bold">SyncInt</span>( myChuck, "myGlobalInt" );
+}
+
+void Update()
+{
+    // get the most recently synced value
+    Debug.Log( myIntSyncer.<span class="bold">GetCurrentValue</span>() );
+}</code></pre>
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
@@ -746,6 +772,8 @@ void <b class="name">SetNewValue</b> ( int <span class="bold arg">newValue</span
 
 
 <br /><h2 id="chuckfloatsyncer" class="greentext">ChuckFloatSyncer</h2>
+<p>See <a href="#chuckintsyncer">ChuckIntSyncer</a> above for an example of how to use this component.</p>
+
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
@@ -782,6 +810,7 @@ void <b class="name">SetNewValue</b> ( float <span class="bold arg">newValue</sp
 
 
 <br /><h2 id="chuckstringsyncer" class="greentext">ChuckStringSyncer</h2>
+<p>See <a href="#chuckintsyncer">ChuckIntSyncer</a> above for an example of how to use this component.</p>
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
