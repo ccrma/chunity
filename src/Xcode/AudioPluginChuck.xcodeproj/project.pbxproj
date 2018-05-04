@@ -72,7 +72,7 @@
 		0492AE2B1F6B83A8005FE7CE /* util_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0492ADDD1F6B83A7005FE7CE /* util_string.cpp */; };
 		0492AE2C1F6B83A8005FE7CE /* util_thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0492ADDF1F6B83A7005FE7CE /* util_thread.cpp */; };
 		0492AE2D1F6B83A8005FE7CE /* util_xforms.c in Sources */ = {isa = PBXBuildFile; fileRef = 0492ADE11F6B83A7005FE7CE /* util_xforms.c */; };
-		04E09863209D25F300BF924F /* AudioPluginUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E0985F209D25F300BF924F /* AudioPluginUtil.cpp */; };
+		04E09869209D276500BF924F /* AudioPluginUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04E09866209D276400BF924F /* AudioPluginUtil.cpp */; };
 		04F254551EA69B7C00B36889 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04F254541EA69B7C00B36889 /* CoreAudio.framework */; };
 		04F254571EA69B8700B36889 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04F254561EA69B8700B36889 /* IOKit.framework */; };
 		04F254591EA69B9400B36889 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04F254581EA69B9400B36889 /* Carbon.framework */; };
@@ -246,11 +246,11 @@
 		0492AE311F6BA634005FE7CE /* chuck.tab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chuck.tab.c; path = ../chuck/src/core/chuck.tab.c; sourceTree = SOURCE_ROOT; };
 		0492AE321F6BA634005FE7CE /* chuck.tab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chuck.tab.h; path = ../chuck/src/core/chuck.tab.h; sourceTree = SOURCE_ROOT; };
 		04D57E1B1ECAC01F00EC69E3 /* Plugin_ChucK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Plugin_ChucK.h; path = ../Plugin_ChucK.h; sourceTree = "<group>"; };
-		04E0985E209D25F300BF924F /* AudioPluginInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPluginInterface.h; sourceTree = "<group>"; };
-		04E0985F209D25F300BF924F /* AudioPluginUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AudioPluginUtil.cpp; sourceTree = "<group>"; };
-		04E09860209D25F300BF924F /* AudioPluginUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioPluginUtil.h; sourceTree = "<group>"; };
-		04E09861209D25F300BF924F /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityGraphics.h; sourceTree = "<group>"; };
-		04E09862209D25F300BF924F /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IUnityInterface.h; sourceTree = "<group>"; };
+		04E09864209D276400BF924F /* IUnityInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityInterface.h; path = ../IUnityInterface.h; sourceTree = "<group>"; };
+		04E09865209D276400BF924F /* AudioPluginUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginUtil.h; path = ../AudioPluginUtil.h; sourceTree = "<group>"; };
+		04E09866209D276400BF924F /* AudioPluginUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioPluginUtil.cpp; path = ../AudioPluginUtil.cpp; sourceTree = "<group>"; };
+		04E09867209D276400BF924F /* AudioPluginInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioPluginInterface.h; path = ../AudioPluginInterface.h; sourceTree = "<group>"; };
+		04E09868209D276500BF924F /* IUnityGraphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IUnityGraphics.h; path = ../IUnityGraphics.h; sourceTree = "<group>"; };
 		04F254541EA69B7C00B36889 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		04F254561EA69B8700B36889 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		04F254581EA69B9400B36889 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
@@ -467,19 +467,6 @@
 			path = ../chuck/src/core/regex;
 			sourceTree = SOURCE_ROOT;
 		};
-		04E0985D209D25F300BF924F /* Unity utils */ = {
-			isa = PBXGroup;
-			children = (
-				04E0985E209D25F300BF924F /* AudioPluginInterface.h */,
-				04E0985F209D25F300BF924F /* AudioPluginUtil.cpp */,
-				04E09860209D25F300BF924F /* AudioPluginUtil.h */,
-				04E09861209D25F300BF924F /* IUnityGraphics.h */,
-				04E09862209D25F300BF924F /* IUnityInterface.h */,
-			);
-			name = "Unity utils";
-			path = "../Unity utils";
-			sourceTree = "<group>";
-		};
 		089C166AFE841209C02AAC07 /* AudioPluginDemo */ = {
 			isa = PBXGroup;
 			children = (
@@ -518,8 +505,12 @@
 		08FB77AFFE84173DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				04E0985D209D25F300BF924F /* Unity utils */,
 				04813AAC1EF992CA00112924 /* hrtftable.cpp */,
+				04E09867209D276400BF924F /* AudioPluginInterface.h */,
+				04E09866209D276400BF924F /* AudioPluginUtil.cpp */,
+				04E09865209D276400BF924F /* AudioPluginUtil.h */,
+				04E09868209D276500BF924F /* IUnityGraphics.h */,
+				04E09864209D276400BF924F /* IUnityInterface.h */,
 				04813AAD1EF992CA00112924 /* Plugin_PanSpatializer.cpp */,
 				04813AAE1EF992CA00112924 /* Plugin_Spatializer.cpp */,
 				04813AB51EFAF26000112924 /* Plugin_SpatializerReverb.cpp */,
@@ -606,7 +597,7 @@
 				048D70681F81584500A703EB /* chuck.y in Sources */,
 				0492AE2B1F6B83A8005FE7CE /* util_string.cpp in Sources */,
 				0492ADF11F6B83A7005FE7CE /* chuck_parse.cpp in Sources */,
-				04E09863209D25F300BF924F /* AudioPluginUtil.cpp in Sources */,
+				04E09869209D276500BF924F /* AudioPluginUtil.cpp in Sources */,
 				04813AB11EF992CA00112924 /* Plugin_Spatializer.cpp in Sources */,
 				0492AE221F6B83A8005FE7CE /* util_buffers.cpp in Sources */,
 				04813AB01EF992CA00112924 /* Plugin_PanSpatializer.cpp in Sources */,
