@@ -4,6 +4,7 @@
 <title>ChucK - [Programming Guide : Standard Libraries]</title>
 <link rel="stylesheet" type="text/css" href="../css/style.css">
 <link rel="stylesheet" type="text/css" href="../css/ckdoc.css">
+<link rel="stylesheet" type="text/css" href="../css/prism.css">
  
 </head>
 <body>
@@ -58,17 +59,39 @@
 
 <!-- TODO intro / table of contents to leap to the various sections below -->
 
-<h1><strong>ChuckMainInstance / ChuckSubInstance</strong></h1>
+<h1 id="chuckmainsubinstance"><strong>ChuckMainInstance / ChuckSubInstance</strong></h1>
 <p>
 These components have identical APIs. In most cases, you will be sending commands
 to a ChuckSubInstance, which will send on those commands to whichever ChuckMainInstance
 it refers to, but you can also send commands directly to a ChuckMainInstance.</p>
 
-<!-- TODO: example code? -->
 
 <div>
 <!-- Running code -->
-<br /><h2 class="greentext">Running Code</h2>
+<br /><h2 id="runningcode" class="greentext">Running Code</h2>
+<p>Here's an example of how to use a ChuckMainInstance / ChuckSubInstance, 
+taken from the <a href="../tutorials#unityvariables1">tutorials</a>.</p>
+
+<pre data-line="9-16" class="line-numbers"><code class="language-csharp">void OnTriggerEnter( Collider other )
+{
+	if( other.gameObject.CompareTag( "Pick Up" ) )
+	{
+		other.gameObject.SetActive( false );
+		count = count + 1;
+		SetCountText();
+
+		<span class="bold">GetComponent&lt;ChuckSubInstance&gt;().RunCode(@"
+			SinOsc foo => dac;
+			repeat( 5 )
+			{
+				Math.random2f( 300, 1000 ) => foo.freq;
+				100::ms => now;
+			}
+		");</span>
+	}
+}</code></pre>
+
+
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">RunCode</b> ( string <span class="bold arg">code</span> );</h3>
@@ -100,7 +123,40 @@ bool <b class="name">RunFile</b> ( string <span class="bold arg">filename</span>
 
 
 <!-- Global ints -->
-<br /><h2 class="greentext">Global Ints</h2>
+<br /><h2 id="globalints" class="greentext">Global Ints</h2>
+<p>Here's how it would look to set and get a global int. See also <a href="#chuckintsyncer">ChuckIntSyncer</a> 
+below for a simpler pattern that doesn't involve writing your own callback.</p>
+<pre data-line="13,16,22" class="line-numbers"><code class="language-csharp">ChuckSubInstance myChuck;
+Chuck.IntCallback myIntCallback;
+long latestGottenInt;
+
+void Start()
+{
+    myChuck = GetComponent&lt;ChuckSubInstance&gt;();
+    myChuck.RunCode(@"
+        global int myGlobalInt;
+        // ...
+    ");
+    // create a callback to use with GetInt in Update()
+    myIntCallback = myChuck.<span class="bold">CreateGetIntCallback</span>( MyGetIntCallbackFunction );
+    
+    // call SetInt
+    myChuck.<span class="bold">SetInt</span>( "myGlobalInt", 5 );
+}
+
+void Update()
+{
+    // call the callback
+    myChuck.<span class="bold">GetInt</span>( "myGlobalInt", myIntCallback );
+    
+    // do something with the gotten value
+    Debug.Log( latestGottenInt );
+}
+
+void MyGetIntCallbackFunction( long newValue )
+{
+    latestGottenInt = newValue;
+}</code></pre>
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">SetInt</b> ( string <span class="bold arg">variableName</span>, long <span class="bold arg">value</span> );</h3>
@@ -132,7 +188,10 @@ Chuck.IntCallback <b class="name">CreateGetIntCallback</b> ( Action< long > <spa
 
 
 <!-- Global floats -->
-<br /><h2 class="greentext">Global Floats</h2>
+<br /><h2 id="globalfloats" class="greentext">Global Floats</h2>
+<p>See <a href="#globalints">Global Ints</a> above for an example of how to get and 
+set global variables. See also <a href="#chuckfloatsyncer">ChuckFloatSyncer</a> 
+below for a simpler pattern that doesn't involve writing your own callback.</p>
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">SetFloat</b> ( string <span class="bold arg">variableName</span>, double <span class="bold arg">value</span> );</h3>
@@ -165,7 +224,10 @@ Chuck.FloatCallback <b class="name">CreateGetFloatCallback</b> ( Action< double 
 
 
 <!-- Global strings -->
-<br /><h2 class="greentext">Global Strings</h2>
+<br /><h2 id="globalstrings" class="greentext">Global Strings</h2>
+<p>See <a href="#globalints">Global Ints</a> above for an example of how to get and 
+set global variables. See also <a href="#chuckstringsyncer">ChuckStringSyncer</a> 
+below for a simpler pattern that doesn't involve writing your own callback.</p>
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">SetString</b> ( string <span class="bold arg">variableName</span>, string <span class="bold arg">value</span> );</h3>
@@ -198,7 +260,63 @@ Chuck.StringCallback <b class="name">CreateGetStringCallback</b> ( Action< strin
 
 
 <!-- Global Events -->
-<br /><h2 class="greentext">Global Events</h2>
+<br /><h2 id="globalevents" class="greentext">Global Events</h2>
+<p>Here's an example of how to trigger and listen to global Events. 
+See also <a href="#chuckeventlistener">ChuckEventListener</a> 
+below for a simpler pattern that doesn't involve communicating back
+from the audio thread to the Update() thread.</p>
+
+
+<pre data-line="21,24,27" class="line-numbers"><code class="language-csharp">ChuckSubInstance myChuck;
+Chuck.VoidCallback myEventCallback;
+
+void Start()
+{
+    myChuck = GetComponent&lt;ChuckSubInstance&gt;();
+    myChuck.RunCode( @"
+        global Event startNotifying;
+        global Event notifier;
+
+        startNotifying => now;
+        while( true )
+        {
+            notifier.broadcast();
+            250::ms => now;
+        }
+    " );
+    
+
+    // call BroadcastEvent to trigger startNotifying
+    myChuck.<span class="bold">BroadcastEvent</span>( "startNotifying" );
+
+    // create a callback to use with StartListeningForChuckEvent
+    myEventCallback = myChuck.<span class="bold">CreateVoidCallback</span>( MyEventReaction );
+
+    // call my callback every time notifier broadcasts
+    myChuck.<span class="bold">StartListeningForChuckEvent</span>( "notifier", myEventCallback );
+}
+
+// keep track of how many times the Event has
+// broadcast on the audio thread
+int numTimesEventHappenedOnAudioThread = 0;
+void MyEventReaction()
+{
+    numTimesEventHappenedOnAudioThread++;
+}
+
+// use that information on the Update() thread
+void Update()
+{
+    while( numTimesEventHappenedOnAudioThread > 0 )
+    {
+        numTimesEventHappenedOnAudioThread--;
+        // Do something in Unity, e.g....
+        transform.Rotate( ... );
+    }
+}</code></pre>
+
+
+
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">SignalEvent</b> ( string <span class="bold arg">variableName</span> );</h3>
@@ -259,7 +377,13 @@ Chuck.VoidCallback <b class="name">CreateVoidCallback</b> ( Action <span class="
 
 
 <!-- Global int arrays -->
-<br /><h2 class="greentext">Global Int Arrays</h2>
+<br /><h2 id="globalintarrays" class="greentext">Global Int Arrays</h2>
+<p>See <a href="#globalints">Global Ints</a> above for an example of how to get and 
+set global variables. Note that "associative array" is ChucK's version of a 
+dictionary with string keys mapping to values (see 
+<a href="http://chuck.cs.princeton.edu/doc/language/array.html" target="_blank">ChucK documentation</a>).</p>
+
+
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">SetIntArray</b> ( string <span class="bold arg">variableName</span>, long[] <span class="bold arg">values</span> );</h3>
@@ -339,7 +463,12 @@ bool <b class="name">GetAssociativeIntArrayValue</b> ( string <span class="bold 
 
 
 <!-- Global float arrays -->
-<br /><h2 class="greentext">Global Float Arrays</h2>
+<br /><h2 id="globalfloatarrays" class="greentext">Global Float Arrays</h2>
+<p>See <a href="#globalints">Global Ints</a> above for an example of how to get and 
+set global variables. Note that "associative array" is ChucK's version of a 
+dictionary with string keys mapping to values (see 
+<a href="http://chuck.cs.princeton.edu/doc/language/array.html" target="_blank">ChucK documentation</a>).</p>
+
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">SetFloatArray</b> ( string <span class="bold arg">variableName</span>, double[] <span class="bold arg">values</span> );</h3>
@@ -416,7 +545,26 @@ bool <b class="name">GetAssociativeFloatArrayValue</b> ( string <span class="bol
 
 
 
-<br /><h2 class="greentext">Miscellaneous</h2>
+<br /><h2 id="uniquevariablename" class="greentext">Unique Variables</h2>
+<p>You might want many copies running of a script that needs a global variable
+for communication between ChucK and Unity, but they all should not be referring
+to the same global variable. In this case, you should determine the name of
+each script's global variable at runtime.</p>
+
+<pre data-line="2,7,9-12" class="line-numbers"><code class="language-csharp">ChuckSubInstance myChuck;
+string myGlobalVariableName;
+
+void Start()
+{
+    myChuck = GetComponent&lt;ChuckSubInstance&gt;();
+    myGlobalVariableName = myChuck.<span class="bold">GetUniqueVariableName</span>();
+
+    myChuck.RunCode( <span class="bold">string.Format</span>( @"
+        global int <span class="bold">{0}</span>;
+        // ...
+    ", <span class="bold">myGlobalVariableName</span> ) );
+}</code></pre>
+
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
 bool <b class="name">GetUniqueVariableName</b> ( string <span class="bold arg">prefix</span> = "v" );</h3>
@@ -430,7 +578,8 @@ if you don't specify a prefix, then "v" is used. choosing a prefix is mostly use
 
 
 
-<br /><h2 class="greentext">Specific to ChuckMainInstance</h2>
+<br /><h2 id="specifictomain" class="greentext">Specific to ChuckMainInstance</h2>
+<p>A ChuckMainInstance has one setting: the microphone used as input to its ChucK VM.</p>
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[value]</a>:
 string <b class="name">microphoneIdentifier</b></h3>
@@ -440,7 +589,9 @@ your system's default microphone is used</li>
 </ul></div></div>
 
 
-<br /><h2 class="greentext">Specific to ChuckSubInstance</h2>
+<br /><h2 id="soecifictosub" class="greentext">Specific to ChuckSubInstance</h2>
+<p>A ChuckSubInstance has two parameters for setting itself up. See the <a href="../tutorials#setup">initial setup
+tutorial</a> and the <a href="../tutorials#spatialization">spatialization tutorial</a>.</p>
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[value]</a>:
 ChuckMainInstance <b class="name">chuckMainInstance</b></h3>
@@ -476,13 +627,14 @@ void <b class="name">SetRunning</b> ( bool <span class="bold arg">r</span> );</h
 <br />
 
 
-<h1><strong>TheChuck</strong></h1>
+<h1 id="thechuck"><strong>TheChuck</strong></h1>
 <p>If you add a <span class="bold">TheChuck</span> component to a game object
 with a <span class="bold">ChuckMainInstance</span> component, then you will
 not need to set the <span class="bold">chuckMainInstance</span> field of any new 
 <span class="bold">ChuckSubInstances</span> you spawn; they will instead refer
 to the game object that has a <span class="bold">TheChuck</span> attached.</p>
 
+<img class="tutorialimg" src="../images/docs/thechuck.png" width=500 />
 
 
 <br />
@@ -490,7 +642,7 @@ to the game object that has a <span class="bold">TheChuck</span> attached.</p>
 <br />
 
 
-<h1><strong>Helper Components</strong></h1>
+<h1 id="helpercomponents"><strong>Helper Components</strong></h1>
 <p>
 These components can be used by adding them to a GameObject at runtime.
 They are useful for dealing with global ChucK variables without having
@@ -498,7 +650,45 @@ to write callbacks that are called from the audio thread.</p>
 
 <!-- TODO add an example -->
 
-<br /><h2 class="greentext">ChuckEventListener</h2>
+<br /><h2 id="chuckeventlistener" class="greentext">ChuckEventListener</h2>
+<p>ChuckEventListener is a helper component that makes it easier to write programs
+like the example in <a href="#globalevents">Global Events</a>.</p>
+
+<pre data-line="2,22-26" class="line-numbers"><code class="language-csharp">ChuckSubInstance myChuck;
+ChuckEventListener myEventListener;
+
+void Start()
+{
+    myChuck = GetComponent&lt;ChuckSubInstance&gt;();
+    myChuck.RunCode( @"
+        global Event startNotifying;
+        global Event notifier;
+
+        startNotifying => now;
+        while( true )
+        {
+            notifier.broadcast();
+            250::ms => now;
+        }
+    " );
+    
+    // call BroadcastEvent to trigger startNotifying
+    myChuck.BroadcastEvent( "startNotifying" );
+
+    // create an EventListener to call my callback
+    myEventListener = gameObject.AddComponent&lt;ChuckEventListener&gt;();
+
+    // call my callback every time notifier broadcasts
+    myEventListener.ListenForEvent( myChuck, "notifier", MyEventReaction );
+}
+
+// this function will be called from the Update() thread
+void MyEventReaction()
+{
+    // Do something in Unity
+    transform.Rotate( ... );
+}</code></pre>
+
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
@@ -519,7 +709,7 @@ void <b class="name">StopListening</b> ();</h3>
 
 
 
-<br /><h2 class="greentext">ChuckIntSyncer</h2>
+<br /><h2 id="chuckintsyncer" class="greentext">ChuckIntSyncer</h2>
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
@@ -555,7 +745,7 @@ void <b class="name">SetNewValue</b> ( int <span class="bold arg">newValue</span
 
 
 
-<br /><h2 class="greentext">ChuckFloatSyncer</h2>
+<br /><h2 id="chuckfloatsyncer" class="greentext">ChuckFloatSyncer</h2>
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
@@ -591,7 +781,7 @@ void <b class="name">SetNewValue</b> ( float <span class="bold arg">newValue</sp
 
 
 
-<br /><h2 class="greentext">ChuckStringSyncer</h2>
+<br /><h2 id="chuckstringsyncer" class="greentext">ChuckStringSyncer</h2>
 
 <div class="export">
 <h3 class="function-name"><a class="heading" name="fabs">[function]</a>:
@@ -628,255 +818,48 @@ void <b class="name">SetNewValue</b> ( string <span class="bold arg">newValue</s
 
 
 
-<br>
-
-<hr width="10%">
-
-<font size="3" class="greentext">namespace: <b>Machine</b></font>
-<br><br><p align="justify">
-<b>Machine</b> is ChucK runtime interface to the virtual machine.  this interface can 
-be used to manage shreds.  They are similar to the <a href="http://chuck.cs.princeton.edu/doc/program/otfp.html">On-the-fly Programming Commands</a>, 
-except these are invoked from within a ChucK program, and are subject to the timing mechanism.
-</p> ----------<br>
-<!--- begin ulib_machine.html --->
-<div class="export"><h3>
-<a class="heading" name="add">[function]</a>: 
-int <b class="name">add</b> ( string <b class="arg">path</b> );</h3>
-<div class="comments"><ul><li> compile and spork a new shred from file at 'path' into the VM now</li>
-<li> returns the shred ID</li>
-<li> (see example/machine.ck)</li>
-</ul></div></div><div class="export"><h3>
-<a class="heading" name="spork">[function]</a>: 
-int <b class="name">spork</b> ( string <b class="arg">path</b> );</h3>
-<div class="comments"><ul><li> same as add</li>
-</ul></div></div><div class="export"><h3>
-<a class="heading" name="remove">[function]</a>: 
-int <b class="name">remove</b> ( int <b class="arg">id</b> );</h3>
-<div class="comments"><ul><li> remove shred from VM by shred ID (returned by add/spork)</li>
-</ul></div></div><div class="export"><h3>
-<a class="heading" name="replace">[function]</a>: 
-int <b class="name">replace</b> ( int <b class="arg">id</b>, string <b class="arg">path</b> );</h3>
-<div class="comments"><ul><li> replace shred with new shred from file</li>
-<li> returns shred ID , or 0 on error </li>
-</ul></div></div><div class="export"><h3>
-<a class="heading" name="status">[function]</a>: 
-int <b class="name">status</b> (  );</h3>
-<div class="comments"><ul><li> display current status of VM</li>
-<li> (see example/status.ck)</li>
-</ul></div></div><div class="export"><h3>
-<a class="heading" name="crash">[function]</a>:
-void <b class="name">crash</b> (  );</h3>
-<div class="comments"><ul><li>literally causes the VM to crash.  the very last 
-resort; use with care.  Thanks.</li></ul></div></div>
-
-<!--- end ulib_machine.html --->
-<br><br>
-<hr width="10%">
-<font size="3" class="greentext">namespace: <b>Math</b></font>
-<br><br>
-<b>Math</b> contains the standard math functions, including all trignometric functions expects angles
-to be in radians, as well as random number generators.
-<br><br>
-<!--- begin ulib_math.html --->
-<div class="example">[example]<br>
-<div class="code">// print sine of pi/2
-&lt;&lt;&lt;&lt; Math.sin( Math.PI / 2.0 ) &gt;&gt;&gt;;
-</div></div>
-<div class="example">[example 2]<br>
-<div class="code">// infinite time-loop
-while( true )
-{
-  // generate random float (and print)
-  &lt;&lt;&lt; Math.random2f( 100.0, 1000.0 ) &gt;&gt;&gt;;
-  // wait a bit
-  50::ms =&gt; now;
-}
-</div></div><div class="export"><h3>
-<a class="heading" name="sin">[function]</a>: 
-float <b class="name">sin</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the sine of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="cos">[function]</a>: 
-float <b class="name">cos</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the cosine of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="tan">[function]</a>: 
-float <b class="name">tan</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the tangent of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="asin">[function]</a>: 
-float <b class="name">asin</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the arc sine of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="acos">[function]</a>: 
-float <b class="name">acos</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the arc cosine of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="atan">[function]</a>: 
-float <b class="name">atan</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the arc tangent of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="atan2">[function]</a>: 
-float <b class="name">atan2</b> ( float <b class="arg">y</b>, float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the principal value of the arc tangent of
-<b>y</b>/<b>x</b>, using the signs of both arguments to determine the quadrant of the
-return value
-</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="sinh">[function]</a>: 
-float <b class="name">sinh</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the hyperbolic sine of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="cosh">[function]</a>: 
-float <b class="name">cosh</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the hyperbolic cosine of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="tanh">[function]</a>: 
-float <b class="name">tanh</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the hyperbolic tangent of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="hypot">[function]</a>: 
-float <b class="name">hypot</b> ( float <b class="arg">x</b>, float <b class="arg">y</b> );</h3>
-<div class="comments"><ul><li>computes the euclidean distance of the orthogonal vectors (<b>x</b>,0) 
-and (0,<b>y</b>)</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="pow">[function]</a>: 
-float <b class="name">pow</b> ( float <b class="arg">x</b>, float <b class="arg">y</b> );</h3>
-<div class="comments"><ul><li>computes <b>x</b> taken to the <b>y</b>-th power</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="sqrt">[function]</a>: 
-float <b class="name">sqrt</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the nonnegative square root of <b>x</b>  (x must 
-be &gt;= 0)</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="exp">[function]</a>: 
-float <b class="name">exp</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes e^<b>x</b>, the base-e exponential of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="log">[function]</a>: 
-float <b class="name">log</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the natural logarithm of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="log2">[function]</a>: 
-float <b class="name">log2</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the logarithm of <b>x</b> to base 2</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="log10">[function]</a>: 
-float <b class="name">log10</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the logarithm of <b>x</b> to base 10</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="random">[function]</a>: 
-int <b class="name">random</b> (  );</h3>
-<div class="comments"><ul><li>generates random integer between 0 and Math.RANDOM_MAX</li><li>(NOTE: Math.random*() functions use a different, 
-superior random number generator than the Std.rand*() functions)</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="random2">[function]</a>: 
-int <b class="name">random2</b> ( int <b class="arg">min</b>, int <b class="arg">max</b> );</h3>
-<div class="comments"><ul><li>generates random integer in the range [min, max]</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="randomf">[function]</a>: 
-float <b class="name">randomf</b> (  );</h3>
-<div class="comments"><ul><li>generates random floating point number in the range [0, 1]<br>
-(NOTE: this is different semantics than Std.randf(), which has the range [-1,1])</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="random2f">[function]</a>: 
-float <b class="name">random2f</b> ( float <b class="arg">min</b>, float <b class="arg">max</b> );</h3>
-<div class="comments"><ul><li>generates random floating point number in the range [min, max]</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="floor">[function]</a>: 
-float <b class="name">floor</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>round to largest integral value (returned as float) not greater 
-than <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="ceil">[function]</a>: 
-float <b class="name">ceil</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>round to smallest integral value (returned as float) not less
-than <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="round">[function]</a>: 
-float <b class="name">round</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>round to nearest integral value (returned as float)</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="trunc">[function]</a>: 
-float <b class="name">trunc</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>round to largest integral value (returned as float) no greater in 
-magnitude than <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="fmod">[function]</a>: 
-float <b class="name">fmod</b> ( float <b class="arg">x</b>, float <b class="arg">y</b> );</h3>
-<div class="comments"><ul><li>computes the floating point remainder of <b>x</b> / <b>y</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="remainder">[function]</a>: 
-float <b class="name">remainder</b> ( float <b class="arg">x</b>, float <b class="arg">y</b> );</h3>
-<div class="comments"><ul><li>computes the value r such that r = <b>x</b> - n * <b>y</b>, where n is the 
-integer nearest the exact value of <b>x</b> / <b>y</b>.  If there are two integers closest to <b>x</b> / 
-<b>y</b>, n shall be the even one. If r is zero, it is given the same sign as <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="min">[function]</a>: 
-float <b class="name">min</b> ( float <b class="arg">x</b>, float <b class="arg">y</b> );</h3>
-<div class="comments"><ul><li>choose lesser of two values</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="max">[function]</a>: 
-float <b class="name">max</b> ( float <b class="arg">x</b>, float <b class="arg">y</b> );</h3>
-<div class="comments"><ul><li>choose greater of two values</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="nextpow2">[function]</a>: 
-int <b class="name">nextpow2</b> ( int <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>computes the integeral (returned as int) smallest power of 2 greater
-than the value of <b>x</b></li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="isinf">[function]</a>: 
-float <b class="name">isinf</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>tests if <b>x</b> is infinity</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="isnan">[function]</a>:
-float <b class="name">isnan</b> ( float <b class="arg">x</b> );</h3>
-<div class="comments"><ul><li>tests if <b>x</b> "is not a number"</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="pi">[constant]</a>: 
-float <b class="name">PI</b>;</h3>
-<div class="comments"><ul><li>constant PI; use as: Math.PI</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="two_pi">[constant]</a>: 
-float <b class="name">TWO_PI</b>;</h3>
-<div class="comments"><ul><li>constant PI*2; example usage: Math.TWO_PI</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="e">[constant]</a>: 
-float <b class="name">e</b>; // same as: E</h3>
-<div class="comments"><ul><li>Euler's constant, base of natural logarithm; same as Math.exp(1); use as: Math.e or Math.E</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="j">[constant]</a>: 
-complex <b class="name">i</b>; // same as: j, I, or J</h3>
-<div class="comments"><ul><li>the imaginary number 'i' as a complex value; use as: Math.i or Math.j or Math.I or Math.J</li></ul></div>
-</div><div class="export"><h3>
-<a class="heading" name="RANDOM_MAX">[constant]</a>: 
-int <b class="name">RANDOM_MAX</b>;</h3>
-<div class="comments"><ul><li>max value returned by Math.random()</li><li>(NOTE: not to be confused with Std.rand*)</li></ul></div>
-</div>
 
 
-
-<!--- end ulib_math.html --->
-
+<!-- chuck-nav -->
 <center>
-<hr width="10%">
-Next: <a href="http://chuck.cs.princeton.edu/doc/program/ugen.html">Chuck Standard Unit Generators</a>
-<br><br>
-Return to <a href="http://chuck.cs.princeton.edu/doc/program/index.html">Programming Guide</a>
-<br><br>
+<br /><hr width="40%"><br /><br />
+<table><tbody>
+<tr><td>
+<center>
+<div class="chuck_nav">
 
-</center></font></td></tr></tbody></table>
+	<table border="0"><tbody><tr><td>
+	<center>
+	<div class="chuck_nav_bar">	
+  (up): <a href="..">chunity</a> <!-- | (next): <a href="">next link</a> &gt;  -->
+	</div>
+	</center>  
+	</td></tr></tbody></table>
 
-<font size="1">
+</div>
+</center>
+</td></tr>
+</center>
+
+<!-- chuck-footer -->
+
+<tr><td>
+<div id="chuck_footer">
+<center>
 <hr width="15%">
-<a href="http://chuck.cs.princeton.edu/">chuck</a> |
+<a href="http://chuck.stanford.edu/">chuck</a> |
 <a href="http://soundlab.cs.princeton.edu/">soundlab</a> |
-<a href="http://www.cs.princeton.edu/">cs</a> |
-<a href="http://www.music.princeton.edu/">music</a> |
 <a href="http://ccrma.stanford.edu/">ccrma</a>
-<br>
-<br>
-</font>
+
+</center>
+</div>
+</td></tr>
+</tbody></table>
+
+</center>
+</td></tr></tbody></table>
 
 
-</center></td></tr></tbody></table></center></font></body></html>
+</center></td></tr></tbody></table></center>
+<script src="../js/prism.js"></script>
+</body></html>
