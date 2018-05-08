@@ -2,12 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MyMouseInput : MonoBehaviour {
+public class ChunityExampleMouseInput : MonoBehaviour
+{
+	// It's possible to access the mouse in
+	// ChucK without interfacing with Unity!
+	// (As well as keyboards, joysticks, ...!)
 
-	// Use this for initialization
-	void Start () {
+	// If this is not behaving as intended,
+	// edit the "device" early on in the script.
+
+	// This file is a classic ChucK example file
+	// called "mouse-fm.ck".
+
+	void Start()
+	{
 		//Chuck.SetLogLevel( Chuck.LogLevel.Info );
-		GetComponent<ChuckSubInstance>().RunCode(@"
+		GetComponent<ChuckSubInstance>().RunCode( @"
 			// name: mouse-fm.ck
 			// desc: uses first X/Y axes of a mouse to control mf and index for FM
 			// author: Spencer Salazar
@@ -52,14 +62,11 @@ public class MyMouseInput : MonoBehaviour {
 			// infinite time loop
 			while( true )
 			{
-//<<< ""waiting for the hid event "" >>>;
 			    // wait on event
 			    hi => now;
-//<<< ""event to now happened "" >>>;
 			    // loop over messages
 			    while( hi.recv( msg ) )
 			    {
-//<<< ""message received "" >>>;
 			        if( msg.isMouseMotion() )
 			        {
 			            msg.deltaX * .001 + a0 => a0;
@@ -75,20 +82,14 @@ public class MyMouseInput : MonoBehaviour {
 			            count++;
 			            if( count == 1 ) e.keyOn();
 			            set( base, a0, a1, a2 );
-//<<< "" is button down "">>>;
 			        }
 
 			        else if( msg.isButtonUp() )
 			        {
-//<<< "" is button up "">>>;
 			            msg.which => base;
 			            count--;
 			            if( !count ) e.keyOff();
 			        }
-else
-{
-//	<<< ""I don't know what this is!!"" >>>;
-}
 			    }
 			}
 
@@ -103,11 +104,6 @@ else
 			    ( 1000 * (v1+1) ) => m.gain;
 //			    <<< ""carrier:"", c.freq(), ""modulator:"", m.freq(), ""index:"", m.gain() >>>;
 			}
-		");
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+		" );
 	}
 }

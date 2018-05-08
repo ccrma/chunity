@@ -2,7 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChuckFilePlayerExample : MonoBehaviour {
+public class ChunityExampleRunFromFile : MonoBehaviour
+{
+	// You may not always wish to type your 
+	// ChucK scripts inline in Unity C# code.
+	// You can also run scripts from file.
+
+	// Place your scripts in the StreamingAssets
+	// folder to run them. You can optionally
+	// pass arguments to the scripts, just as
+	// in the command line version of ChucK.
 
 	ChuckSubInstance myChuck;
 
@@ -13,7 +22,7 @@ public class ChuckFilePlayerExample : MonoBehaviour {
 		// play a file located in streaming assets
 		myChuck.RunFile( "ExampleChuckScript.ck" );
 	}
-	
+
 	// Update is called once per frame
 	void Update()
 	{

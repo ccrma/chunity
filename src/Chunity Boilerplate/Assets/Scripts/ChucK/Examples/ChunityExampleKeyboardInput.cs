@@ -2,11 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MyKeyboardOrgan : MonoBehaviour {
+public class ChunityExampleKeyboardInput : MonoBehaviour
+{
+	// It's possible to access the keyboard in
+	// ChucK without interfacing with Unity!
+	// (As well as mice, joysticks, ...!)
 
-	// Use this for initialization
-	void Start () {
-		GetComponent<ChuckSubInstance>().RunCode(@"
+	// If this is not behaving as intended,
+	// edit the "device" early on in the script.
+
+	// This file is a classic ChucK example file
+	// called "keyboard-organ.ck".
+
+
+	void Start()
+	{
+		GetComponent<ChuckSubInstance>().RunCode( @"
 		// HID
 		Hid hi;
 		HidMsg msg;
@@ -60,11 +71,6 @@ public class MyKeyboardOrgan : MonoBehaviour {
 		    }
 		}
 
-		");
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+		" );
 	}
 }

@@ -2,11 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MyChuckPrintStatements : MonoBehaviour {
+public class ChunityExamplePrintStatements : MonoBehaviour
+{
+	// It's easy to print to the console from
+	// ChucK. There are three main ways to do it:
+	// <<< >>> error printing -- quick and dirty.
+	// chout and cherr -- work similarly to cout and cerr
+	// in C++.
 
 	// Use this for initialization
-	void Start () {
-		GetComponent<ChuckSubInstance>().RunCode(@"
+	void Start()
+	{
+		GetComponent<ChuckSubInstance>().RunCode( @"
 			SinOsc foo => dac;
 			<<< ""Hello, I am a print statement and my script has connected foo to dac! "" >>>;
 			chout <= ""Hello, I am another kind of print statement. "" <= "" with TWO PARTS! "" <= IO.newline();
@@ -17,13 +24,8 @@ public class MyChuckPrintStatements : MonoBehaviour {
 				cherr <= ""foo.freq is "" <= foo.freq() <= IO.newline();
 				100::ms => now;
 			}
-		");
+		" );
 
-		GetComponent<ChuckSubInstance>().RunCode(" I am code with a syntax error ");
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+		GetComponent<ChuckSubInstance>().RunCode( " I am code with a syntax error " );
 	}
 }
