@@ -23,3 +23,7 @@ they are also special folders:
 
 You can read more about Unity special folders here:
 https://docs.unity3d.com/Manual/SpecialFolders.html
+
+
+For support, email
+mcdgroup.ccrma (at) gmail (dot) com
