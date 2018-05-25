@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -215,6 +215,7 @@ GameObject:
   - component: {fileID: 255029676}
   - component: {fileID: 255029682}
   - component: {fileID: 255029681}
+  - component: {fileID: 255029683}
   - component: {fileID: 255029680}
   m_Layer: 0
   m_Name: 'Chunity Example: RunCode'
@@ -283,12 +284,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 255029675}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &255029680
 MonoBehaviour:
@@ -409,6 +410,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &255029683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 255029675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'RunCode Demo: when the spacebar is pressed, this demo rotates the
+    cube and uses RunCode to play a short ChucK script!'
 --- !u!1 &394512432
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,6 +436,7 @@ GameObject:
   - component: {fileID: 394512436}
   - component: {fileID: 394512435}
   - component: {fileID: 394512434}
+  - component: {fileID: 394512440}
   - component: {fileID: 394512433}
   m_Layer: 0
   m_Name: 'Chunity Example: Midi Input'
@@ -609,13 +624,29 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 394512432}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &394512440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 394512432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'MIDI Demo: ChucK can directly access your system''s MIDI devices without
+    going through Unity! See this game object''s component for an example of how.
+    (Click and hold, then move the mouse cursor!)  If this doesn''t work, then try
+    changing the device number inside the script. (Requires you to hook up a MIDI
+    device such as a MIDI keyboard.)'
 --- !u!1 &402380039
 GameObject:
   m_ObjectHideFlags: 0
@@ -629,6 +660,7 @@ GameObject:
   - component: {fileID: 402380043}
   - component: {fileID: 402380042}
   - component: {fileID: 402380041}
+  - component: {fileID: 402380047}
   - component: {fileID: 402380040}
   m_Layer: 0
   m_Name: 'Chunity Example: Stop Script'
@@ -816,12 +848,87 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 402380039}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &402380047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 402380039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Stop Script Demo: see this game object''s component for an example
+    of how to stop a script using global Events. (Press the space bar!)'
+--- !u!1 &513556548
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 513556551}
+  - component: {fileID: 513556550}
+  - component: {fileID: 513556549}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &513556549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 513556548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1077351063, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &513556550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 513556548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -619905303, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &513556551
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 513556548}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &522326290
 GameObject:
@@ -836,6 +943,7 @@ GameObject:
   - component: {fileID: 522326294}
   - component: {fileID: 522326293}
   - component: {fileID: 522326292}
+  - component: {fileID: 522326298}
   - component: {fileID: 522326291}
   m_Layer: 0
   m_Name: 'Chunity Example: Edit Parameter While Running (Using Classes)'
@@ -1023,13 +1131,28 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 522326290}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &522326298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 522326290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Edit Parameter While Running (2): if something isn''t available as
+    a global variable, you can also add it as a static member of a public class. See
+    this game object''s component for an example of how to do so. (Press the space
+    bar!)'
 --- !u!1 &523318878
 GameObject:
   m_ObjectHideFlags: 0
@@ -1043,6 +1166,7 @@ GameObject:
   - component: {fileID: 523318882}
   - component: {fileID: 523318881}
   - component: {fileID: 523318880}
+  - component: {fileID: 523318886}
   - component: {fileID: 523318879}
   m_Layer: 0
   m_Name: 'Chunity Example: Mouse Input'
@@ -1230,13 +1354,28 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 523318878}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &523318886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 523318878}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Mouse Demo: ChucK can directly access your system''s mouse without
+    going through Unity! See this game object''s component for an example of how.
+    (Click and hold, then move the mouse cursor!)  If this doesn''t work, then try
+    changing the device number inside the script.'
 --- !u!1 &543287623
 GameObject:
   m_ObjectHideFlags: 0
@@ -1250,6 +1389,7 @@ GameObject:
   - component: {fileID: 543287628}
   - component: {fileID: 543287626}
   - component: {fileID: 543287625}
+  - component: {fileID: 543287627}
   - component: {fileID: 543287624}
   m_Layer: 0
   m_Name: 'Chunity Example: Run Script From File'
@@ -1377,6 +1517,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &543287627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 543287623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Run File Demo: if you don''t want to write ChucK code directly in
+    your C# files, you can also run ChucK files that are located in your StreamingAssets
+    folder! See this game object''s component for an example of how. (Press the space
+    bar!) Make sure your StreamingAssets folder is in the top level of your assets
+    folder!'
 --- !u!23 &543287628
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1437,12 +1593,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 543287623}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 18
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &626474971
 GameObject:
@@ -1457,6 +1613,7 @@ GameObject:
   - component: {fileID: 626474975}
   - component: {fileID: 626474974}
   - component: {fileID: 626474973}
+  - component: {fileID: 626474979}
   - component: {fileID: 626474972}
   m_Layer: 0
   m_Name: 'Chunity Example: Edit Parameter While Running (Using Classes) (1)'
@@ -1644,13 +1801,123 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 626474971}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &626474979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 626474971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Edit Parameter While Running (1): you can edit the parameter of a
+    unit generator (sound producing object) in ChucK by making it global and referring
+    to it later. See this game object''s component for an example of how to do so.
+    (Press the space bar!)'
+--- !u!1 &652643711
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 652643715}
+  - component: {fileID: 652643714}
+  - component: {fileID: 652643713}
+  - component: {fileID: 652643712}
+  m_Layer: 5
+  m_Name: Canvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &652643712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 652643711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &652643713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 652643711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 0
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+--- !u!223 &652643714
+Canvas:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 652643711}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!224 &652643715
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 652643711}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 1153962148}
+  - {fileID: 2134051618}
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
 --- !u!1 &658998726
 GameObject:
   m_ObjectHideFlags: 0
@@ -1787,7 +2054,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &658998730
 MonoBehaviour:
@@ -1878,6 +2145,7 @@ GameObject:
   - component: {fileID: 946420849}
   - component: {fileID: 946420847}
   - component: {fileID: 946420846}
+  - component: {fileID: 946420853}
   - component: {fileID: 946420848}
   m_Layer: 0
   m_Name: 'Chunity Example: Global Int Arrays'
@@ -2066,13 +2334,28 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 946420845}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &946420853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 946420845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Global Int Arrays Demo: variables with the "global" keyword in ChucK
+    are used to communicate between ChucK and Unity. This demo has a similar capability
+    as the previous one, but doesn''t need to use string manipulation to construct
+    the code on the fly. (Press the space bar multiple times!)'
 --- !u!1 &1055358773
 GameObject:
   m_ObjectHideFlags: 0
@@ -2158,6 +2441,80 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1055358773}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1153962147
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1153962148}
+  - component: {fileID: 1153962150}
+  - component: {fileID: 1153962149}
+  m_Layer: 5
+  m_Name: InstructionText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1153962148
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1153962147}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 652643715}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 50}
+  m_SizeDelta: {x: 1000, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1153962149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1153962147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 32
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 3
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 1
+    m_LineSpacing: 1
+  m_Text: Press Enter to cycle between Chunity Examples!
+--- !u!222 &1153962150
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1153962147}
 --- !u!1 &1215681573
 GameObject:
   m_ObjectHideFlags: 0
@@ -2171,6 +2528,7 @@ GameObject:
   - component: {fileID: 1215681577}
   - component: {fileID: 1215681576}
   - component: {fileID: 1215681575}
+  - component: {fileID: 1215681581}
   - component: {fileID: 1215681574}
   m_Layer: 0
   m_Name: 'Chunity Example: Set Log Level'
@@ -2358,13 +2716,27 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1215681573}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 19
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1215681581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1215681573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Log Level Demo: if anything ever goes seriously wrong, see this game
+    object''s script for an example of how to increase ChucK''s internal log level.
+    You probably won''t ever need to do this.'
 --- !u!1 &1243518076
 GameObject:
   m_ObjectHideFlags: 0
@@ -2378,6 +2750,7 @@ GameObject:
   - component: {fileID: 1243518080}
   - component: {fileID: 1243518079}
   - component: {fileID: 1243518078}
+  - component: {fileID: 1243518085}
   - component: {fileID: 1243518077}
   - component: {fileID: 1243518084}
   m_Layer: 0
@@ -2567,12 +2940,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1243518076}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1243518084
 MonoBehaviour:
@@ -2585,6 +2958,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be8c720e9067a4e26935ff5d369f4841, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1243518085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1243518076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Global Event Demo: this script uses global Events to trigger Unity
+    actions at regular intervals. However, you can cause Events to fire at whatever
+    schedule you want! (Press the space bar!)'
 --- !u!1 &1250383275
 GameObject:
   m_ObjectHideFlags: 0
@@ -2598,6 +2985,7 @@ GameObject:
   - component: {fileID: 1250383279}
   - component: {fileID: 1250383277}
   - component: {fileID: 1250383276}
+  - component: {fileID: 1250383278}
   - component: {fileID: 1250383283}
   m_Layer: 0
   m_Name: 'Chunity Example: Global Strings'
@@ -2714,6 +3102,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &1250383278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1250383275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Global Strings Demo: strings are another data type you can pass between
+    ChucK and Unity! See this game object''s component to see how. (Press the space
+    bar!)'
 --- !u!23 &1250383279
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2774,12 +3176,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1250383275}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1250383283
 MonoBehaviour:
@@ -2805,6 +3207,7 @@ GameObject:
   - component: {fileID: 1490268496}
   - component: {fileID: 1490268495}
   - component: {fileID: 1490268494}
+  - component: {fileID: 1490268500}
   - component: {fileID: 1490268493}
   m_Layer: 0
   m_Name: 'Chunity Example: Microphone'
@@ -2992,13 +3395,27 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1490268492}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1490268500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1490268492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Microphone Demo: access the microphone with "adc" in your ChucK code.
+    If no microphone name is specified on your "TheChuck" ChuckMainInstance, then
+    your system''s default mic will be used.'
 --- !u!1 &1841820382
 GameObject:
   m_ObjectHideFlags: 0
@@ -3012,6 +3429,7 @@ GameObject:
   - component: {fileID: 1841820386}
   - component: {fileID: 1841820385}
   - component: {fileID: 1841820384}
+  - component: {fileID: 1841820390}
   - component: {fileID: 1841820383}
   m_Layer: 0
   m_Name: 'Chunity Example: Keyboard Input'
@@ -3199,13 +3617,86 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1841820382}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1841820390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1841820382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Keyboard Demo: ChucK can directly access your system''s keyboard without
+    going through Unity! See this game object''s component for an example of how.
+    (Try playing the keys!) If this doesn''t work, then try changing the device number
+    inside the script.'
+--- !u!1 &1883249821
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1883249822}
+  - component: {fileID: 1883249823}
+  m_Layer: 0
+  m_Name: Chunity Examples
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1883249822
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1883249821}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 255029679}
+  - {fileID: 2003159374}
+  - {fileID: 1901990623}
+  - {fileID: 946420852}
+  - {fileID: 1953669294}
+  - {fileID: 1250383282}
+  - {fileID: 1243518083}
+  - {fileID: 1490268499}
+  - {fileID: 402380046}
+  - {fileID: 626474978}
+  - {fileID: 522326297}
+  - {fileID: 1841820389}
+  - {fileID: 523318885}
+  - {fileID: 394512439}
+  - {fileID: 2138699096}
+  - {fileID: 543287631}
+  - {fileID: 1215681580}
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1883249823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1883249821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a90e690cdccb2e642883ef7e85fd9fa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myDemoText: {fileID: 2134051619}
 --- !u!1 &1901990618
 GameObject:
   m_ObjectHideFlags: 0
@@ -3219,6 +3710,7 @@ GameObject:
   - component: {fileID: 1901990620}
   - component: {fileID: 1901990625}
   - component: {fileID: 1901990624}
+  - component: {fileID: 1901990626}
   - component: {fileID: 1901990619}
   m_Layer: 0
   m_Name: 'Chunity Example: Construct Code String'
@@ -3303,12 +3795,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1901990618}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1901990624
 MonoBehaviour:
@@ -3418,6 +3910,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &1901990626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1901990618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Code String Demo: this is an example of how you can construct ChucK
+    code on the fly at runtime. Try modifying "My Midi Notes" on the gameobject''s
+    component. (Press the space bar!)'
 --- !u!1 &1953669287
 GameObject:
   m_ObjectHideFlags: 0
@@ -3431,6 +3937,7 @@ GameObject:
   - component: {fileID: 1953669291}
   - component: {fileID: 1953669290}
   - component: {fileID: 1953669289}
+  - component: {fileID: 1953669295}
   - component: {fileID: 1953669288}
   m_Layer: 0
   m_Name: 'Chunity Example: Global Float Arrays'
@@ -3623,13 +4130,28 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1953669287}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1953669295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1953669287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Global Float Arrays Demo: variables with the "global" keyword in ChucK
+    are used to communicate between ChucK and Unity. This demo has a similar capability
+    as the previous one, but uses floats instead of ints. (Press the space bar multiple
+    times!)'
 --- !u!1 &2003159373
 GameObject:
   m_ObjectHideFlags: 0
@@ -3640,8 +4162,9 @@ GameObject:
   - component: {fileID: 2003159374}
   - component: {fileID: 2003159377}
   - component: {fileID: 2003159376}
-  - component: {fileID: 2003159375}
+  - component: {fileID: 2003159379}
   - component: {fileID: 2003159378}
+  - component: {fileID: 2003159375}
   m_Layer: 0
   m_Name: 'Chunity Example: Time Advancer'
   m_TagString: Untagged
@@ -3655,13 +4178,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2003159373}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1055358774}
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2003159375
 MonoBehaviour:
@@ -3794,6 +4317,94 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myCube: {fileID: 1055358774}
+--- !u!114 &2003159379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2003159373}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Time Advancer Demo: this script shows how you might program and animate
+    a continual time update with periodic "beats", as in a sequencer. Left / right
+    mouse position affects the tempo.'
+--- !u!1 &2134051617
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 2134051618}
+  - component: {fileID: 2134051620}
+  - component: {fileID: 2134051619}
+  m_Layer: 5
+  m_Name: DescriptionText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2134051618
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2134051617}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 652643715}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -30}
+  m_SizeDelta: {x: 1000, y: 30}
+  m_Pivot: {x: 0.5, y: 1}
+--- !u!114 &2134051619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2134051617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 32
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 3
+    m_MaxSize: 40
+    m_Alignment: 1
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 1
+    m_LineSpacing: 1
+  m_Text: Demo instructions will appear here!
+--- !u!222 &2134051620
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2134051617}
 --- !u!1 &2138699089
 GameObject:
   m_ObjectHideFlags: 0
@@ -3807,6 +4418,7 @@ GameObject:
   - component: {fileID: 2138699093}
   - component: {fileID: 2138699092}
   - component: {fileID: 2138699091}
+  - component: {fileID: 2138699097}
   - component: {fileID: 2138699090}
   m_Layer: 0
   m_Name: 'Chunity Example: Print Statements'
@@ -3994,10 +4606,23 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2138699089}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_Father: {fileID: 1883249822}
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2138699097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2138699089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee37810ffca026044a3824db04227677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  description: 'Print Statements Demo: you can print to the Unity console in a few
+    ways from ChucK. See this game object''s component for examples of how to do so!'

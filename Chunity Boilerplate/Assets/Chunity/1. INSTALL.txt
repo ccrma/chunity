@@ -1,0 +1,29 @@
+Chunity is ChucK for Unity! See tutorials, documentation, and more
+at http://chuck.stanford.edu/chunity/.
+
+///////////////////////////////////////////////////////////////////////////
+                           Install Instructions
+///////////////////////////////////////////////////////////////////////////
+To use Chunity, you will need to move these folders into the top level
+of your Assets folder:
+- Plugins
+- Streaming Assets
+
+The reason for this is that Unity mandates that there is only one of each
+of these kinds of special folders, and that they must reside at the top
+level of your Assets folder. If your project already has these folders,
+then you will need to copy the contents of Chunity/Plugins/ and 
+Chunity/Streaming Assets/ into your project's existing folders of the 
+same name.
+
+Additionally, you should not change the names of these directories since
+they are also special folders:
+- Editor
+- Resources
+
+You can read more about Unity special folders here:
+https://docs.unity3d.com/Manual/SpecialFolders.html
+
+
+For support, email
+mcdgroup.ccrma (at) gmail (dot) com

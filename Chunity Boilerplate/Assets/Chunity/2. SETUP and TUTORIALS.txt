@@ -1,0 +1,10 @@
+Chunity is ChucK for Unity! See tutorials, documentation, and more
+at http://chuck.stanford.edu/chunity/.
+
+///////////////////////////////////////////////////////////////////////////
+                           Setup and Tutorials
+///////////////////////////////////////////////////////////////////////////
+See comprehensive walkthroughs of how to set up a scene to use Chunity
+and how to use common Chunity functionality at 
+http://chuck.stanford.edu/chunity/tutorials/.
+

@@ -1,0 +1,9 @@
+Chunity is ChucK for Unity! See tutorials, documentation, and more
+at http://chuck.stanford.edu/chunity/.
+
+///////////////////////////////////////////////////////////////////////////
+                           Script Reference
+///////////////////////////////////////////////////////////////////////////
+See comprehensive documentation of all Chunity functions at 
+http://chuck.stanford.edu/chunity/documentation/.
+

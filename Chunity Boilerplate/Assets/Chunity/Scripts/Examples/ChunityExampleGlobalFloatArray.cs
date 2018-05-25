@@ -19,19 +19,20 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		myChuck = GetComponent<ChuckSubInstance>();
 		myChuck.RunCode( @"
 			TriOsc myOsc;
-			[60.0] @=> global float myNotes[];
+			[60.0] @=> global float myFloatNotes[];
 			global Event playMyNotes;
 			
 			while( true )
 			{
 				playMyNotes => now;
 				myOsc => dac;
-				for( 0 => int i; i < myNotes.size(); i++ )
+				for( 0 => int i; i < myFloatNotes.size(); i++ )
 				{
-					myNotes[i] => Math.mtof => myOsc.freq;
+                    <<< ""myFloatNotes["", i, ""] ="", myFloatNotes[i] >>>;
+					myFloatNotes[i] => Math.mtof => myOsc.freq;
 					100::ms => now;
 				}
-				<<< myNotes[""numPlayed""], ""played so far"" >>>;
+				<<< myFloatNotes[""numPlayed""], ""played so far"" >>>;
 				myOsc =< dac;
 			}
 		" );
@@ -50,20 +51,21 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 			// on first press, set entire array
 			if( numPresses == 0 )
 			{
-				myChuck.SetFloatArray( "myNotes", myMidiNotes );
+				myChuck.SetFloatArray( "myFloatNotes", myMidiNotes );
 			}
 			// on any press, change the value of index 1
-			myChuck.SetFloatArrayValue( "myNotes", 1, 60.5f + numPresses );
+			myChuck.SetFloatArrayValue( "myFloatNotes", 1, 60.5f + numPresses );
 			// set a dictionary value too
-			myChuck.SetAssociativeFloatArrayValue( "myNotes", "numPlayed", numPresses );
-			// actually play it!
-			myChuck.BroadcastEvent( "playMyNotes" );
+			myChuck.SetAssociativeFloatArrayValue( "myFloatNotes", "numPlayed", numPresses );
 
 
 			// test some gets too
-			myChuck.GetFloatArray( "myNotes", myFloatArrayCallback );
-			myChuck.GetFloatArrayValue( "myNotes", 1, myFloatCallback );
-			myChuck.GetAssociativeFloatArrayValue( "myNotes", "numPlayed", myFloatCallback );
+			myChuck.GetFloatArray( "myFloatNotes", myFloatArrayCallback );
+			myChuck.GetFloatArrayValue( "myFloatNotes", 1, myFloatCallback );
+			myChuck.GetAssociativeFloatArrayValue( "myFloatNotes", "numPlayed", myFloatCallback );
+			
+            // actually play it!
+			myChuck.BroadcastEvent( "playMyNotes" );
 
 			numPresses++;
 		}
