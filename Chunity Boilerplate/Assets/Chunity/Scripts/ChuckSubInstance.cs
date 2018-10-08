@@ -212,7 +212,7 @@ public class ChuckSubInstance : MonoBehaviour
     // ----------------------------------------------------
     public bool BroadcastEvent( string variableName )
     {
-        return chuckMainInstance.SignalEvent( variableName );
+        return chuckMainInstance.BroadcastEvent( variableName );
     }
 
 
