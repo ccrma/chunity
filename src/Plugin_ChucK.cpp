@@ -494,6 +494,30 @@ namespace ChucK_For_Unity
 
 
 
+    UNITY_INTERFACE_EXPORT bool clearChuckInstance( unsigned int chuckID )
+    {
+        if( chuck_instances.count( chuckID ) > 0 )
+        {
+            // the chuck to clear
+            ChucK * chuck = chuck_instances[chuckID];
+            
+            // create a msg asking to clear the VM
+            Chuck_Msg * msg = new Chuck_Msg;
+            msg->type = MSG_CLEARVM;
+            
+            // null reply so that VM will delete for us when it's done
+            msg->reply = ( ck_msg_func )NULL;
+            
+            // tell the VM to clear
+            chuck->vm()->queue_msg( msg, 1 );
+            
+            return true;
+        }
+        
+        return false;
+    }
+
+
     UNITY_INTERFACE_EXPORT bool cleanupChuckInstance( unsigned int chuckID )
     {
         if( chuck_instances.count( chuckID ) > 0 )
