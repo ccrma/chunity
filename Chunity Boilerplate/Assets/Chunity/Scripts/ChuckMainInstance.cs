@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Audio;
 using System;
 
@@ -23,6 +24,32 @@ public class ChuckMainInstance : MonoBehaviour
     // ----------------------------------------------------
     [Tooltip( "A substring to search for in your microphone devices list." )]
     public string microphoneIdentifier = "";
+
+
+
+
+    // ----------------------------------------------------
+    // name: persistToNextScene
+    // desc: this ChucK will not be deleted upon a 
+    //       scene load if this bool is true.
+    //       If left false, will be delete as usual.
+    // ----------------------------------------------------
+    [Tooltip( "Whether to keep this ChuckMainInstance when the next scene loads." )]
+    public bool persistToNextScene = false;
+
+
+
+
+    // ----------------------------------------------------
+    // name: clearChuckOnSceneLoad
+    // desc: if this ChucK is not fully deleted on a 
+    //       scene load, and this bool is true, then
+    //       its VM will be cleared / reset.
+    //       Otherwise, the VM will continue running
+    //       in the next scene.
+    // ----------------------------------------------------
+    [Tooltip( "If this ChuckMainInstance is kept when the next scene loads, this controls whether its VM is cleared (reset)." )]
+    public bool clearChuckOnSceneLoad = false;
 
 
 
@@ -466,6 +493,15 @@ public class ChuckMainInstance : MonoBehaviour
 
         // has init
         hasInit = true;
+
+        // when scene is unloaded, check whether we need to clear the chuck
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+
+        // don't delete me?
+        if( persistToNextScene )
+        {
+            DontDestroyOnLoad( this.gameObject );
+        }
     }
 
     public bool HasInit()
@@ -577,6 +613,14 @@ public class ChuckMainInstance : MonoBehaviour
     public bool RunFileWithReplacementDac( string filename, string args, string replacementDac, bool fromStreamingAssets )
     {
         return Chuck.Manager.RunFileWithReplacementDac( myChuckId, filename, args, replacementDac, fromStreamingAssets );
+    }
+
+    private void OnSceneUnloaded( Scene current )
+    {
+        if( persistToNextScene && clearChuckOnSceneLoad )
+        {
+            Chuck.Manager.ClearChuck( myChuckId );
+        }
     }
 
     private void OnDestroy()

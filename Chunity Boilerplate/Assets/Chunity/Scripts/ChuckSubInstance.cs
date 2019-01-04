@@ -33,6 +33,18 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: persistToNextScene
+    // desc: this sub instance will not be deleted upon a 
+    //       scene load if this bool is true.
+    //       If left false, will be delete as usual.
+    // ----------------------------------------------------
+    [Tooltip( "Whether to keep this ChuckSubInstance when the next scene loads." )]
+    public bool persistToNextScene = false;
+
+
+
+
+    // ----------------------------------------------------
     // name: RunCode
     // desc: add a new ChucK program to this VM
     // ----------------------------------------------------
@@ -515,6 +527,11 @@ public class ChuckSubInstance : MonoBehaviour
 
         running = true;
 
+        // don't delete me?
+        if( persistToNextScene )
+        {
+            DontDestroyOnLoad( this.gameObject );
+        }
     }
 
     void Update()

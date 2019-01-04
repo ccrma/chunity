@@ -5,6 +5,9 @@ using System;
 using System.IO;
 using UnityEngine.Audio;
 using System.Runtime.InteropServices;
+#if UNITY_IOS
+using AOT;
+#endif
 
 public class Chuck
 {
@@ -76,6 +79,12 @@ public class Chuck
         return id;
     }
 
+    public bool ClearChuck( System.UInt32 id )
+    {
+        return clearChuckInstance( id );
+    }
+    
+    
     public bool CleanupFilter( System.UInt32 id )
     {
         return cleanupChuckInstance( id );
@@ -698,30 +707,50 @@ public class Chuck
         setLogLevel( (uint) level );
     }
 
-
+#if UNITY_IOS
+#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+#endif
     public delegate void MyLogCallback( System.String str );
 
+#if UNITY_IOS
+#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+#endif
     public delegate void IntCallback( System.Int64 i );
 
+#if UNITY_IOS
+#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+#endif
     public delegate void VoidCallback();
 
+#if UNITY_IOS
+#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+#endif
     public delegate void FloatCallback( double f );
 
+#if UNITY_IOS
+#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+#endif
     public delegate void StringCallback( System.String str );
 
+#if UNITY_IOS
+#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+#endif
     public delegate void IntArrayCallback(
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 1)]
         System.Int64[] values,
         System.UInt64 numValues
     );
 
+#if UNITY_IOS
+#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+#endif
     public delegate void FloatArrayCallback(
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R8, SizeParamIndex = 1)]
         double[] values,
@@ -737,13 +766,21 @@ public class Chuck
     private Dictionary<string, StringCallback> stringCallbacks;
     private Dictionary<string, VoidCallback> voidCallbacks;
 
+#if UNITY_IOS
+    const string PLUGIN_NAME = "__Internal";
+#else
     const string PLUGIN_NAME = "AudioPluginChuck";
+#endif
+    
 
     [DllImport( PLUGIN_NAME )]
     private static extern void cleanRegisteredChucks();
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool initChuckInstance( System.UInt32 chuckID, System.UInt32 sampleRate );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool clearChuckInstance( System.UInt32 chuckID );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool cleanupChuckInstance( System.UInt32 chuckID );
@@ -908,21 +945,35 @@ public class Chuck
         cleanRegisteredChucks();
     }
 
+// TODO: why is this necessary? Will people need to add this on all of their other callbacks?
+// Can I make a "define" statement which adds this for people?
+#if UNITY_IOS
+    [MonoPInvokeCallback(typeof(MyLogCallback))]
+#endif
     static void ChoutCallback( System.String str )
     {
         Debug.Log( "[chout]: " + str );
     }
 
+#if UNITY_IOS
+    [MonoPInvokeCallback(typeof(MyLogCallback))]
+#endif
     static void CherrCallback( System.String str )
     {
         Debug.LogError( "[cherr]: " + str );
     }
 
+#if UNITY_IOS
+    [MonoPInvokeCallback(typeof(MyLogCallback))]
+#endif
     static void StdoutCallback( System.String str )
     {
         Debug.Log( str );
     }
 
+#if UNITY_IOS
+    [MonoPInvokeCallback(typeof(MyLogCallback))]
+#endif
     static void StderrCallback( System.String str )
     {
         Debug.LogError( str );
