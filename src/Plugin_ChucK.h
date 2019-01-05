@@ -53,6 +53,7 @@ namespace ChucK_For_Unity {
     
     UNITY_INTERFACE_EXPORT bool initChuckInstance( unsigned int chuckID, unsigned int sampleRate );
     UNITY_INTERFACE_EXPORT bool clearChuckInstance( unsigned int chuckID );
+    UNITY_INTERFACE_EXPORT bool clearGlobals( unsigned int chuckID );
     UNITY_INTERFACE_EXPORT bool cleanupChuckInstance( unsigned int chuckID );
     UNITY_INTERFACE_EXPORT bool chuckManualAudioCallback( unsigned int chuckID, float * inBuffer, float * outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels );
     UNITY_INTERFACE_EXPORT void cleanRegisteredChucks();
