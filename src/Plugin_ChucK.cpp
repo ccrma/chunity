@@ -509,7 +509,7 @@ namespace ChucK_For_Unity
             msg->reply = ( ck_msg_func )NULL;
             
             // tell the VM to clear
-            chuck->vm()->queue_msg( msg, 1 );
+            chuck->vm()->execute_chuck_msg_with_globals( msg );
             
             return true;
         }
@@ -534,7 +534,7 @@ namespace ChucK_For_Unity
             msg->reply = ( ck_msg_func )NULL;
             
             // tell the VM to clear
-            chuck->vm()->queue_msg( msg, 1 );
+            chuck->vm()->execute_chuck_msg_with_globals( msg );
             
             return true;
         }
