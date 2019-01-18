@@ -8,7 +8,7 @@ Plugin_SpatializerReverb.cpp \
 hrtftable.cpp
 OUTPUT=libAudioPluginChuck.so
 CXXFLAGS=-I. -Ichuck/src/core -D__PLATFORM_LINUX__ -O2 -fPIC
-LDFLAGS=-shared -rdynamic -fPIC -lasound -lstdc++ -ldl -lm -lsndfile -lpthread
+LDFLAGS=-shared -rdynamic -fPIC -lstdc++ -ldl -lm -lpthread -lsndfile
 CXX=g++
 
 #include $(COREDIR)/makefile $(MAKECMDGOALS)
