@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Runtime.InteropServices;
+
 
 [RequireComponent( typeof( AudioSource ) )]
 public class ChuckSubInstance : MonoBehaviour
@@ -28,18 +30,6 @@ public class ChuckSubInstance : MonoBehaviour
     // ----------------------------------------------------
     [Tooltip( "Whether to spatialize this ChuckSubInstance" )]
     public bool spatialize = false;
-
-
-
-
-    // ----------------------------------------------------
-    // name: persistToNextScene
-    // desc: this sub instance will not be deleted upon a 
-    //       scene load if this bool is true.
-    //       If left false, will be delete as usual.
-    // ----------------------------------------------------
-    [Tooltip( "Whether to keep this ChuckSubInstance when the next scene loads." )]
-    public bool persistToNextScene = false;
 
 
 
@@ -299,7 +289,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: SetIntArray
     // desc: set the value of global int variableName[]
     // ----------------------------------------------------
-    public bool SetIntArray( string variableName, long[] values )
+    public bool SetIntArray( string variableName, int[] values )
     {
         return chuckMainInstance.SetIntArray( variableName, values );
     }
@@ -467,6 +457,10 @@ public class ChuckSubInstance : MonoBehaviour
 
     // =========== INTERNAL MECHANICS ========== //
 
+    #if UNITY_WEBGL
+    private System.UInt32 myID;
+    private static System.UInt32 nextID = 1;
+    #endif
 
     private string myOutputUgen;
 
@@ -518,21 +512,28 @@ public class ChuckSubInstance : MonoBehaviour
 
         // setup chuck
         myOutputUgen = chuckMainInstance.GetUniqueVariableName( "__dac__" );
+
+        #if UNITY_WEBGL
+        myID = nextID++;
+        System.UInt32 mainID = chuckMainInstance.GetID();
+        initSubChuckInstance( mainID, myID, myOutputUgen );
+        #else
         // replacement dac is initted and constructed here!
         // so it shouldn't have to be anywhere else.
         chuckMainInstance.RunCode( string.Format( @"
 			global Gain {0} => blackhole;
 			true => {0}.buffered;
 		", myOutputUgen ) );
+        #endif
 
         running = true;
 
-        // don't delete me?
-        if( persistToNextScene )
-        {
-            DontDestroyOnLoad( this.gameObject );
-        }
     }
+
+    #if UNITY_WEBGL
+    [DllImport( "__Internal" )]
+    private static extern bool initSubChuckInstance( System.UInt32 chuckID, System.UInt32 subChuckID, System.String dacName );
+    #endif
 
     void Update()
     {
@@ -558,7 +559,8 @@ public class ChuckSubInstance : MonoBehaviour
         prevSpatialize = spatialize;
     }
 
-    // Update is called once per frame
+    #if UNITY_WEBGL
+    #else
     void OnAudioFilterRead( float[] data, int channels )
     {
         if( !chuckMainInstance.HasInit() )
@@ -599,6 +601,7 @@ public class ChuckSubInstance : MonoBehaviour
             }
         }
     }
+    #endif
 
 
     public string GetUniqueVariableName()

@@ -5,9 +5,6 @@ using System;
 using System.IO;
 using UnityEngine.Audio;
 using System.Runtime.InteropServices;
-#if UNITY_IOS
-using AOT;
-#endif
 
 public class Chuck
 {
@@ -17,7 +14,12 @@ public class Chuck
         get
         {
             if( __sharedInstance == null )
+            {
                 __sharedInstance = new Chuck();
+                #if UNITY_WEBGL
+                initChuckScript();
+                #endif
+            }
 
             return __sharedInstance;
         }
@@ -79,12 +81,6 @@ public class Chuck
         return id;
     }
 
-    public bool ClearChuck( System.UInt32 id )
-    {
-        return clearChuckInstance( id );
-    }
-    
-    
     public bool CleanupFilter( System.UInt32 id )
     {
         return cleanupChuckInstance( id );
@@ -92,8 +88,12 @@ public class Chuck
 
     public bool ManualAudioCallback( System.UInt32 chuckID, float[] inBuffer, float[] outBuffer, System.UInt32 channels )
     {
+        #if UNITY_WEBGL
+        return false;
+        #else
         System.UInt32 numFrames = Convert.ToUInt32( inBuffer.Length / channels );
         return chuckManualAudioCallback( chuckID, inBuffer, outBuffer, numFrames, channels, channels );
+        #endif
     }
 
     public bool RunCode( string name, string code )
@@ -220,7 +220,7 @@ public class Chuck
 
     public bool SetInt( System.UInt32 chuckId, string variableName, System.Int64 value )
     {
-        return setChuckInt( chuckId, variableName, value );
+        return setChuckInt( chuckId, variableName, (int) value );
     }
 
     public static Chuck.IntCallback CreateGetIntCallback( Action<System.Int64> callbackFunction )
@@ -458,7 +458,11 @@ public class Chuck
     public bool GetUGenSamples( System.UInt32 chuckID, System.String name,
         float[] buffer, System.Int32 numSamples )
     {
+        #if UNITY_WEBGL
+        return false;
+        #else
         return getGlobalUGenSamples( chuckID, name, buffer, numSamples );
+        #endif
     }
 
     public static Chuck.IntArrayCallback CreateGetIntArrayCallback( Action<long[], ulong> callbackFunction )
@@ -466,7 +470,8 @@ public class Chuck
         return new IntArrayCallback( callbackFunction );
     }
 
-    public bool SetIntArray( string chuckName, string variableName, long[] values )
+// TODO: cleanup this and other instances; type was changed but should only have been changed for UNITY_WEBGL
+    public bool SetIntArray( string chuckName, string variableName, int[] values )
     {
         if( ids.ContainsKey( chuckName ) )
         {
@@ -479,7 +484,7 @@ public class Chuck
         }
     }
 
-    public bool SetIntArray( System.UInt32 chuckId, string variableName, long[] values )
+    public bool SetIntArray( System.UInt32 chuckId, string variableName, int[] values )
     {
         return setGlobalIntArray( chuckId, variableName, values, (uint) values.Length );
     }
@@ -517,7 +522,7 @@ public class Chuck
 
     public bool SetIntArrayValue( System.UInt32 chuckId, string variableName, uint index, long value )
     {
-        return setGlobalIntArrayValue( chuckId, variableName, index, value );
+        return setGlobalIntArrayValue( chuckId, variableName, index, (int) value );
     }
 
     public bool GetIntArrayValue( string chuckName, string variableName, uint index, Chuck.IntCallback callback )
@@ -553,7 +558,7 @@ public class Chuck
 
     public bool SetAssociativeIntArrayValue( System.UInt32 chuckId, string variableName, string key, long value )
     {
-        return setGlobalAssociativeIntArrayValue( chuckId, variableName, key, value );
+        return setGlobalAssociativeIntArrayValue( chuckId, variableName, key, (int) value );
     }
 
     public bool GetAssociativeIntArrayValue( string chuckName, string variableName, string key, Chuck.IntCallback callback )
@@ -707,50 +712,30 @@ public class Chuck
         setLogLevel( (uint) level );
     }
 
-#if UNITY_IOS
-#else
+
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-#endif
     public delegate void MyLogCallback( System.String str );
 
-#if UNITY_IOS
-#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-#endif
     public delegate void IntCallback( System.Int64 i );
 
-#if UNITY_IOS
-#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-#endif
     public delegate void VoidCallback();
 
-#if UNITY_IOS
-#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-#endif
     public delegate void FloatCallback( double f );
 
-#if UNITY_IOS
-#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-#endif
     public delegate void StringCallback( System.String str );
 
-#if UNITY_IOS
-#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-#endif
     public delegate void IntArrayCallback(
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 1)]
         System.Int64[] values,
         System.UInt64 numValues
     );
 
-#if UNITY_IOS
-#else
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-#endif
     public delegate void FloatArrayCallback(
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R8, SizeParamIndex = 1)]
         double[] values,
@@ -766,21 +751,129 @@ public class Chuck
     private Dictionary<string, StringCallback> stringCallbacks;
     private Dictionary<string, VoidCallback> voidCallbacks;
 
-#if UNITY_IOS
+#if UNITY_WEBGL
     const string PLUGIN_NAME = "__Internal";
+
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void initChuckScript();
+    [DllImport( PLUGIN_NAME )]
+    private static extern void cleanRegisteredChucks();
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool initChuckInstance( System.UInt32 chuckID, System.UInt32 sampleRate, System.UInt32 inChannels, System.UInt32 outChannels );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool cleanupChuckInstance( System.UInt32 chuckID );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool runChuckCode( System.UInt32 chuckID, System.String code );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool runChuckCodeWithReplacementDac( System.UInt32 chuckID, System.String code, System.String replacement_dac );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool runChuckFile( System.UInt32 chuckID, System.String filename );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool runChuckFileWithReplacementDac( System.UInt32 chuckID, System.String filename, System.String replacement_dac );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool runChuckFileWithArgs( System.UInt32 chuckID, System.String filename, System.String args );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool runChuckFileWithArgsWithReplacementDac( System.UInt32 chuckID, System.String filename, System.String args, System.String replacement_dac );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setChuckInt( System.UInt32 chuckID, System.String name, System.Int32 val );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getChuckInt( System.UInt32 chuckID, System.String name, IntCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setChuckFloat( System.UInt32 chuckID, System.String name, double val );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getChuckFloat( System.UInt32 chuckID, System.String name, FloatCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setChuckString( System.UInt32 chuckID, System.String name, System.String val );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getChuckString( System.UInt32 chuckID, System.String name, StringCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool signalChuckEvent( System.UInt32 chuckID, System.String name );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool broadcastChuckEvent( System.UInt32 chuckID, System.String name );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool listenForChuckEventOnce( System.UInt32 chuckID, System.String name, VoidCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool startListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool stopListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setGlobalIntArray( System.UInt32 chuckID, System.String name, System.Int32[] arrayValues, System.UInt32 numValues );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalIntArray( System.UInt32 chuckID, System.String name, IntArrayCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, System.Int32 value );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, IntCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, System.Int32 value );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, IntCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setGlobalFloatArray( System.UInt32 chuckID, System.String name, double[] arrayValues, System.UInt32 numValues );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalFloatArray( System.UInt32 chuckID, System.String name, FloatArrayCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, double value );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, FloatCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, double value );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, FloatCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setChoutCallback( System.UInt32 chuckID, MyLogCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setCherrCallback( System.UInt32 chuckID, MyLogCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setStdoutCallback( MyLogCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setStderrCallback( MyLogCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool setDataDir( System.String dir );
 #else
     const string PLUGIN_NAME = "AudioPluginChuck";
-#endif
-    
 
     [DllImport( PLUGIN_NAME )]
     private static extern void cleanRegisteredChucks();
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool initChuckInstance( System.UInt32 chuckID, System.UInt32 sampleRate );
-
-    [DllImport( PLUGIN_NAME )]
-    private static extern bool clearChuckInstance( System.UInt32 chuckID );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool cleanupChuckInstance( System.UInt32 chuckID );
@@ -894,10 +987,10 @@ public class Chuck
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool setDataDir( System.String dir );
+#endif
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool setLogLevel( System.UInt32 level );
-
 
     private static Chuck __sharedInstance;
     private System.UInt32 _nextValidID;
@@ -945,35 +1038,25 @@ public class Chuck
         cleanRegisteredChucks();
     }
 
-// TODO: why is this necessary? Will people need to add this on all of their other callbacks?
-// Can I make a "define" statement which adds this for people?
-#if UNITY_IOS
-    [MonoPInvokeCallback(typeof(MyLogCallback))]
-#endif
+    [AOT.MonoPInvokeCallback(typeof(MyLogCallback))]
     static void ChoutCallback( System.String str )
     {
         Debug.Log( "[chout]: " + str );
     }
 
-#if UNITY_IOS
-    [MonoPInvokeCallback(typeof(MyLogCallback))]
-#endif
+    [AOT.MonoPInvokeCallback(typeof(MyLogCallback))]
     static void CherrCallback( System.String str )
     {
         Debug.LogError( "[cherr]: " + str );
     }
 
-#if UNITY_IOS
-    [MonoPInvokeCallback(typeof(MyLogCallback))]
-#endif
+    [AOT.MonoPInvokeCallback(typeof(MyLogCallback))]
     static void StdoutCallback( System.String str )
     {
         Debug.Log( str );
     }
 
-#if UNITY_IOS
-    [MonoPInvokeCallback(typeof(MyLogCallback))]
-#endif
+    [AOT.MonoPInvokeCallback(typeof(MyLogCallback))]
     static void StderrCallback( System.String str )
     {
         Debug.LogError( str );

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.Audio;
 using System;
 
@@ -24,32 +23,6 @@ public class ChuckMainInstance : MonoBehaviour
     // ----------------------------------------------------
     [Tooltip( "A substring to search for in your microphone devices list." )]
     public string microphoneIdentifier = "";
-
-
-
-
-    // ----------------------------------------------------
-    // name: persistToNextScene
-    // desc: this ChucK will not be deleted upon a 
-    //       scene load if this bool is true.
-    //       If left false, will be delete as usual.
-    // ----------------------------------------------------
-    [Tooltip( "Whether to keep this ChuckMainInstance when the next scene loads." )]
-    public bool persistToNextScene = false;
-
-
-
-
-    // ----------------------------------------------------
-    // name: clearChuckOnSceneLoad
-    // desc: if this ChucK is not fully deleted on a 
-    //       scene load, and this bool is true, then
-    //       its VM will be cleared / reset.
-    //       Otherwise, the VM will continue running
-    //       in the next scene.
-    // ----------------------------------------------------
-    [Tooltip( "If this ChuckMainInstance is kept when the next scene loads, this controls whether its VM is cleared (reset)." )]
-    public bool clearChuckOnSceneLoad = false;
 
 
 
@@ -304,7 +277,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: SetIntArray
     // desc: set the value of global int variableName[]
     // ----------------------------------------------------
-    public bool SetIntArray( string variableName, long[] values )
+    public bool SetIntArray( string variableName, int[] values )
     {
         return Chuck.Manager.SetIntArray( myChuckId, variableName, values );
     }
@@ -493,15 +466,11 @@ public class ChuckMainInstance : MonoBehaviour
 
         // has init
         hasInit = true;
+    }
 
-        // when scene is unloaded, check whether we need to clear the chuck
-        SceneManager.sceneUnloaded += OnSceneUnloaded;
-
-        // don't delete me?
-        if( persistToNextScene )
-        {
-            DontDestroyOnLoad( this.gameObject );
-        }
+    public System.UInt32 GetID()
+    {
+        return myChuckId;
     }
 
     public bool HasInit()
@@ -513,6 +482,10 @@ public class ChuckMainInstance : MonoBehaviour
     {
         // default device
         myMicDevice = "";
+        #if UNITY_WEBGL
+        // TODO
+        // pass; could setup later if I wanted from chuckscript
+        #else
         // try to find one that matches identifier
         if( microphoneIdentifier != "" )
         {
@@ -537,6 +510,7 @@ public class ChuckMainInstance : MonoBehaviour
         while( !( Microphone.GetPosition( myMicDevice ) > 0 ) ) { };
         // play audio source!
         mySource.Play();
+        #endif
     }
 
     public string GetUniqueVariableName()
@@ -551,6 +525,8 @@ public class ChuckMainInstance : MonoBehaviour
         return prefix + currentVar.ToString();
     }
 
+    #if UNITY_WEBGL
+    #else
     void OnAudioFilterRead( float[] data, int channels )
     {
         // check whether channels is correct
@@ -575,6 +551,7 @@ public class ChuckMainInstance : MonoBehaviour
         // copy output back to data, which is now output
         Array.Copy( myOutBuffer, data, data.Length );
     }
+    #endif
 
     // unused for the moment
     private bool Advance( long now, float[] input, float[] output, uint channels )
@@ -613,14 +590,6 @@ public class ChuckMainInstance : MonoBehaviour
     public bool RunFileWithReplacementDac( string filename, string args, string replacementDac, bool fromStreamingAssets )
     {
         return Chuck.Manager.RunFileWithReplacementDac( myChuckId, filename, args, replacementDac, fromStreamingAssets );
-    }
-
-    private void OnSceneUnloaded( Scene current )
-    {
-        if( persistToNextScene && clearChuckOnSceneLoad )
-        {
-            Chuck.Manager.ClearChuck( myChuckId );
-        }
     }
 
     private void OnDestroy()
