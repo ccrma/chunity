@@ -80,6 +80,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 		}
 	}
 
+	[AOT.MonoPInvokeCallback(typeof(Chuck.IntArrayCallback))]
 	void GetInitialArrayCallback( CK_INT[] values, CK_UINT numValues )
 	{
 		Debug.Log( "Array has " + numValues.ToString() + " numbers which are: " );
@@ -89,6 +90,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 		}
 	}
 
+	[AOT.MonoPInvokeCallback(typeof(Chuck.IntCallback))]
 	void GetANumberCallback( CK_INT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );

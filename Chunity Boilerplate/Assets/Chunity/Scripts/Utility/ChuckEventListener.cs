@@ -68,6 +68,8 @@ public class ChuckEventListener : MonoBehaviour
     private Action userCallback;
 
     private int numTimesCalled = 0;
+    
+    [AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
     private void MyCallback()
     {
         numTimesCalled++;

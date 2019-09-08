@@ -41,6 +41,7 @@ public class ChunityExampleGlobalEventWithHelperComponents : MonoBehaviour
 		}
 	}
 
+	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	void MyCallback()
 	{
 		// react to event (in this case, rotate my object)

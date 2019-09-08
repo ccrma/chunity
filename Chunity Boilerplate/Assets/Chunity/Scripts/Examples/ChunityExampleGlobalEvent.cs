@@ -38,6 +38,7 @@ public class ChunityExampleGlobalEvent : MonoBehaviour
 		myChuck.StartListeningForChuckEvent( "notifier", myCallback );
 	}
 
+	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	void CallbackFunction()
 	{
 		// store a message that the callback function was called

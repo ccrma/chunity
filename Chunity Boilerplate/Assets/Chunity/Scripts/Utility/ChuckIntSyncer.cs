@@ -98,6 +98,7 @@ public class ChuckIntSyncer : MonoBehaviour
     }
 
     private int myIntValue = 0;
+    [AOT.MonoPInvokeCallback(typeof(Chuck.IntCallback))]
     private void MyCallback( CK_INT newValue )
     {
         myIntValue = (int) newValue;

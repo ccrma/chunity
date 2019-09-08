@@ -82,6 +82,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
+	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallback))]
 	void GetInitialArrayCallback( CK_FLOAT[] values, CK_UINT numValues )
 	{
 		Debug.Log( "Array has " + numValues.ToString() + " numbers which are: " );
@@ -91,6 +92,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
+	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
 	void GetANumberCallback( CK_FLOAT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );

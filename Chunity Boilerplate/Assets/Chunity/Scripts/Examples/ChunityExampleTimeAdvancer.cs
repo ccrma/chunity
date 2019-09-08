@@ -96,11 +96,13 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		}
 	}
 
+	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
 	void GetPosCallback( CK_FLOAT pos )
 	{
 		myPos = (float) pos;
 	}
 
+	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	void BeNotified1()
 	{
 		Debug.Log( "I was notified~~" );
