@@ -287,7 +287,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: SetIntArray
     // desc: set the value of global int variableName[]
     // ----------------------------------------------------
-    public bool SetIntArray( string variableName, int[] values )
+    public bool SetIntArray( string variableName, CK_INT[] values )
     {
         return Chuck.Manager.SetIntArray( myChuckId, variableName, values );
     }
