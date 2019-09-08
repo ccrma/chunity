@@ -4,6 +4,16 @@ using UnityEngine;
 using UnityEngine.Audio;
 using System;
 
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+using CK_FLOAT = System.Single;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+using CK_FLOAT = System.Double;
+#endif
+
 
 
 [RequireComponent( typeof( AudioSource ) )]
@@ -75,7 +85,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: SetInt
     // desc: set the value of global int variableName
     // ----------------------------------------------------
-    public bool SetInt( string variableName, System.Int64 value )
+    public bool SetInt( string variableName, CK_INT value )
     {
         return Chuck.Manager.SetInt( myChuckId, variableName, value );
     }
@@ -87,7 +97,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: CreateGetIntCallback
     // desc: construct the callback necessary for GetInt
     // ----------------------------------------------------
-    public Chuck.IntCallback CreateGetIntCallback( Action<System.Int64> callbackFunction )
+    public Chuck.IntCallback CreateGetIntCallback( Action<CK_INT> callbackFunction )
     {
         return Chuck.CreateGetIntCallback( callbackFunction );
     }
@@ -112,7 +122,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: SetFloat
     // desc: set the value of global float variableName
     // ----------------------------------------------------
-    public bool SetFloat( string variableName, double value )
+    public bool SetFloat( string variableName, CK_FLOAT value )
     {
         return Chuck.Manager.SetFloat( myChuckId, variableName, value );
     }
@@ -124,7 +134,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: CreateGetFloatCallback
     // desc: construct the callback necessary for GetFloat
     // ----------------------------------------------------
-    public Chuck.FloatCallback CreateGetFloatCallback( Action<double> callbackFunction )
+    public Chuck.FloatCallback CreateGetFloatCallback( Action<CK_FLOAT> callbackFunction )
     {
         return Chuck.CreateGetFloatCallback( callbackFunction );
     }
@@ -265,7 +275,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: CreateGetIntArrayCallback
     // desc: create a callback for getting an int array
     // ----------------------------------------------------
-    public Chuck.IntArrayCallback CreateGetIntArrayCallback( Action<long[], ulong> callbackFunction )
+    public Chuck.IntArrayCallback CreateGetIntArrayCallback( Action<CK_INT[], CK_UINT> callbackFunction )
     {
         return Chuck.CreateGetIntArrayCallback( callbackFunction );
     }
@@ -301,7 +311,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: SetIntArrayValue
     // desc: set the value of global int variableName[index]
     // ----------------------------------------------------
-    public bool SetIntArrayValue( string variableName, uint index, long value )
+    public bool SetIntArrayValue( string variableName, uint index, CK_INT value )
     {
         return Chuck.Manager.SetIntArrayValue( myChuckId, variableName, index, value );
     }
@@ -325,7 +335,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: SetAssociativeIntArrayValue
     // desc: set the value of global int variableName[key]
     // ----------------------------------------------------
-    public bool SetAssociativeIntArrayValue( string variableName, string key, long value )
+    public bool SetAssociativeIntArrayValue( string variableName, string key, CK_INT value )
     {
         return Chuck.Manager.SetAssociativeIntArrayValue( myChuckId, variableName, key, value );
     }
@@ -349,7 +359,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: CreateGetFloatArrayCallback
     // desc: create a callback for getting a float array
     // ----------------------------------------------------
-    public Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action<double[], ulong> callbackFunction )
+    public Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action<CK_FLOAT[], CK_UINT> callbackFunction )
     {
         return Chuck.CreateGetFloatArrayCallback( callbackFunction );
     }
@@ -361,7 +371,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: SetFloatArray
     // desc: set the value of global float variableName[]
     // ----------------------------------------------------
-    public bool SetFloatArray( string variableName, double[] values )
+    public bool SetFloatArray( string variableName, CK_FLOAT[] values )
     {
         return Chuck.Manager.SetFloatArray( myChuckId, variableName, values );
     }
@@ -385,7 +395,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: SetFloatArrayValue
     // desc: set the value of global float variableName[index]
     // ----------------------------------------------------
-    public bool SetFloatArrayValue( string variableName, uint index, double value )
+    public bool SetFloatArrayValue( string variableName, uint index, CK_FLOAT value )
     {
         return Chuck.Manager.SetFloatArrayValue( myChuckId, variableName, index, value );
     }
@@ -409,7 +419,7 @@ public class ChuckMainInstance : MonoBehaviour
     // name: SetAssociativeFloatArrayValue
     // desc: set the value of global float variableName[key]
     // ----------------------------------------------------
-    public bool SetAssociativeFloatArrayValue( string variableName, string key, double value )
+    public bool SetAssociativeFloatArrayValue( string variableName, string key, CK_FLOAT value )
     {
         return Chuck.Manager.SetAssociativeFloatArrayValue( myChuckId, variableName, key, value );
     }
@@ -464,6 +474,11 @@ public class ChuckMainInstance : MonoBehaviour
         // setup mic
         SetupMic();
 
+        #if UNITY_WEBGL
+        // setup listener
+        SetUpListener();
+        #endif
+
         // has init
         hasInit = true;
     }
@@ -512,6 +527,19 @@ public class ChuckMainInstance : MonoBehaviour
         mySource.Play();
         #endif
     }
+
+    #if UNITY_WEBGL
+    private void SetUpListener()
+    {
+        AudioListener theListener = FindObjectOfType< AudioListener >();
+        ChuckListenerPosition listener = theListener.GetComponent< ChuckListenerPosition >();
+        if( listener == null )
+        {
+            // it doesn't exist --> we need to create it
+            theListener.gameObject.AddComponent< ChuckListenerPosition >();
+        }
+    }
+    #endif
 
     public string GetUniqueVariableName()
     {

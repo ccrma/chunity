@@ -4,6 +4,16 @@ using UnityEngine;
 using System;
 using System.Runtime.InteropServices;
 
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+using CK_FLOAT = System.Single;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+using CK_FLOAT = System.Double;
+#endif
+
 
 [RequireComponent( typeof( AudioSource ) )]
 public class ChuckSubInstance : MonoBehaviour
@@ -87,7 +97,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: SetInt
     // desc: set the value of global int variableName
     // ----------------------------------------------------
-    public bool SetInt( string variableName, System.Int64 value )
+    public bool SetInt( string variableName, CK_INT value )
     {
         return chuckMainInstance.SetInt( variableName, value );
     }
@@ -99,7 +109,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: CreateGetIntCallback
     // desc: construct the callback necessary for GetInt
     // ----------------------------------------------------
-    public Chuck.IntCallback CreateGetIntCallback( Action<System.Int64> callbackFunction )
+    public Chuck.IntCallback CreateGetIntCallback( Action<CK_INT> callbackFunction )
     {
         return Chuck.CreateGetIntCallback( callbackFunction );
     }
@@ -124,7 +134,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: SetFloat
     // desc: set the value of global float variableName
     // ----------------------------------------------------
-    public bool SetFloat( string variableName, double value )
+    public bool SetFloat( string variableName, CK_FLOAT value )
     {
         return chuckMainInstance.SetFloat( variableName, value );
     }
@@ -136,7 +146,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: CreateGetFloatCallback
     // desc: construct the callback necessary for GetFloat
     // ----------------------------------------------------
-    public Chuck.FloatCallback CreateGetFloatCallback( Action<double> callbackFunction )
+    public Chuck.FloatCallback CreateGetFloatCallback( Action<CK_FLOAT> callbackFunction )
     {
         return Chuck.CreateGetFloatCallback( callbackFunction );
     }
@@ -277,7 +287,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: CreateGetIntArrayCallback
     // desc: create a callback for getting an int array
     // ----------------------------------------------------
-    public Chuck.IntArrayCallback CreateGetIntArrayCallback( Action<long[], ulong> callbackFunction )
+    public Chuck.IntArrayCallback CreateGetIntArrayCallback( Action<CK_INT[], CK_UINT> callbackFunction )
     {
         return Chuck.CreateGetIntArrayCallback( callbackFunction );
     }
@@ -313,7 +323,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: SetIntArrayValue
     // desc: set the value of global int variableName[index]
     // ----------------------------------------------------
-    public bool SetIntArrayValue( string variableName, uint index, long value )
+    public bool SetIntArrayValue( string variableName, uint index, CK_INT value )
     {
         return chuckMainInstance.SetIntArrayValue( variableName, index, value );
     }
@@ -337,7 +347,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: SetAssociativeIntArrayValue
     // desc: set the value of global int variableName[key]
     // ----------------------------------------------------
-    public bool SetAssociativeIntArrayValue( string variableName, string key, long value )
+    public bool SetAssociativeIntArrayValue( string variableName, string key, CK_INT value )
     {
         return chuckMainInstance.SetAssociativeIntArrayValue( variableName, key, value );
     }
@@ -361,7 +371,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: CreateGetFloatArrayCallback
     // desc: create a callback for getting a float array
     // ----------------------------------------------------
-    public Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action<double[], ulong> callbackFunction )
+    public Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action<CK_FLOAT[], CK_UINT> callbackFunction )
     {
         return Chuck.CreateGetFloatArrayCallback( callbackFunction );
     }
@@ -373,7 +383,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: SetFloatArray
     // desc: set the value of global float variableName[]
     // ----------------------------------------------------
-    public bool SetFloatArray( string variableName, double[] values )
+    public bool SetFloatArray( string variableName, CK_FLOAT[] values )
     {
         return chuckMainInstance.SetFloatArray( variableName, values );
     }
@@ -397,7 +407,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: SetFloatArrayValue
     // desc: set the value of global float variableName[index]
     // ----------------------------------------------------
-    public bool SetFloatArrayValue( string variableName, uint index, double value )
+    public bool SetFloatArrayValue( string variableName, uint index, CK_FLOAT value )
     {
         return chuckMainInstance.SetFloatArrayValue( variableName, index, value );
     }
@@ -421,7 +431,7 @@ public class ChuckSubInstance : MonoBehaviour
     // name: SetAssociativeFloatArrayValue
     // desc: set the value of global float variableName[key]
     // ----------------------------------------------------
-    public bool SetAssociativeFloatArrayValue( string variableName, string key, double value )
+    public bool SetAssociativeFloatArrayValue( string variableName, string key, CK_FLOAT value )
     {
         return chuckMainInstance.SetAssociativeFloatArrayValue( variableName, key, value );
     }
@@ -494,6 +504,8 @@ public class ChuckSubInstance : MonoBehaviour
 
         // setup group for reliable ordering
         mySource = GetComponent<AudioSource>();
+        #if UNITY_WEBGL
+        #else
         mySource.outputAudioMixerGroup = Chuck.FindAudioMixerGroup( "ChuckSubInstanceDestination" );
         // other settings
         mySource.loop = true;
@@ -504,10 +516,7 @@ public class ChuckSubInstance : MonoBehaviour
         spatialClip = (AudioClip) Resources.Load( "Audio/1" );
         mySource.clip = spatialClip;
         mySource.Play();
-
-        // opposite to have first UpdateSpatialize() take effect
-        prevSpatialize = !spatialize;
-        UpdateSpatialize();
+        #endif
 
 
         // setup chuck
@@ -517,6 +526,7 @@ public class ChuckSubInstance : MonoBehaviour
         myID = nextID++;
         System.UInt32 mainID = chuckMainInstance.GetID();
         initSubChuckInstance( mainID, myID, myOutputUgen );
+        initSpatializer( myID, mySource.minDistance, mySource.maxDistance );
         #else
         // replacement dac is initted and constructed here!
         // so it shouldn't have to be anywhere else.
@@ -526,6 +536,10 @@ public class ChuckSubInstance : MonoBehaviour
 		", myOutputUgen ) );
         #endif
 
+        // opposite to have first UpdateSpatialize() take effect
+        prevSpatialize = !spatialize;
+        UpdateSpatialize();
+
         running = true;
 
     }
@@ -533,12 +547,31 @@ public class ChuckSubInstance : MonoBehaviour
     #if UNITY_WEBGL
     [DllImport( "__Internal" )]
     private static extern bool initSubChuckInstance( System.UInt32 chuckID, System.UInt32 subChuckID, System.String dacName );
+    [DllImport( "__Internal" )]
+    private static extern bool initSpatializer( System.UInt32 subChuckID, float minDistance, float maxDistance );
+    [DllImport( "__Internal" )]
+    private static extern bool setSubChuckSpatializationParameters( System.UInt32 subChuckID, 
+        System.UInt32 doSpatialization, float minDistance, float maxDistance, float rolloffFactor );
+    [DllImport( "__Internal" )]
+    private static extern bool setSubChuckTransform( System.UInt32 subChuckID, 
+        float posX, float posY, float posZ,
+        float forwardX, float forwardY, float forwardZ 
+    );
     #endif
 
     void Update()
     {
         isMuted = mySource.mute;
         UpdateSpatialize();
+
+        #if UNITY_WEBGL
+        if( transform.hasChanged )
+        {
+            Vector3 pos = transform.position;
+            Vector3 forward = transform.forward;
+            setSubChuckTransform( myID, pos.x, pos.y, pos.z, forward.x, forward.y, forward.z );
+        }
+        #endif
     }
 
     void UpdateSpatialize()
@@ -548,6 +581,9 @@ public class ChuckSubInstance : MonoBehaviour
             return;
         }
 
+        #if UNITY_WEBGL
+        setSubChuckSpatializationParameters( myID, spatialize ? (uint) 1 : (uint) 0, mySource.minDistance, mySource.maxDistance, 1 );
+        #else
         if( spatialize )
         {
             mySource.spatialBlend = 1.0f;
@@ -556,6 +592,7 @@ public class ChuckSubInstance : MonoBehaviour
         {
             mySource.spatialBlend = 0.0f;
         }
+        #endif
         prevSpatialize = spatialize;
     }
 

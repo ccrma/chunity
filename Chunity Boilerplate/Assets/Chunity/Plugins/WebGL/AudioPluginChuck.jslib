@@ -3,6 +3,7 @@ mergeInto(LibraryManager.library, {
     {
         this.chucks = {};
         this.subChucks = {};
+        this.panners = {};
         this.stopIDs = {};
         chuckPrint = function( text )
         {
@@ -51,7 +52,10 @@ mergeInto(LibraryManager.library, {
     },
     initChuckInstance: function( chuckID, sampleRate )
     {
-        // do nothing and secretly use theChuck
+        // right now, we are secretly using theChuck
+        // so clear it as if it's a new chuck
+        theChuck.clearChuckInstance();
+        theChuck.clearGlobals();
 
         // // ignore srate; it will be set to WebAudio's srate.
         // var thisChuckReady = defer();
@@ -66,12 +70,119 @@ mergeInto(LibraryManager.library, {
     {
         var thisSubChuckReady = defer();
         dacName = Pointer_stringify( dacName );
-        /*await*/ theChuck.runCode( "global Gain " + dacName + " => blackhole; true => " + dacName + ".buffered;" );
+        theChuck.runCode( "global Gain " + dacName + " => blackhole; true => " + dacName + ".buffered;" );
         this.subChucks[ subChuckID ] = createASubChuck( theChuck, dacName, thisSubChuckReady );
-        // TODO: connect to a panner when spatialization turned on.
         this.subChucks[ subChuckID ].connect( audioContext.destination );
+        this.subChucks[ subChuckID ].currentlySpatialized = false;
+
         //await thisSubChuckReady;
         return subChuckID;
+    },
+    initSpatializer: function( subChuckID, minDistance, maxDistance )
+    {
+        this.panners[ subChuckID ] = new PannerNode( audioContext,
+        {
+            panningModel: 'equalpower',
+            distanceModel: 'inverse',
+            positionX: 0,
+            positionY: 0,
+            positionZ: 0,
+            orientationX: 0,
+            orientationY: 0,
+            orientationZ: -1,
+            refDistance: minDistance,
+            maxDistance: maxDistance,
+            rolloffFactor: 1,
+            coneInnerAngle: 360,
+            coneOuterAngle: 360,
+            coneOuterGain: 1
+        });
+        this.panners[ subChuckID ].connect( audioContext.destination );
+        return subChuckID;
+    },
+    // TODO: what is the correct conversion of coordinate systems? right now, L/R are flipped,
+    // but that doesn't mean that -x is necessarily the correct answer...
+    setListenerTransform: function( x, y, z, forwardX, forwardY, forwardZ, upX, upY, upZ )
+    {
+        // set position
+        if( chunityAudioListener.positionX ) 
+        {
+            // most browsers
+            chunityAudioListener.positionX.setValueAtTime( x, audioContext.currentTime );
+            chunityAudioListener.positionY.setValueAtTime( y, audioContext.currentTime );
+            chunityAudioListener.positionZ.setValueAtTime( z, audioContext.currentTime );
+        }
+        else
+        {
+            // firefox still uses deprecated API
+            chunityAudioListener.setPosition( x, y, z );
+        }
+
+        // set orientation
+        if( chunityAudioListener.forwardX )
+        {
+            // most browsers
+            chunityAudioListener.forwardX.setValueAtTime( forwardX, audioContext.currentTime );
+            chunityAudioListener.forwardY.setValueAtTime( forwardY, audioContext.currentTime );
+            chunityAudioListener.forwardZ.setValueAtTime( forwardZ, audioContext.currentTime );
+            chunityAudioListener.upX.setValueAtTime( upX, audioContext.currentTime );
+            chunityAudioListener.upY.setValueAtTime( upY, audioContext.currentTime );
+            chunityAudioListener.upZ.setValueAtTime( upZ, audioContext.currentTime );
+        }
+        else
+        {
+            // firefox still uses deprecated API
+            chunityAudioListener.setOrientation( forwardX, forwardY, forwardZ, upX, upY, upZ );
+        }
+
+    },
+    setSubChuckTransform: function( subChuckID, posX, posY, posZ, forwardX, forwardY, forwardZ )
+    {
+        // set position
+        if( this.panners[ subChuckID ].positionX )
+        {
+            // most browsers
+            this.panners[ subChuckID ].positionX.setValueAtTime( posX, audioContext.currentTime );
+            this.panners[ subChuckID ].positionY.setValueAtTime( posY, audioContext.currentTime );
+            this.panners[ subChuckID ].positionZ.setValueAtTime( posZ, audioContext.currentTime );
+        }
+        else
+        {
+            // firefox still uses deprecated API
+            this.panners[ subChuckID ].setPosition( posX, posY, posZ );
+        }
+
+        // set forward direction
+        if( this.panners[ subChuckID ].orientationX )
+        {
+            // most browsers
+            this.panners[ subChuckID ].orientationX.setValueAtTime( forwardX, audioContext.currentTime );
+            this.panners[ subChuckID ].orientationY.setValueAtTime( forwardY, audioContext.currentTime );
+            this.panners[ subChuckID ].orientationZ.setValueAtTime( forwardZ, audioContext.currentTime );
+        }
+        else
+        {
+            // firefox still uses deprecated API
+            this.panners[ subChuckID ].setOrientation( forwardX, forwardY, forwardZ );
+        }
+    },
+    // TODO what other values might we want to set? e.g. roll-off distance?
+    setSubChuckSpatializationParameters: function( subChuckID, doSpatialization, minDistance, maxDistance, rolloffFactor )
+    {
+        if( doSpatialization && !this.subChucks[ subChuckID ].currentlySpatialized )
+        {
+            this.subChucks[ subChuckID ].disconnect( audioContext.destination );
+            this.subChucks[ subChuckID ].connect( this.panners[ subChuckID ] );
+        }
+        else if( !doSpatialization && this.subChucks[ subChuckID ].currentlySpatialized )
+        {
+            this.subChucks[ subChuckID ].disconnect( this.panners[ subChuckID ] );
+            this.subChucks[ subChuckID ].connect( audioContext.destination );
+        }
+
+        this.panners[ subChuckID ].refDistance = minDistance;
+        this.panners[ subChuckID ].maxDistance = maxDistance;
+        this.panners[ subChuckID ].rolloffFactor = rolloffFactor;
     },
     clearChuckInstance: function( chuckID )
     {

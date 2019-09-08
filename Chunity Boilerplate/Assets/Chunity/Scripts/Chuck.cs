@@ -6,6 +6,16 @@ using System.IO;
 using UnityEngine.Audio;
 using System.Runtime.InteropServices;
 
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+using CK_FLOAT = System.Single;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+using CK_FLOAT = System.Double;
+#endif
+
 public class Chuck
 {
 
@@ -205,7 +215,7 @@ public class Chuck
         return runChuckFileWithArgsWithReplacementDac( chuckId, filename, args, replacementDac );
     }
 
-    public bool SetInt( string chuckName, string variableName, System.Int64 value )
+    public bool SetInt( string chuckName, string variableName, CK_INT value )
     {
         if( ids.ContainsKey( chuckName ) )
         {
@@ -218,12 +228,12 @@ public class Chuck
         }
     }
 
-    public bool SetInt( System.UInt32 chuckId, string variableName, System.Int64 value )
+    public bool SetInt( System.UInt32 chuckId, string variableName, CK_INT value )
     {
         return setChuckInt( chuckId, variableName, (int) value );
     }
 
-    public static Chuck.IntCallback CreateGetIntCallback( Action<System.Int64> callbackFunction )
+    public static Chuck.IntCallback CreateGetIntCallback( Action<CK_INT> callbackFunction )
     {
         return new IntCallback( callbackFunction );
     }
@@ -254,7 +264,7 @@ public class Chuck
         return true;
     }
 
-    public bool SetFloat( string chuckName, string variableName, double value )
+    public bool SetFloat( string chuckName, string variableName, CK_FLOAT value )
     {
         if( ids.ContainsKey( chuckName ) )
         {
@@ -267,12 +277,12 @@ public class Chuck
         }
     }
 
-    public bool SetFloat( System.UInt32 chuckId, string variableName, double value )
+    public bool SetFloat( System.UInt32 chuckId, string variableName, CK_FLOAT value )
     {
         return setChuckFloat( chuckId, variableName, value );
     }
 
-    public static Chuck.FloatCallback CreateGetFloatCallback( Action<double> callbackFunction )
+    public static Chuck.FloatCallback CreateGetFloatCallback( Action<CK_FLOAT> callbackFunction )
     {
         return new FloatCallback( callbackFunction );
     }
@@ -465,13 +475,12 @@ public class Chuck
         #endif
     }
 
-    public static Chuck.IntArrayCallback CreateGetIntArrayCallback( Action<long[], ulong> callbackFunction )
+    public static Chuck.IntArrayCallback CreateGetIntArrayCallback( Action<CK_INT[], CK_UINT> callbackFunction )
     {
         return new IntArrayCallback( callbackFunction );
     }
 
-// TODO: cleanup this and other instances; type was changed but should only have been changed for UNITY_WEBGL
-    public bool SetIntArray( string chuckName, string variableName, int[] values )
+    public bool SetIntArray( string chuckName, string variableName, CK_INT[] values )
     {
         if( ids.ContainsKey( chuckName ) )
         {
@@ -484,7 +493,7 @@ public class Chuck
         }
     }
 
-    public bool SetIntArray( System.UInt32 chuckId, string variableName, int[] values )
+    public bool SetIntArray( System.UInt32 chuckId, string variableName, CK_INT[] values )
     {
         return setGlobalIntArray( chuckId, variableName, values, (uint) values.Length );
     }
@@ -579,12 +588,12 @@ public class Chuck
         return getGlobalAssociativeIntArrayValue( chuckId, variableName, key, callback );
     }
 
-    public static Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action<double[], ulong> callbackFunction )
+    public static Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action<CK_FLOAT[], CK_UINT> callbackFunction )
     {
         return new FloatArrayCallback( callbackFunction );
     }
 
-    public bool SetFloatArray( string chuckName, string variableName, double[] values )
+    public bool SetFloatArray( string chuckName, string variableName, CK_FLOAT[] values )
     {
         if( ids.ContainsKey( chuckName ) )
         {
@@ -597,7 +606,7 @@ public class Chuck
         }
     }
 
-    public bool SetFloatArray( System.UInt32 chuckId, string variableName, double[] values )
+    public bool SetFloatArray( System.UInt32 chuckId, string variableName, CK_FLOAT[] values )
     {
         return setGlobalFloatArray( chuckId, variableName, values, (uint) values.Length );
     }
@@ -620,7 +629,7 @@ public class Chuck
         return getGlobalFloatArray( chuckId, variableName, callback );
     }
 
-    public bool SetFloatArrayValue( string chuckName, string variableName, uint index, double value )
+    public bool SetFloatArrayValue( string chuckName, string variableName, uint index, CK_FLOAT value )
     {
         if( ids.ContainsKey( chuckName ) )
         {
@@ -633,7 +642,7 @@ public class Chuck
         }
     }
 
-    public bool SetFloatArrayValue( System.UInt32 chuckId, string variableName, uint index, double value )
+    public bool SetFloatArrayValue( System.UInt32 chuckId, string variableName, uint index, CK_FLOAT value )
     {
         return setGlobalFloatArrayValue( chuckId, variableName, index, value );
     }
@@ -656,7 +665,7 @@ public class Chuck
         return getGlobalFloatArrayValue( chuckId, variableName, index, callback );
     }
 
-    public bool SetAssociativeFloatArrayValue( string chuckName, string variableName, string key, double value )
+    public bool SetAssociativeFloatArrayValue( string chuckName, string variableName, string key, CK_FLOAT value )
     {
         if( ids.ContainsKey( chuckName ) )
         {
@@ -669,7 +678,7 @@ public class Chuck
         }
     }
 
-    public bool SetAssociativeFloatArrayValue( System.UInt32 chuckId, string variableName, string key, double value )
+    public bool SetAssociativeFloatArrayValue( System.UInt32 chuckId, string variableName, string key, CK_FLOAT value )
     {
         return setGlobalAssociativeFloatArrayValue( chuckId, variableName, key, value );
     }
@@ -717,13 +726,13 @@ public class Chuck
     public delegate void MyLogCallback( System.String str );
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-    public delegate void IntCallback( System.Int64 i );
+    public delegate void IntCallback( CK_INT i );
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void VoidCallback();
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-    public delegate void FloatCallback( double f );
+    public delegate void FloatCallback( CK_FLOAT f );
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void StringCallback( System.String str );
@@ -731,15 +740,15 @@ public class Chuck
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void IntArrayCallback(
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 1)]
-        System.Int64[] values,
-        System.UInt64 numValues
+        CK_INT[] values,
+        CK_UINT numValues
     );
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void FloatArrayCallback(
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R8, SizeParamIndex = 1)]
-        double[] values,
-        System.UInt64 numValues
+        CK_FLOAT[] values,
+        CK_UINT numValues
     );
 
     private MyLogCallback chout_delegate;
@@ -760,7 +769,7 @@ public class Chuck
     private static extern void cleanRegisteredChucks();
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool initChuckInstance( System.UInt32 chuckID, System.UInt32 sampleRate, System.UInt32 inChannels, System.UInt32 outChannels );
+    private static extern bool initChuckInstance( System.UInt32 chuckID, System.UInt32 sampleRate );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool cleanupChuckInstance( System.UInt32 chuckID );
@@ -784,13 +793,13 @@ public class Chuck
     private static extern bool runChuckFileWithArgsWithReplacementDac( System.UInt32 chuckID, System.String filename, System.String args, System.String replacement_dac );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setChuckInt( System.UInt32 chuckID, System.String name, System.Int32 val );
+    private static extern bool setChuckInt( System.UInt32 chuckID, System.String name, CK_INT val );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getChuckInt( System.UInt32 chuckID, System.String name, IntCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setChuckFloat( System.UInt32 chuckID, System.String name, double val );
+    private static extern bool setChuckFloat( System.UInt32 chuckID, System.String name, CK_FLOAT val );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getChuckFloat( System.UInt32 chuckID, System.String name, FloatCallback callback );
@@ -817,37 +826,37 @@ public class Chuck
     private static extern bool stopListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalIntArray( System.UInt32 chuckID, System.String name, System.Int32[] arrayValues, System.UInt32 numValues );
+    private static extern bool setGlobalIntArray( System.UInt32 chuckID, System.String name, CK_INT[] arrayValues, System.UInt32 numValues );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalIntArray( System.UInt32 chuckID, System.String name, IntArrayCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, System.Int32 value );
+    private static extern bool setGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, CK_INT value );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, IntCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, System.Int32 value );
+    private static extern bool setGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, CK_INT value );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, IntCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalFloatArray( System.UInt32 chuckID, System.String name, double[] arrayValues, System.UInt32 numValues );
+    private static extern bool setGlobalFloatArray( System.UInt32 chuckID, System.String name, CK_FLOAT[] arrayValues, System.UInt32 numValues );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalFloatArray( System.UInt32 chuckID, System.String name, FloatArrayCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, double value );
+    private static extern bool setGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, CK_FLOAT value );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, FloatCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, double value );
+    private static extern bool setGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, CK_FLOAT value );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, FloatCallback callback );
@@ -905,13 +914,13 @@ public class Chuck
     private static extern bool runChuckFileWithArgsWithReplacementDac( System.UInt32 chuckID, System.String filename, System.String args, System.String replacement_dac );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setChuckInt( System.UInt32 chuckID, System.String name, System.Int64 val );
+    private static extern bool setChuckInt( System.UInt32 chuckID, System.String name, CK_INT val );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getChuckInt( System.UInt32 chuckID, System.String name, IntCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setChuckFloat( System.UInt32 chuckID, System.String name, double val );
+    private static extern bool setChuckFloat( System.UInt32 chuckID, System.String name, CK_FLOAT val );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getChuckFloat( System.UInt32 chuckID, System.String name, FloatCallback callback );
@@ -938,37 +947,37 @@ public class Chuck
     private static extern bool stopListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalIntArray( System.UInt32 chuckID, System.String name, long[] arrayValues, uint numValues );
+    private static extern bool setGlobalIntArray( System.UInt32 chuckID, System.String name, CK_INT[] arrayValues, uint numValues );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalIntArray( System.UInt32 chuckID, System.String name, IntArrayCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, long value );
+    private static extern bool setGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, CK_INT value );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, IntCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, long value );
+    private static extern bool setGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, CK_INT value );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, IntCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalFloatArray( System.UInt32 chuckID, System.String name, double[] arrayValues, uint numValues );
+    private static extern bool setGlobalFloatArray( System.UInt32 chuckID, System.String name, CK_FLOAT[] arrayValues, uint numValues );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalFloatArray( System.UInt32 chuckID, System.String name, FloatArrayCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, double value );
+    private static extern bool setGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, CK_FLOAT value );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, FloatCallback callback );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool setGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, double value );
+    private static extern bool setGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, CK_FLOAT value );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, FloatCallback callback );
