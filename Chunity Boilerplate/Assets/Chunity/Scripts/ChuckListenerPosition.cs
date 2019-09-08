@@ -12,20 +12,30 @@ public class ChuckListenerPosition : MonoBehaviour
         float upX, float upY, float upZ
     );
 
+    void Start()
+    {
+        UpdateTransform();
+    }
+
 
     void Update()
     {
         if( transform.hasChanged )
         {
-            Vector3 pos = transform.position;
-            Vector3 forward = transform.forward;
-            Vector3 up = transform.up;
-            setListenerTransform( 
-                pos.x, pos.y, pos.z,
-                forward.x, forward.y, forward.z,
-                up.x, up.y, up.z
-            );
+            UpdateTransform();
         }
+    }
+
+    void UpdateTransform()
+    {
+        Vector3 pos = transform.position;
+        Vector3 forward = transform.forward;
+        Vector3 up = transform.up;
+        setListenerTransform( 
+            pos.x, pos.y, pos.z,
+            forward.x, forward.y, forward.z,
+            up.x, up.y, up.z
+        );
     }
     #endif
 }

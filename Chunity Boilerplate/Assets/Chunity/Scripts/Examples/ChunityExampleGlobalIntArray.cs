@@ -2,6 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+using CK_FLOAT = System.Single;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+using CK_FLOAT = System.Double;
+#endif
+
 public class ChunityExampleGlobalIntArray : MonoBehaviour
 {
 	// This example shows how to use various
@@ -12,7 +22,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 	Chuck.IntArrayCallback myIntArrayCallback;
 	Chuck.IntCallback myIntCallback;
 
-	public long[] myMidiNotes = { 60, 65, 69, 72 };
+	public CK_INT[] myMidiNotes = { 60, 65, 69, 72 };
 
 	// Use this for initialization
 	void Start()
@@ -70,7 +80,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 		}
 	}
 
-	void GetInitialArrayCallback( long[] values, ulong numValues )
+	void GetInitialArrayCallback( CK_INT[] values, CK_UINT numValues )
 	{
 		Debug.Log( "Array has " + numValues.ToString() + " numbers which are: " );
 		for( int i = 0; i < values.Length; i++ )
@@ -79,7 +89,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 		}
 	}
 
-	void GetANumberCallback( long value )
+	void GetANumberCallback( CK_INT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );
 	}

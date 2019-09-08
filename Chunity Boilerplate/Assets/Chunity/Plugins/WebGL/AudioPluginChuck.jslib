@@ -100,8 +100,9 @@ mergeInto(LibraryManager.library, {
         this.panners[ subChuckID ].connect( audioContext.destination );
         return subChuckID;
     },
-    // TODO: what is the correct conversion of coordinate systems? right now, L/R are flipped,
-    // but that doesn't mean that -x is necessarily the correct answer...
+    // NOTE: Unity uses left-handed cartesian coordinates (forward is z++)
+    // and WebAudio uses right-handed cartesian coordinates (forward is z--)
+    // It is necessary to convert by negating every z component.
     setListenerTransform: function( x, y, z, forwardX, forwardY, forwardZ, upX, upY, upZ )
     {
         // set position
@@ -110,12 +111,12 @@ mergeInto(LibraryManager.library, {
             // most browsers
             chunityAudioListener.positionX.setValueAtTime( x, audioContext.currentTime );
             chunityAudioListener.positionY.setValueAtTime( y, audioContext.currentTime );
-            chunityAudioListener.positionZ.setValueAtTime( z, audioContext.currentTime );
+            chunityAudioListener.positionZ.setValueAtTime( -z, audioContext.currentTime );
         }
         else
         {
             // firefox still uses deprecated API
-            chunityAudioListener.setPosition( x, y, z );
+            chunityAudioListener.setPosition( x, y, -z );
         }
 
         // set orientation
@@ -124,18 +125,21 @@ mergeInto(LibraryManager.library, {
             // most browsers
             chunityAudioListener.forwardX.setValueAtTime( forwardX, audioContext.currentTime );
             chunityAudioListener.forwardY.setValueAtTime( forwardY, audioContext.currentTime );
-            chunityAudioListener.forwardZ.setValueAtTime( forwardZ, audioContext.currentTime );
+            chunityAudioListener.forwardZ.setValueAtTime( -forwardZ, audioContext.currentTime );
             chunityAudioListener.upX.setValueAtTime( upX, audioContext.currentTime );
             chunityAudioListener.upY.setValueAtTime( upY, audioContext.currentTime );
-            chunityAudioListener.upZ.setValueAtTime( upZ, audioContext.currentTime );
+            chunityAudioListener.upZ.setValueAtTime( -upZ, audioContext.currentTime );
         }
         else
         {
             // firefox still uses deprecated API
-            chunityAudioListener.setOrientation( forwardX, forwardY, forwardZ, upX, upY, upZ );
+            chunityAudioListener.setOrientation( forwardX, forwardY, -forwardZ, upX, upY, -upZ );
         }
 
     },
+    // NOTE: Unity uses left-handed cartesian coordinates (forward is z++)
+    // and WebAudio uses right-handed cartesian coordinates (forward is z--)
+    // It is necessary to convert by negating every z component.
     setSubChuckTransform: function( subChuckID, posX, posY, posZ, forwardX, forwardY, forwardZ )
     {
         // set position
@@ -144,12 +148,12 @@ mergeInto(LibraryManager.library, {
             // most browsers
             this.panners[ subChuckID ].positionX.setValueAtTime( posX, audioContext.currentTime );
             this.panners[ subChuckID ].positionY.setValueAtTime( posY, audioContext.currentTime );
-            this.panners[ subChuckID ].positionZ.setValueAtTime( posZ, audioContext.currentTime );
+            this.panners[ subChuckID ].positionZ.setValueAtTime( -posZ, audioContext.currentTime );
         }
         else
         {
             // firefox still uses deprecated API
-            this.panners[ subChuckID ].setPosition( posX, posY, posZ );
+            this.panners[ subChuckID ].setPosition( posX, posY, -posZ );
         }
 
         // set forward direction
@@ -158,15 +162,15 @@ mergeInto(LibraryManager.library, {
             // most browsers
             this.panners[ subChuckID ].orientationX.setValueAtTime( forwardX, audioContext.currentTime );
             this.panners[ subChuckID ].orientationY.setValueAtTime( forwardY, audioContext.currentTime );
-            this.panners[ subChuckID ].orientationZ.setValueAtTime( forwardZ, audioContext.currentTime );
+            this.panners[ subChuckID ].orientationZ.setValueAtTime( -forwardZ, audioContext.currentTime );
         }
         else
         {
             // firefox still uses deprecated API
-            this.panners[ subChuckID ].setOrientation( forwardX, forwardY, forwardZ );
+            this.panners[ subChuckID ].setOrientation( forwardX, forwardY, -forwardZ );
         }
     },
-    // TODO what other values might we want to set? e.g. roll-off distance?
+    // TODO what other values might we want to set?
     setSubChuckSpatializationParameters: function( subChuckID, doSpatialization, minDistance, maxDistance, rolloffFactor )
     {
         if( doSpatialization && !this.subChucks[ subChuckID ].currentlySpatialized )

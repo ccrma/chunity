@@ -80,12 +80,19 @@ var preloadFilenames = async function( filenamesToPreload )
     await Promise.all( promises );
 }
 
+var theWasm;
+var startAudioContext = async function()
+{
+    theWasm = await loadWasm;
+    audioContext = new AudioContext();
+    await audioContext.audioWorklet.addModule( whereIsChuck + '/chucknode.js');
+}
+
 var startChuck = async function() 
 {
     if( audioContext === undefined )
     {
-        audioContext = new AudioContext();
-        await audioContext.audioWorklet.addModule( whereIsChuck + '/chucknode.js');
+        await startAudioContext();
         
         var newID = currentChuckID;
         currentChuckID++;
@@ -96,14 +103,13 @@ var startChuck = async function()
     }
 };
 
-var createAChuck = async function( chuckID, initPromise )
+var createAChuck = function( chuckID, initPromise )
 {
     // important: "number of inputs / outputs" is like an aggregate source
     // most of the time, you only want one input source and one output
     // source, but each one has multiple channels
     var numInOutChannels = 2;
     
-    var theWasm = await loadWasm;
     var aChuck = new AudioWorkletNode( audioContext, 'chuck-node', { 
         numberOfInputs: 1,
         numberOfOutputs: 1,

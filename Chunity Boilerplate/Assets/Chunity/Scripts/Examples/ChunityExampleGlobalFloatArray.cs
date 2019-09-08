@@ -2,6 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+using CK_FLOAT = System.Single;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+using CK_FLOAT = System.Double;
+#endif
+
 public class ChunityExampleGlobalFloatArray : MonoBehaviour
 {
 	// This example shows how to use various methods
@@ -11,7 +22,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 	Chuck.FloatArrayCallback myFloatArrayCallback;
 	Chuck.FloatCallback myFloatCallback;
 
-	public double[] myMidiNotes = { 60, 65, 69, 72 };
+	public CK_FLOAT[] myMidiNotes = { 60, 65, 69, 72 };
 
 	// Use this for initialization
 	void Start()
@@ -71,7 +82,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
-	void GetInitialArrayCallback( double[] values, ulong numValues )
+	void GetInitialArrayCallback( CK_FLOAT[] values, CK_UINT numValues )
 	{
 		Debug.Log( "Array has " + numValues.ToString() + " numbers which are: " );
 		for( int i = 0; i < values.Length; i++ )
@@ -80,7 +91,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
-	void GetANumberCallback( double value )
+	void GetANumberCallback( CK_FLOAT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );
 	}

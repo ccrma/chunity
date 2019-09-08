@@ -3,6 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+using CK_FLOAT = System.Single;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+using CK_FLOAT = System.Double;
+#endif
+
 public class ChuckFloatSyncer : MonoBehaviour
 {
 
@@ -51,7 +61,7 @@ public class ChuckFloatSyncer : MonoBehaviour
         // set
         if( myChuck != null && myFloatName != "" )
         {
-            myChuck.SetFloat( myFloatName, (double) newValue );
+            myChuck.SetFloat( myFloatName, (CK_FLOAT) newValue );
         }
 
         // pre-set my storage too
@@ -88,7 +98,7 @@ public class ChuckFloatSyncer : MonoBehaviour
     }
 
     private float myFloatValue = 0;
-    private void MyCallback( double newValue )
+    private void MyCallback( CK_FLOAT newValue )
     {
         myFloatValue = (float) newValue;
     }
