@@ -281,7 +281,16 @@ mergeInto(LibraryManager.library, {
             {
                 dynCall( 'vi', c, [result] );
             });
-        })(callback); 
+        })(callback);
+    },
+    getChuckIntWithUnityStyleCallback: function( chuckID, name, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.getInt( Pointer_stringify( name ) ).then( function( result )
+            {
+                unityInstance.SendMessage( g, m, result );
+            });
+        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
     },
     setChuckFloat: function( chuckID, name, val )
     {
@@ -295,6 +304,15 @@ mergeInto(LibraryManager.library, {
                 dynCall( 'vf', c, [result] );
             });
         })(callback); 
+    },
+    getChuckFloatWithUnityStyleCallback: function( chuckID, name, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.getFloat( Pointer_stringify( name ) ).then( function( result )
+            {
+                unityInstance.SendMessage( g, m, result );
+            });
+        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
     },
     setChuckString: function( chuckID, name, val )
     {
@@ -315,6 +333,15 @@ mergeInto(LibraryManager.library, {
             });
         })(callback);
     },
+    getChuckStringWithUnityStyleCallback: function( chuckID, name, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.getString( Pointer_stringify( name ) ).then( function( result )
+            {
+                unityInstance.SendMessage( g, m, result );
+            });
+        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+    },
     signalChuckEvent: function( chuckID, name )
     {
         return theChuck.signalEvent( Pointer_stringify( name ) );
@@ -332,6 +359,15 @@ mergeInto(LibraryManager.library, {
         })(callback);
         return true;
     },
+    listenForChuckEventOnceWithUnityStyleCallback: function( chuckID, name, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.listenForEventOnce( Pointer_stringify( name ), function()
+            {
+                unityInstance.SendMessage( g, m );
+            });
+        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+    },
     startListeningForChuckEvent: function( chuckID, name, callback )
     {
         (function( c ) {
@@ -343,10 +379,24 @@ mergeInto(LibraryManager.library, {
         
         return true;
     },
+    startListeningForChuckEventWithUnityStyleCallback: function( chuckID, name, gameObject, method )
+    {
+        (function( g, m ) {
+            var callbackID = theChuck.startListeningForEvent( Pointer_stringify( name ), function() {
+                unityInstance.SendMessage( g, m );
+            });
+            this.stopIDs[ g + ":::" + m ] = callbackID;
+        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+    },
     stopListeningForChuckEvent: function( chuckID, name, callback )
     {
         var callbackID = this.stopIDs[ callback ];
         return theChuck.stopListeningForEvent( Pointer_stringify( name ), callbackID );
+    },
+    stopListeningForChuckEventWithUnityStyleCallback: function( chuckID, name, gameObject, method )
+    {
+        var callbackID = this.stopIDs[ Pointer_stringify( gameObject ) + ":::" + Pointer_stringify( method ) ];
+        theChuck.stopListeningForEvent( Pointer_stringify( name ), callbackID );
     },
 
     // note: array is what Unity thinks is CKINT, which is 32 bit
@@ -381,6 +431,14 @@ mergeInto(LibraryManager.library, {
             });
         })(callback);
     },
+    getGlobalIntArrayValueWithUnityStyleCallback: function( chuckID, name, index, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.getIntArrayValue( Pointer_stringify( name ), index ).then( function( result ) {
+                unityInstance.SendMessage( g, m, result );
+            });
+        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+    },
     setGlobalAssociativeIntArrayValue: function( chuckID, name, key, value )
     {
         return theChuck.setAssociativeIntArrayValue( Pointer_stringify( name ), Pointer_stringify( key ), value );
@@ -392,6 +450,14 @@ mergeInto(LibraryManager.library, {
                 dynCall( 'vi', c, [result] );
             });
         })(callback);
+    },
+    getGlobalAssociativeIntArrayValueWithUnityStyleCallback: function( chuckID, name, key, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.getAssociativeIntArrayValue( Pointer_stringify( name ), Pointer_stringify( key ) ).then( function( result ) {
+                unityInstance.SendMessage( g, m, result );
+            });
+        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
     },
 
     // note: array is t_CKFLOAT == Float32 since that's what Unity thinks CKFLOAT is
@@ -426,6 +492,14 @@ mergeInto(LibraryManager.library, {
             });
         })(callback);
     },
+    getGlobalFloatArrayValueWithUnityStyleCallback: function( chuckID, name, index, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.getFloatArrayValue( Pointer_stringify( name ), index ).then( function( result ) {
+                unityInstance.SendMessage( g, m, result );
+            });
+        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
+    },
     setGlobalAssociativeFloatArrayValue: function( chuckID, name, key, value )
     {
         return theChuck.setAssociativeFloatArrayValue( Pointer_stringify( name ), Pointer_stringify( key ), value );
@@ -437,6 +511,14 @@ mergeInto(LibraryManager.library, {
                 dynCall( 'vf', c, [result] );
             });
         })(callback);
+    },
+    getGlobalAssociativeFloatArrayValueWithUnityStyleCallback: function( chuckID, name, key, gameObject, method )
+    {
+        (function( g, m ) {
+            theChuck.getAssociativeFloatArrayValue( Pointer_stringify( name ), Pointer_stringify( key ) ).then( function( result ) {
+                unityInstance.SendMessage( g, m, result );
+            });
+        })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
     }
 
 

@@ -23,7 +23,10 @@ public class ChuckStringSyncer : MonoBehaviour
         // start up again
         myChuck = chuck;
         myStringName = stringToSync;
-        myStringCallback = Chuck.CreateGetStringCallback( MyCallback );
+        #if UNITY_WEBGL
+        #else
+        myStringCallback = MyCallback;
+        #endif
     }
 
 
@@ -76,15 +79,25 @@ public class ChuckStringSyncer : MonoBehaviour
     // =========== INTERNAL MECHANICS ========== //
 
     ChuckSubInstance myChuck = null;
+    #if UNITY_WEBGL
+    #else
     Chuck.StringCallback myStringCallback;
+    #endif
     string myStringName = "";
 
     private void Update()
     {
+        #if UNITY_WEBGL
+        if( myChuck != null && myStringName != "" )
+        {
+            myChuck.GetString( myStringName, gameObject.name, "MyCallback" );
+        }
+        #else
         if( myChuck != null && myStringCallback != null && myStringName != "" )
         {
             myChuck.GetString( myStringName, myStringCallback );
         }
+        #endif
     }
 
     private string myStringValue = "";

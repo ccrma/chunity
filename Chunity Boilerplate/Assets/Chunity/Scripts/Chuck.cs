@@ -761,11 +761,93 @@ public class Chuck
     private Dictionary<string, VoidCallback> voidCallbacks;
 
 #if UNITY_WEBGL
+    // method calls specific to WebGL
+    public bool GetInt( System.UInt32 chuckID, string variableName, string gameObjectWithCallback, string callback )
+    {
+        getChuckIntWithUnityStyleCallback( chuckID, variableName, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool GetFloat( System.UInt32 chuckID, string variableName, string gameObjectWithCallback, string callback )
+    {
+        getChuckFloatWithUnityStyleCallback( chuckID, variableName, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool GetString( System.UInt32 chuckID, string variableName, string gameObjectWithCallback, string callback )
+    {
+        getChuckStringWithUnityStyleCallback( chuckID, variableName, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool ListenForChuckEventOnce( System.UInt32 chuckId, string variableName, string gameObjectWithCallback, string callback )
+    {
+        listenForChuckEventOnceWithUnityStyleCallback( chuckId, variableName, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool StartListeningForChuckEvent( System.UInt32 chuckId, string variableName, string gameObjectWithCallback, string callback )
+    {
+        startListeningForChuckEventWithUnityStyleCallback( chuckId, variableName, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool StopListeningForChuckEvent( System.UInt32 chuckId, string variableName, string gameObjectWithCallback, string callback )
+    {
+        stopListeningForChuckEventWithUnityStyleCallback( chuckId, variableName, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool GetIntArrayValue( System.UInt32 chuckId, string variableName, uint index, string gameObjectWithCallback, string callback )
+    {
+        getGlobalIntArrayValueWithUnityStyleCallback( chuckId, variableName, index, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool GetAssociativeIntArrayValue( System.UInt32 chuckId, string variableName, string key, string gameObjectWithCallback, string callback )
+    {
+        getGlobalAssociativeIntArrayValueWithUnityStyleCallback( chuckId, variableName, key, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool GetFloatArrayValue( System.UInt32 chuckId, string variableName, uint index, string gameObjectWithCallback, string callback )
+    {
+        getGlobalFloatArrayValueWithUnityStyleCallback( chuckId, variableName, index, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool GetAssociativeFloatArrayValue( System.UInt32 chuckId, string variableName, string key, string gameObjectWithCallback, string callback )
+    {
+        getGlobalAssociativeFloatArrayValueWithUnityStyleCallback( chuckId, variableName, key, gameObjectWithCallback, callback );
+        return true;
+    }
+    
     const string PLUGIN_NAME = "__Internal";
 
     // imports specific to WebGL
     [DllImport( PLUGIN_NAME) ]
     private static extern void initChuckScript();
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void getChuckIntWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void getChuckFloatWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void getChuckStringWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void listenForChuckEventOnceWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void startListeningForChuckEventWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void stopListeningForChuckEventWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void getGlobalIntArrayValueWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.UInt32 index, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void getGlobalAssociativeIntArrayValueWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String key, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void getGlobalFloatArrayValueWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.UInt32 index, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void getGlobalAssociativeFloatArrayValueWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String key, System.String gameObject, System.String method );
+    
 #else
     const string PLUGIN_NAME = "AudioPluginChuck";
 

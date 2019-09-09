@@ -28,9 +28,9 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 	Chuck.FloatCallback myGetPosCallback;
 	Chuck.VoidCallback myTimeStepCallback;
 
-	static int notifyCount;
+	int notifyCount;
 
-	static float myPos;
+	float myPos;
 
 	// Use this for initialization
 	void Start()
@@ -76,7 +76,14 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 			}
 		" );
 
+		#if UNITY_WEBGL
+		// WebGL specific callback signature: game object name, method name
+		myChuck.StartListeningForChuckEvent( "notifier", gameObject.name, "BeNotified1" );
+
+		// NOTE: can use below call signature if the callback is a *static* method
+		#else
 		myChuck.StartListeningForChuckEvent( "notifier", myTimeStepCallback );
+		#endif
 	}
 
 	// Update is called once per frame
@@ -85,25 +92,40 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		float newTimeStep = Mathf.Clamp( Input.mousePosition.x, 250, 1000 ) / 1000.0f;
 
 		myChuck.SetFloat( "timeStep", newTimeStep );
+
+		#if UNITY_WEBGL
+		// WebGL specific callback signature: game object name, method name
+		myChuck.GetFloat( "pos", gameObject.name, "GetPosCallback" );
+
+		// NOTE: can use below method too if the callback is made into a *static* method
+		#else
 		myChuck.GetFloat( "pos", myGetPosCallback );
+		#endif
 
 		transform.position = new Vector3( myPos % 4, 0, 0 );
 
 		// an example of how to stop calling a callback 
 		if( notifyCount > 5 )
 		{
+			#if UNITY_WEBGL
+			// WebGL specific callback signature: game object name, method name
+			myChuck.StopListeningForChuckEvent( "notifier", gameObject.name, "BeNotified1" );
+
+			// NOTE: can use below call signature if the callback is a *static* method
+			#else
 			myChuck.StopListeningForChuckEvent( "notifier", myTimeStepCallback );
+			#endif
 		}
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-	static void GetPosCallback( CK_FLOAT pos )
+	void GetPosCallback( CK_FLOAT pos )
 	{
 		myPos = (float) pos;
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
-	static void BeNotified1()
+	void BeNotified1()
 	{
 		Debug.Log( "I was notified~~" );
 		notifyCount++;

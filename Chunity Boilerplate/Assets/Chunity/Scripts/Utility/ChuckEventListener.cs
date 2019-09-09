@@ -22,11 +22,15 @@ public class ChuckEventListener : MonoBehaviour
         StopListening();
 
         // start up again
-        myVoidCallback = MyCallback;
         userCallback = callback;
         myChuck = chuck;
         myEventName = eventToListenFor;
+        #if UNITY_WEBGL
+        myChuck.StartListeningForChuckEvent( myEventName, gameObject.name, "MyDirectCallback" );
+        #else
+        myVoidCallback = MyCallback;
         myChuck.StartListeningForChuckEvent( myEventName, myVoidCallback );
+        #endif
     }
 
 
@@ -37,12 +41,20 @@ public class ChuckEventListener : MonoBehaviour
     // ----------------------------------------------------
     public void StopListening()
     {
+        #if UNITY_WEBGL
+        if( myChuck != null && myEventName != "" )
+        {
+            myChuck.StopListeningForChuckEvent( myEventName, gameObject.name, "MyDirectCallback" );
+        }
+        #else
         if( myChuck != null && myVoidCallback != null )
         {
             myChuck.StopListeningForChuckEvent( myEventName, myVoidCallback );
         }
-        myChuck = null;
         myVoidCallback = null;
+        #endif
+
+        myChuck = null;
         myEventName = "";
     }
 
@@ -64,7 +76,10 @@ public class ChuckEventListener : MonoBehaviour
         }
     }
 
+    #if UNITY_WEBGL
+    #else
     private Chuck.VoidCallback myVoidCallback;
+    #endif
     private Action userCallback;
 
     private int numTimesCalled = 0;
@@ -73,6 +88,11 @@ public class ChuckEventListener : MonoBehaviour
     private void MyCallback()
     {
         numTimesCalled++;
+    }
+
+    private void MyDirectCallback()
+    {
+        userCallback();
     }
 
 

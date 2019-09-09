@@ -22,13 +22,14 @@
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     var audioContext = undefined;
     var chunityAudioListener = undefined;
+    var unityInstance = undefined;
     startButton.addEventListener( "click", async function() {
         startButton.disabled = true;
         await startChuck();
         await theChuckReady;
         chunityAudioListener = audioContext.listener;
         
-        var unityInstance = UnityLoader.instantiate("unityContainer", "%UNITY_WEBGL_BUILD_URL%");    
+        unityInstance = UnityLoader.instantiate("unityContainer", "%UNITY_WEBGL_BUILD_URL%");    
     });
     </script>
   </body>

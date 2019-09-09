@@ -27,11 +27,10 @@ public class ChunityExampleGlobalEventWithHelperComponents : MonoBehaviour
         " );
 
 		// create a ChuckEventListener on this gameObject
-		// ChuckEventListener listener = gameObject.AddComponent<ChuckEventListener>();
+		ChuckEventListener listener = gameObject.AddComponent<ChuckEventListener>();
 
 		// call MyCallback() on the Update() thread after every broadcast from "notifier"
-		// listener.ListenForEvent( myChuck, "notifier", MyCallback );
-		myChuck.StartListeningForChuckEvent( "notifier", MyCallback );
+		listener.ListenForEvent( myChuck, "notifier", MyCallback );
 	}
 
 	void Update()

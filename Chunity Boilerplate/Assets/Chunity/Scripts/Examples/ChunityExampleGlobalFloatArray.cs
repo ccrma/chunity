@@ -72,8 +72,16 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 
 			// test some gets too
 			myChuck.GetFloatArray( "myFloatNotes", myFloatArrayCallback );
+			#if UNITY_WEBGL
+			// WebGL specific float callback signature: game object name, method name
+			myChuck.GetFloatArrayValue( "myFloatNotes", 1, gameObject.name, "GetANumberCallback" );
+			myChuck.GetAssociativeFloatArrayValue( "myFloatNotes", "numPlayed", gameObject.name, "GetANumberCallback" );
+		
+			// NOTE: can do it the below way if the callback is made into a *static* method
+			#else
 			myChuck.GetFloatArrayValue( "myFloatNotes", 1, myFloatCallback );
 			myChuck.GetAssociativeFloatArrayValue( "myFloatNotes", "numPlayed", myFloatCallback );
+			#endif
 			
             // actually play it!
 			myChuck.BroadcastEvent( "playMyNotes" );
@@ -93,7 +101,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-	static void GetANumberCallback( CK_FLOAT value )
+	void GetANumberCallback( CK_FLOAT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );
 	}

@@ -33,7 +33,10 @@ public class ChuckFloatSyncer : MonoBehaviour
         // start up again
         myChuck = chuck;
         myFloatName = floatToSync;
+        #if UNITY_WEBGL
+        #else
         myFloatCallback = MyCallback;
+        #endif
     }
 
 
@@ -86,15 +89,25 @@ public class ChuckFloatSyncer : MonoBehaviour
     // =========== INTERNAL MECHANICS ========== //
 
     ChuckSubInstance myChuck = null;
+    #if UNITY_WEBGL
+    #else
     Chuck.FloatCallback myFloatCallback;
+    #endif
     string myFloatName = "";
 
     private void Update()
     {
+        #if UNITY_WEBGL
+        if( myChuck != null && myFloatName != "" )
+        {
+            myChuck.GetFloat( myFloatName, gameObject.name, "MyCallback" );
+        }
+        #else
         if( myChuck != null && myFloatCallback != null && myFloatName != "" )
         {
             myChuck.GetFloat( myFloatName, myFloatCallback );
         }
+        #endif
     }
 
     private float myFloatValue = 0;

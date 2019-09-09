@@ -439,6 +439,62 @@ public class ChuckMainInstance : MonoBehaviour
 
 
 
+#if UNITY_WEBGL
+    // method calls specific to WebGL
+    public bool GetInt( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.GetInt( myChuckId, variableName, gameObjectWithCallback, callback );
+    }
+
+    public bool GetFloat( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.GetFloat( myChuckId, variableName, gameObjectWithCallback, callback );
+    }
+
+    public bool GetString( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.GetString( myChuckId, variableName, gameObjectWithCallback, callback );
+    }
+
+    public bool ListenForChuckEventOnce( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.ListenForChuckEventOnce( myChuckId, variableName, gameObjectWithCallback, callback );
+    }
+
+    public bool StartListeningForChuckEvent( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.StartListeningForChuckEvent( myChuckId, variableName, gameObjectWithCallback, callback );
+    }
+
+    public bool StopListeningForChuckEvent( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.StopListeningForChuckEvent( myChuckId, variableName, gameObjectWithCallback, callback );
+    }
+
+    public bool GetIntArrayValue( string variableName, uint index, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.GetIntArrayValue( myChuckId, variableName, index, gameObjectWithCallback, callback );
+    }
+
+    public bool GetAssociativeIntArrayValue( string variableName, string key, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.GetAssociativeIntArrayValue( myChuckId, variableName, key, gameObjectWithCallback, callback );
+    }
+
+    public bool GetFloatArrayValue( string variableName, uint index, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.GetFloatArrayValue( myChuckId, variableName, index, gameObjectWithCallback, callback );
+    }
+
+    public bool GetAssociativeFloatArrayValue( string variableName, string key, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.GetAssociativeFloatArrayValue( myChuckId, variableName, key, gameObjectWithCallback, callback );
+    }
+#endif
+
+
+
+
 
     // =========== INTERNAL MECHANICS ========== //
 
