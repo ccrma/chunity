@@ -557,6 +557,20 @@ public class ChuckSubInstance : MonoBehaviour
         float posX, float posY, float posZ,
         float forwardX, float forwardY, float forwardZ 
     );
+    [DllImport( "__Internal" )]
+    private static extern bool muteSubChuckInstance( System.UInt32 subChuckID );
+    [DllImport( "__Internal" )]
+    private static extern bool unMuteSubChuckInstance( System.UInt32 subChuckID );
+
+    void OnDisable()
+    {
+        muteSubChuckInstance( myID );
+    }
+
+    void OnEnable()
+    {
+        unMuteSubChuckInstance( myID );
+    }
     #endif
 
     void Update()

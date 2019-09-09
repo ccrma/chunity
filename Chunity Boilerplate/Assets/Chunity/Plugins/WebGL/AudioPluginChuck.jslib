@@ -78,6 +78,22 @@ mergeInto(LibraryManager.library, {
         //await thisSubChuckReady;
         return subChuckID;
     },
+    muteSubChuckInstance: function( subChuckID )
+    {
+        this.subChucks[ subChuckID ].disconnect();
+    },
+    unMuteSubChuckInstance: function( subChuckID )
+    {
+        this.subChucks[ subChuckID ].disconnect();
+        if( this.subChucks[ subChuckID ].currentlySpatialized )
+        {
+            this.subChucks[ subChuckID ].connect( this.panners[ subChuckID ] );
+        }
+        else
+        {
+            this.subChucks[ subChuckID ].connect( audioContext.destination );
+        }
+    },
     initSpatializer: function( subChuckID, minDistance, maxDistance )
     {
         this.panners[ subChuckID ] = new PannerNode( audioContext,
@@ -183,6 +199,7 @@ mergeInto(LibraryManager.library, {
             this.subChucks[ subChuckID ].disconnect( this.panners[ subChuckID ] );
             this.subChucks[ subChuckID ].connect( audioContext.destination );
         }
+        this.subChucks[ subChuckID ].currentlySpatialized = doSpatialization;
 
         this.panners[ subChuckID ].refDistance = minDistance;
         this.panners[ subChuckID ].maxDistance = maxDistance;
