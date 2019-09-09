@@ -12,22 +12,22 @@ mergeInto(LibraryManager.library, {
     },
     // helper function to turn csharp array pointer and length
     // into JS array
-    cs64FArrayToJSArray: function ( csArray, csArrayLength )
+    cs32FArrayToJSArray: function ( csArray, csArrayLength )
     {
         var result = [];
         for( var i = 0; i < csArrayLength; i++ )
         {
-            result.push( HEAPF64[(csArray >> 3) + i]);
+            result.push( HEAPF32[(csArray >> 2) + i]);
         }
         return result;
     },
 
     // helper function to put jsArray onto heap where csharp pointer is
-    jsArrayToCS64FArray: function( jsArray, csArray )
+    jsArrayToCS32FArray: function( jsArray, csArray )
     {
         for( var i = 0; i < jsArray.length; i++ )
         {
-            HEAPF64[(csArray >> 3) + i] = jsArray[i];
+            HEAPF32[(csArray >> 2) + i] = jsArray[i];
         }
     },
     // helper function to turn csharp array pointer and length
@@ -262,7 +262,7 @@ mergeInto(LibraryManager.library, {
         (function( c ) {
             theChuck.getInt( Pointer_stringify( name ) ).then( function( result )
             {
-                c( result );
+                dynCall( 'vi', c, [result] );
             });
         })(callback); 
     },
@@ -275,7 +275,7 @@ mergeInto(LibraryManager.library, {
         (function( c ) {
             theChuck.getFloat( Pointer_stringify( name ) ).then( function( result )
             {
-                c( result );
+                dynCall( 'vf', c, [result] );
             });
         })(callback); 
     },
@@ -292,7 +292,7 @@ mergeInto(LibraryManager.library, {
                 var buffer = _malloc( bufferSize );
                 stringToUTF8( result, buffer, bufferSize );
                 // send it along!
-                c( buffer );
+                dynCall( 'vf', c, [buffer] );
                 // be nice to memory
                 _free( buffer );
             });
@@ -308,12 +308,22 @@ mergeInto(LibraryManager.library, {
     },
     listenForChuckEventOnce: function( chuckID, name, callback )
     {
-        return theChuck.listenForEventOnce( Pointer_stringify( name ), callback );
+        (function( c ) {
+            theChuck.listenForEventOnce( Pointer_stringify( name ), function() {
+                dynCall( 'v', c, 0 );
+            });
+        })(callback);
+        return true;
     },
     startListeningForChuckEvent: function( chuckID, name, callback )
     {
-        var callbackID = theChuck.startListeningForEvent( Pointer_stringify( name ), callback );
-        this.stopIDs[ callback ] = callbackID;
+        (function( c ) {
+            var callbackID = theChuck.startListeningForEvent( Pointer_stringify( name ), function() {
+                dynCall( 'v', c, 0 );
+            });
+            this.stopIDs[ c ] = callbackID;
+        })(callback);
+        
         return true;
     },
     stopListeningForChuckEvent: function( chuckID, name, callback )
@@ -334,10 +344,10 @@ mergeInto(LibraryManager.library, {
         (function( c ) {
             theChuck.getIntArray( Pointer_stringify( name ) ).then( function( result ) {
                 // need to malloc space for the array on the heap
-                // assuming 64 bit ints, since that's what unity thinks is an int size!
-                var buffer = _malloc( 8 * result.length );
+                // assuming 32 bit ints, since that's what unity thinks is an int size!
+                var buffer = _malloc( 4 * result.length );
                 _jsArrayToCS32Array( result, buffer );
-                c( buffer, result.length );
+                dynCall( 'vii', c, [buffer, result.length] );
                 _free( buffer );
             });
         })(callback);
@@ -350,7 +360,7 @@ mergeInto(LibraryManager.library, {
     {
         (function( c ) {
             theChuck.getIntArrayValue( Pointer_stringify( name ), index ).then( function( result ) {
-                c( result );
+                dynCall( 'vi', c, [result] );
             });
         })(callback);
     },
@@ -362,27 +372,27 @@ mergeInto(LibraryManager.library, {
     {
         (function( c ) {
             theChuck.getAssociativeIntArrayValue( Pointer_stringify( name ), Pointer_stringify( key ) ).then( function( result ) {
-                c( result );
+                dynCall( 'vi', c, [result] );
             });
         })(callback);
     },
 
-    // note: array is t_CKFLOAT == Float64 since that's what Unity thinks CKFLOAT is
-    setGlobalFloatArray__deps: ['cs64ArrayToJSArray'],
+    // note: array is t_CKFLOAT == Float32 since that's what Unity thinks CKFLOAT is
+    setGlobalFloatArray__deps: ['cs32ArrayToJSArray'],
     setGlobalFloatArray: function( chuckID, name, arrayValues, numValues )
     {
-        return theChuck.setFloatArray( Pointer_stringify( name ), _cs64ArrayToJSArray( arrayValues, numValues ) );
+        return theChuck.setFloatArray( Pointer_stringify( name ), _cs32ArrayToJSArray( arrayValues, numValues ) );
     },
-    getGlobalFloatArray__deps: ['jsArrayToCS64Array'],
+    getGlobalFloatArray__deps: ['jsArrayToCS32Array'],
     getGlobalFloatArray: function( chuckID, name, callback )
     {
         (function( c ) {
             theChuck.getFloatArray( Pointer_stringify( name ) ).then( function( result ) {
                 // need to malloc space for the array on the heap
-                // assuming 64 bit floats, since that's what unity thinks is a float size!
-                var buffer = _malloc( 8 * result.length );
-                _jsArrayToCS64Array( result, buffer );
-                c( buffer, result.length );
+                // assuming 32 bit floats, since that's what unity thinks is a float size!
+                var buffer = _malloc( 4 * result.length );
+                _jsArrayToCS32Array( result, buffer );
+                dynCall( 'vii', c, [buffer, result.length] );
                 _free( buffer );
             });
         })(callback);
@@ -395,7 +405,7 @@ mergeInto(LibraryManager.library, {
     {
         (function( c ) {
             theChuck.getFloatArrayValue( Pointer_stringify( name ), index ).then( function( result ) {
-                c( result );
+                dynCall( 'vf', c, [result] );
             });
         })(callback);
     },
@@ -407,7 +417,7 @@ mergeInto(LibraryManager.library, {
     {
         (function( c ) {
             theChuck.getAssociativeFloatArrayValue( Pointer_stringify( name ), Pointer_stringify( key ) ).then( function( result ) {
-                c( result );
+                dynCall( 'vf', c, [result] );
             });
         })(callback);
     }

@@ -33,7 +33,7 @@ public class ChuckFloatSyncer : MonoBehaviour
         // start up again
         myChuck = chuck;
         myFloatName = floatToSync;
-        myFloatCallback = Chuck.CreateGetFloatCallback( MyCallback );
+        myFloatCallback = MyCallback;
     }
 
 

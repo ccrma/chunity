@@ -28,16 +28,16 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 	Chuck.FloatCallback myGetPosCallback;
 	Chuck.VoidCallback myTimeStepCallback;
 
-	int notifyCount;
+	static int notifyCount;
 
-	float myPos;
+	static float myPos;
 
 	// Use this for initialization
 	void Start()
 	{
 		myChuck = GetComponent<ChuckSubInstance>();
-		myGetPosCallback = Chuck.CreateGetFloatCallback( GetPosCallback );
-		myTimeStepCallback = Chuck.CreateVoidCallback( BeNotified1 );
+		myGetPosCallback = GetPosCallback;
+		myTimeStepCallback = BeNotified1;
 
 		myPos = 0;
 
@@ -97,13 +97,13 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-	void GetPosCallback( CK_FLOAT pos )
+	static void GetPosCallback( CK_FLOAT pos )
 	{
 		myPos = (float) pos;
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
-	void BeNotified1()
+	static void BeNotified1()
 	{
 		Debug.Log( "I was notified~~" );
 		notifyCount++;

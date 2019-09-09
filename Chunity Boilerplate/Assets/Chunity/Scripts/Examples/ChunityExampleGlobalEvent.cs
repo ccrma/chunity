@@ -15,14 +15,14 @@ public class ChunityExampleGlobalEvent : MonoBehaviour
 
 	public MeshRenderer myBox;
 
-	private int numTimesCallbackCalled = 0;
+	static private int numTimesCallbackCalled = 0;
 
 	void Start()
 	{
 		// get reference to chuck instance
 		myChuck = GetComponent<ChuckSubInstance>();
 		// create the callback we will pass
-		myCallback = Chuck.CreateVoidCallback( CallbackFunction );
+		myCallback = CallbackFunction;
 
 		// run code: make a global event, and every 250 ms, broadcast it to all listeners
 		myChuck.RunCode( @"
@@ -39,7 +39,7 @@ public class ChunityExampleGlobalEvent : MonoBehaviour
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
-	void CallbackFunction()
+	static void CallbackFunction()
 	{
 		// store a message that the callback function was called
 		// (we can't do Unity-specific things in here, since ChucK will be calling this, not Unity)

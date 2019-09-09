@@ -11,6 +11,8 @@ public class ChunityExampleTimeAdvancerWithHelperComponents : MonoBehaviour
 	// - ChucK also provides a float to Unity of 
 	//   how far along the timestep it is.
 	// This example uses Chunity helper components.
+	// NOTE: since this example uses Chunity helper 
+	// components, it will not work on WebGL builds.
 
 	ChuckSubInstance myChuck;
 	ChuckFloatSyncer myAdvancerSyncer;

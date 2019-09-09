@@ -22,7 +22,7 @@ public class ChuckEventListener : MonoBehaviour
         StopListening();
 
         // start up again
-        myVoidCallback = Chuck.CreateVoidCallback( MyCallback );
+        myVoidCallback = MyCallback;
         userCallback = callback;
         myChuck = chuck;
         myEventName = eventToListenFor;

@@ -47,8 +47,8 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 			}
 		" );
 
-		myIntArrayCallback = myChuck.CreateGetIntArrayCallback( GetInitialArrayCallback );
-		myIntCallback = myChuck.CreateGetIntCallback( GetANumberCallback );
+		myIntArrayCallback = GetInitialArrayCallback;
+		myIntCallback = GetANumberCallback;
 	}
 
 	// Update is called once per frame
@@ -81,7 +81,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntArrayCallback))]
-	void GetInitialArrayCallback( CK_INT[] values, CK_UINT numValues )
+	static void GetInitialArrayCallback( CK_INT[] values, CK_UINT numValues )
 	{
 		Debug.Log( "Array has " + numValues.ToString() + " numbers which are: " );
 		for( int i = 0; i < values.Length; i++ )
@@ -91,7 +91,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntCallback))]
-	void GetANumberCallback( CK_INT value )
+	static void GetANumberCallback( CK_INT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );
 	}

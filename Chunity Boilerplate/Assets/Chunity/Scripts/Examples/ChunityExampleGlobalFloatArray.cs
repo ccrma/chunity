@@ -48,8 +48,8 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 			}
 		" );
 
-		myFloatArrayCallback = myChuck.CreateGetFloatArrayCallback( GetInitialArrayCallback );
-		myFloatCallback = myChuck.CreateGetFloatCallback( GetANumberCallback );
+		myFloatArrayCallback = GetInitialArrayCallback;
+		myFloatCallback = GetANumberCallback;
 	}
 
 	// Update is called once per frame
@@ -83,7 +83,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallback))]
-	void GetInitialArrayCallback( CK_FLOAT[] values, CK_UINT numValues )
+	static void GetInitialArrayCallback( CK_FLOAT[] values, CK_UINT numValues )
 	{
 		Debug.Log( "Array has " + numValues.ToString() + " numbers which are: " );
 		for( int i = 0; i < values.Length; i++ )
@@ -93,7 +93,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 	}
 
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-	void GetANumberCallback( CK_FLOAT value )
+	static void GetANumberCallback( CK_FLOAT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );
 	}

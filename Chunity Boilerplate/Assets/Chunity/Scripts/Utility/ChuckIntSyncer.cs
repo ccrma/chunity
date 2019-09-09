@@ -33,7 +33,7 @@ public class ChuckIntSyncer : MonoBehaviour
         // start up again
         myChuck = chuck;
         myIntName = intToSync;
-        myIntCallback = Chuck.CreateGetIntCallback( MyCallback );
+        myIntCallback = MyCallback;
     }
 
 
