@@ -39,6 +39,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 				myOsc => dac;
 				for( 0 => int i; i < myNotes.size(); i++ )
 				{
+					<<< ""myNotes["", i, ""] ="", myNotes[i] >>>;
 					myNotes[i] => Math.mtof => myOsc.freq;
 					100::ms => now;
 				}
@@ -92,7 +93,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntArrayCallback))]
 	static void GetInitialArrayCallback( CK_INT[] values, CK_UINT numValues )
 	{
-		Debug.Log( "Array has " + numValues.ToString() + " numbers which are: " );
+		Debug.Log( "Int array has " + numValues.ToString() + " numbers which are: " );
 		for( int i = 0; i < values.Length; i++ )
 		{
 			Debug.Log( "        " + values[i].ToString() );

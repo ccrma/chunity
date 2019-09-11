@@ -410,6 +410,7 @@ mergeInto(LibraryManager.library, {
     {
         (function( c ) {
             theChuck.getIntArray( Pointer_stringify( name ) ).then( function( result ) {
+                console.log( "JS thinks the GET int array is ", result );
                 // need to malloc space for the array on the heap
                 // assuming 32 bit ints, since that's what unity thinks is an int size!
                 var buffer = _malloc( 4 * result.length );
@@ -461,20 +462,21 @@ mergeInto(LibraryManager.library, {
     },
 
     // note: array is t_CKFLOAT == Float32 since that's what Unity thinks CKFLOAT is
-    setGlobalFloatArray__deps: ['cs32ArrayToJSArray'],
+    setGlobalFloatArray__deps: ['cs32FArrayToJSArray'],
     setGlobalFloatArray: function( chuckID, name, arrayValues, numValues )
     {
-        return theChuck.setFloatArray( Pointer_stringify( name ), _cs32ArrayToJSArray( arrayValues, numValues ) );
+        return theChuck.setFloatArray( Pointer_stringify( name ), _cs32FArrayToJSArray( arrayValues, numValues ) );
     },
-    getGlobalFloatArray__deps: ['jsArrayToCS32Array'],
+    getGlobalFloatArray__deps: ['jsArrayToCS32FArray'],
     getGlobalFloatArray: function( chuckID, name, callback )
     {
         (function( c ) {
             theChuck.getFloatArray( Pointer_stringify( name ) ).then( function( result ) {
+                console.log( "JS thinks the GET float array is ", result );
                 // need to malloc space for the array on the heap
                 // assuming 32 bit floats, since that's what unity thinks is a float size!
                 var buffer = _malloc( 4 * result.length );
-                _jsArrayToCS32Array( result, buffer );
+                _jsArrayToCS32FArray( result, buffer );
                 dynCall( 'vii', c, [buffer, result.length] );
                 _free( buffer );
             });
