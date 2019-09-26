@@ -5,12 +5,11 @@ using UnityEngine;
 #if UNITY_WEBGL
 using CK_INT = System.Int32;
 using CK_UINT = System.UInt32;
-using CK_FLOAT = System.Single;
 #else
 using CK_INT = System.Int64;
 using CK_UINT = System.UInt64;
-using CK_FLOAT = System.Double;
 #endif
+using CK_FLOAT = System.Double;
 
 public class ChunityExampleGlobalIntArray : MonoBehaviour
 {

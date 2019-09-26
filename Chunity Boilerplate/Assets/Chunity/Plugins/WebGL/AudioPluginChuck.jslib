@@ -12,23 +12,20 @@ mergeInto(LibraryManager.library, {
     },
     // helper function to turn csharp array pointer and length
     // into JS array
-    cs32FArrayToJSArray: function ( csArray, csArrayLength )
+    cs64FArrayToJSArray: function ( csArray, csArrayLength )
     {
         var result = [];
         for( var i = 0; i < csArrayLength; i++ )
         {
-            result.push( HEAPF32[(csArray >> 2) + i]);
+            result.push( HEAPF64[(csArray >> 3) + i]);
         }
         return result;
     },
 
     // helper function to put jsArray onto heap where csharp pointer is
-    jsArrayToCS32FArray: function( jsArray, csArray )
+    jsArrayToCS64FArray: function( jsArray, csArray )
     {
-        for( var i = 0; i < jsArray.length; i++ )
-        {
-            HEAPF32[(csArray >> 2) + i] = jsArray[i];
-        }
+        HEAPF64.set( jsArray, csArray >> 3 );
     },
     // helper function to turn csharp array pointer and length
     // into JS array
@@ -45,10 +42,12 @@ mergeInto(LibraryManager.library, {
     // helper function to put jsArray onto heap where csharp pointer is
     jsArrayToCS32Array: function( jsArray, csArray )
     {
-        for( var i = 0; i < jsArray.length; i++ )
-        {
-            HEAP32[(csArray >> 2) + i] = jsArray[i];
-        }
+        // appears to be not working correctly
+        // e.g. [a,b,c,d,e,f,g,h] becomes [a,c,e,g,junk,junk,junk,junk]
+        HEAP32.set( jsArray, csArray >> 2 );
+        // both of these result in complete garbage
+        // HEAPU8.set( jsArray, csArray );
+        // HEAPU8.set( jsArray.buffer, csArray );
     },
     initChuckInstance: function( chuckID, sampleRate )
     {
@@ -461,22 +460,21 @@ mergeInto(LibraryManager.library, {
         })( Pointer_stringify( gameObject ), Pointer_stringify( method ) );
     },
 
-    // note: array is t_CKFLOAT == Float32 since that's what Unity thinks CKFLOAT is
-    setGlobalFloatArray__deps: ['cs32FArrayToJSArray'],
+    // note: array is t_CKFLOAT == Float64 since that's what Unity thinks CKFLOAT is
+    setGlobalFloatArray__deps: ['cs64FArrayToJSArray'],
     setGlobalFloatArray: function( chuckID, name, arrayValues, numValues )
     {
-        return theChuck.setFloatArray( Pointer_stringify( name ), _cs32FArrayToJSArray( arrayValues, numValues ) );
+        return theChuck.setFloatArray( Pointer_stringify( name ), _cs64FArrayToJSArray( arrayValues, numValues ) );
     },
-    getGlobalFloatArray__deps: ['jsArrayToCS32FArray'],
+    getGlobalFloatArray__deps: ['jsArrayToCS64FArray'],
     getGlobalFloatArray: function( chuckID, name, callback )
     {
         (function( c ) {
             theChuck.getFloatArray( Pointer_stringify( name ) ).then( function( result ) {
-                console.log( "JS thinks the GET float array is ", result );
                 // need to malloc space for the array on the heap
-                // assuming 32 bit floats, since that's what unity thinks is a float size!
-                var buffer = _malloc( 4 * result.length );
-                _jsArrayToCS32FArray( result, buffer );
+                // assuming 64 bit floats, since that's what unity thinks is a float size!
+                var buffer = _malloc( 8 * result.length );
+                _jsArrayToCS64FArray( result, buffer );
                 dynCall( 'vii', c, [buffer, result.length] );
                 _free( buffer );
             });

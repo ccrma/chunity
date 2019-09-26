@@ -5,12 +5,11 @@ using UnityEngine;
 #if UNITY_WEBGL
 using CK_INT = System.Int32;
 using CK_UINT = System.UInt32;
-using CK_FLOAT = System.Single;
 #else
 using CK_INT = System.Int64;
 using CK_UINT = System.UInt64;
-using CK_FLOAT = System.Double;
 #endif
+using CK_FLOAT = System.Double;
 
 public class ChunityExampleTimeAdvancer : MonoBehaviour
 {
@@ -127,7 +126,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	void BeNotified1()
 	{
-		Debug.Log( "I was notified~~" );
+		transform.Rotate( new Vector3( 15, 30, 45 ) );
 		notifyCount++;
 	}
 }
