@@ -117,13 +117,13 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		}
 	}
 
-	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
+	//[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
 	void GetPosCallback( CK_FLOAT pos )
 	{
 		myPos = (float) pos;
 	}
 
-	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
+	//[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	void BeNotified1()
 	{
 		transform.Rotate( new Vector3( 15, 30, 45 ) );
