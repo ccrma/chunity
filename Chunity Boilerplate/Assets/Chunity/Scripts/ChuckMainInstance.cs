@@ -17,6 +17,17 @@ public class ChuckMainInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: useMicrophone
+    // desc: If false, ChucK will not set up the microphone
+    //       for the adc variable.
+    // ----------------------------------------------------
+    [Tooltip( "Whether ChucK should attempt to search for and set up a microphone." )]
+    public bool useMicrophone = true;
+    
+    
+    
+    
+    // ----------------------------------------------------
     // name: microphoneIdentifier
     // desc: ChucK will search all your mic devices
     //       for one containing this substring.
@@ -35,7 +46,7 @@ public class ChuckMainInstance : MonoBehaviour
     //       If left false, will be delete as usual.
     // ----------------------------------------------------
     [Tooltip( "Whether to keep this ChuckMainInstance when the next scene loads." )]
-    public bool persistToNextScene = false;
+    private bool persistToNextScene = false;
 
 
 
@@ -49,7 +60,7 @@ public class ChuckMainInstance : MonoBehaviour
     //       in the next scene.
     // ----------------------------------------------------
     [Tooltip( "If this ChuckMainInstance is kept when the next scene loads, this controls whether its VM is cleared (reset)." )]
-    public bool clearChuckOnSceneLoad = false;
+    private bool clearChuckOnSceneLoad = false;
 
 
 
@@ -489,7 +500,10 @@ public class ChuckMainInstance : MonoBehaviour
         mySource.outputAudioMixerGroup = Chuck.FindAudioMixerGroup( "ChuckMainInstanceDestination" );
 
         // setup mic
-        SetupMic();
+        if( useMicrophone )
+        {
+            SetupMic();
+        }
 
         // has init
         hasInit = true;
