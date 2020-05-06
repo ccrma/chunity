@@ -1,7 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 LOCAL_MODULE := AudioPluginChuck
-LOCAL_SRC_FILES := ../../AudioPluginUtil.cpp \
-../../Plugin_ChucK.cpp \
+#../../AudioPluginUtil.cpp
+LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/chuck.cpp \
 ../../chuck/src/core/chuck_absyn.cpp \
 ../../chuck/src/core/chuck_parse.cpp \
@@ -20,18 +20,13 @@ LOCAL_SRC_FILES := ../../AudioPluginUtil.cpp \
 ../../chuck/src/core/chuck_oo.cpp \
 ../../chuck/src/core/chuck_lang.cpp \
 ../../chuck/src/core/chuck_ugen.cpp \
-../../chuck/src/core/chuck_otf.cpp \
 ../../chuck/src/core/chuck_stats.cpp \
 ../../chuck/src/core/chuck_shell.cpp \
-../../chuck/src/core/chuck_io.cpp \
 ../../chuck/src/core/chuck_carrier.cpp \
 ../../chuck/src/core/hidio_sdl.cpp \
-../../chuck/src/core/midiio_rtmidi.cpp \
-../../chuck/src/core/rtmidi.cpp \
 ../../chuck/src/core/ugen_osc.cpp \
 ../../chuck/src/core/ugen_filter.cpp \
 ../../chuck/src/core/ugen_stk.cpp \
-../../chuck/src/core/ugen_xxx.cpp \
 ../../chuck/src/core/ulib_machine.cpp \
 ../../chuck/src/core/ulib_math.cpp \
 ../../chuck/src/core/ulib_std.cpp \
@@ -62,14 +57,17 @@ LOCAL_SRC_FILES := ../../AudioPluginUtil.cpp \
 ../../chuck/src/core/lo/send.c \
 ../../chuck/src/core/lo/server.c \
 ../../chuck/src/core/lo/server_thread.c \
-../../chuck/src/core/lo/timetag.c
+../../chuck/src/core/lo/timetag.c \
+../../chuck/src/core/ugen_xxx.cpp
 
+
+LOCAL_CPP_FEATURES := rtti exceptions
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../ $(LOCAL_PATH)/../../chuck/src/core $(LOCAL_PATH)/../../chuck/src/core/lo
 
-LOCAL_CFLAGS += -D__PLATFORM_LINUX__ -D__CK_SNDFILE_NATIVE__ -fPIC -fno-strict-aliasing 
+LOCAL_CFLAGS += -D__PLATFORM_LINUX__ -D__ANDROID__ -D__CK_SNDFILE_NATIVE__ -D__DISABLE_OTF_SERVER__ -D__DISABLE_FILEIO__ -D__DISABLE_MIDI__ -DHAVE_CONFIG_H -fPIC -fno-strict-aliasing 
 
-#TODO: -lsndfile ? -lasound ?
+#TODO: -lsndfile for SndBuf ? -lasound for MIDI (currently disabled)?
 LOCAL_LDLIBS := -lstdc++ -ldl -lm 
 
 LOCAL_LDFLAGS += -shared -rdynamic -fPIC
