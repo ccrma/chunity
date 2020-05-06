@@ -65,7 +65,7 @@ LOCAL_CPP_FEATURES := rtti exceptions
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../ $(LOCAL_PATH)/../../chuck/src/core $(LOCAL_PATH)/../../chuck/src/core/lo
 
-LOCAL_CFLAGS += -D__PLATFORM_LINUX__ -D__ANDROID__ -D__CK_SNDFILE_NATIVE__ -D__DISABLE_OTF_SERVER__ -D__DISABLE_FILEIO__ -D__DISABLE_MIDI__ -DHAVE_CONFIG_H -fPIC -fno-strict-aliasing 
+LOCAL_CFLAGS += -D__PLATFORM_LINUX__ -D__ANDROID__ -D__DISABLE_OTF_SERVER__ -D__DISABLE_FILEIO__ -D__DISABLE_MIDI__ -DHAVE_CONFIG_H -fPIC -fno-strict-aliasing 
 
 #TODO: -lsndfile for SndBuf ? -lasound for MIDI (currently disabled)?
 LOCAL_LDLIBS := -lstdc++ -ldl -lm 
