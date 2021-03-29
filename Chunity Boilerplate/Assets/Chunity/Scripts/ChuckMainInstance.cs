@@ -25,6 +25,17 @@ public class ChuckMainInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: useMicrophone
+    // desc: If false, ChucK will not set up the microphone
+    //       for the adc variable.
+    // ----------------------------------------------------
+    [Tooltip( "Whether ChucK should attempt to search for and set up a microphone." )]
+    public bool useMicrophone = true;
+    
+    
+    
+    
+    // ----------------------------------------------------
     // name: microphoneIdentifier
     // desc: ChucK will search all your mic devices
     //       for one containing this substring.
@@ -32,6 +43,32 @@ public class ChuckMainInstance : MonoBehaviour
     // ----------------------------------------------------
     [Tooltip( "A substring to search for in your microphone devices list." )]
     public string microphoneIdentifier = "";
+
+
+
+
+    // ----------------------------------------------------
+    // name: persistToNextScene
+    // desc: this ChucK will not be deleted upon a 
+    //       scene load if this bool is true.
+    //       If left false, will be delete as usual.
+    // ----------------------------------------------------
+    [Tooltip( "Whether to keep this ChuckMainInstance when the next scene loads." )]
+    private bool persistToNextScene = false;
+
+
+
+
+    // ----------------------------------------------------
+    // name: clearChuckOnSceneLoad
+    // desc: if this ChucK is not fully deleted on a 
+    //       scene load, and this bool is true, then
+    //       its VM will be cleared / reset.
+    //       Otherwise, the VM will continue running
+    //       in the next scene.
+    // ----------------------------------------------------
+    [Tooltip( "If this ChuckMainInstance is kept when the next scene loads, this controls whether its VM is cleared (reset)." )]
+    private bool clearChuckOnSceneLoad = false;
 
 
 
@@ -527,7 +564,10 @@ public class ChuckMainInstance : MonoBehaviour
         mySource.outputAudioMixerGroup = Chuck.FindAudioMixerGroup( "ChuckMainInstanceDestination" );
 
         // setup mic
-        SetupMic();
+        if( useMicrophone )
+        {
+            SetupMic();
+        }
 
         #if UNITY_WEBGL
         // setup listener
