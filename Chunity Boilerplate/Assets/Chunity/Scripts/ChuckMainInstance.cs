@@ -511,6 +511,8 @@ public class ChuckMainInstance : MonoBehaviour
 
     private bool hasInit = false;
 
+    public bool enableMic = true;
+
 
     void Awake()
     {
@@ -527,7 +529,10 @@ public class ChuckMainInstance : MonoBehaviour
         mySource.outputAudioMixerGroup = Chuck.FindAudioMixerGroup( "ChuckMainInstanceDestination" );
 
         // setup mic
-        SetupMic();
+        if( enableMic )
+        {
+            SetupMic();
+        }
 
         #if UNITY_WEBGL
         // setup listener
