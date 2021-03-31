@@ -5,11 +5,17 @@
 #include "IUnityGraphics.h"
 
 #include "chuck.h"
+#ifdef __EMSCRIPTEN__
 #include "emscripten.h"
+#else
+// nop
+#define EMSCRIPTEN_KEEPALIVE
+#endif
 
 extern "C" {
 
 namespace ChucK_For_Unity {
+
     bool EMSCRIPTEN_KEEPALIVE runChuckCode( unsigned int chuckID, const char * code );
     UNITY_INTERFACE_EXPORT bool runChuckCodeWithReplacementDac( unsigned int chuckID, const char * code, const char * replacement_dac );
     UNITY_INTERFACE_EXPORT bool runChuckFile( unsigned int chuckID, const char * filename );
