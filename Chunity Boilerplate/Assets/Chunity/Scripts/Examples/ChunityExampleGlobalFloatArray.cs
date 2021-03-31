@@ -55,8 +55,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 	private int numPresses = 0;
 	void Update()
 	{
-
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			// on first press, set entire array
 			if( numPresses == 0 )
@@ -89,7 +88,9 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
+	#if UNITY_IOS
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallback))]
+	#endif
 	static void GetInitialArrayCallback( CK_FLOAT[] values, CK_UINT numValues )
 	{
 		Debug.Log( "Float array has " + numValues.ToString() + " numbers which are: " );
@@ -99,8 +100,10 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
+	#if UNITY_IOS
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-	void GetANumberCallback( CK_FLOAT value )
+	#endif
+	static void GetANumberCallback( CK_FLOAT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );
 	}

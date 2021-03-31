@@ -35,13 +35,12 @@ public class ChunityExampleGlobalEventWithHelperComponents : MonoBehaviour
 
 	void Update()
 	{
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			gameObject.GetComponent<ChuckEventListener>().StopListening();
 		}
 	}
 
-	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	void MyCallback()
 	{
 		// react to event (in this case, rotate my object)

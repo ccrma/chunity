@@ -80,7 +80,6 @@ public class ChunityExampleTimeAdvancerWithHelperComponents : MonoBehaviour
 		transform.position = new Vector3( myPos % 4, 0, 0 );
 	}
 
-	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	void RotateMyCube()
 	{
 		myCube.Rotate( new Vector3( 5, 10, 15 ) );

@@ -18,7 +18,7 @@ public class ChunityExampleRunCode : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			// rotate my cube's transform
 			transform.Rotate( new Vector3( 0, 15, 5 ) );

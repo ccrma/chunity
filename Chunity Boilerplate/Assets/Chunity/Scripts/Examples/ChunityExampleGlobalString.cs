@@ -38,7 +38,7 @@ public class ChunityExampleGlobalString : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			if( !haveSetOnce )
 			{
@@ -49,5 +49,4 @@ public class ChunityExampleGlobalString : MonoBehaviour
 			Debug.Log( "Hey, the synced string is " + mySyncer.GetCurrentValue() );
 		}
 	}
-
 }
