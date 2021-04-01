@@ -101,7 +101,6 @@ public class ChuckStringSyncer : MonoBehaviour
     }
 
     private string myStringValue = "";
-    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
     private void MyCallback( string newValue )
     {
         myStringValue = newValue;

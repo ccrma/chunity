@@ -110,7 +110,6 @@ public class ChuckFloatSyncer : MonoBehaviour
     }
 
     private float myFloatValue = 0;
-    [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
     private void MyCallback( CK_FLOAT newValue )
     {
         myFloatValue = (float) newValue;
