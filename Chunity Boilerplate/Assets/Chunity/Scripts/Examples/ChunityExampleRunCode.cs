@@ -26,7 +26,8 @@ public class ChunityExampleRunCode : MonoBehaviour
 			// play a chuck script
 			myChuck.RunCode( @"
 				SndBuf buffy => dac;
-				""special:dope"" => buffy.read;
+				//""special:dope"" => buffy.read;
+				me.dir() + ""impact.wav"" => buffy.read;
 				buffy.length() => now;		
 	
 			" );
