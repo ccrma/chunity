@@ -131,8 +131,10 @@ public class ChuckEventListener : MonoBehaviour
     private void ReturnCallback()
     {
         #if UNITY_IOS && !UNITY_EDITOR
-        activeCallbacks.Remove( myCallbackNumber );
-        availableIndices.Add( myCallbackNumber );
+        if( activeCallbacks.Remove( myCallbackNumber ) )
+        {
+            availableIndices.Add( myCallbackNumber );
+        }
         myCallbackNumber = -1;
         #endif
         // always set my callback to null
