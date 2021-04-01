@@ -89,7 +89,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 	void Update()
 	{
 		// compute time step
-		#if UNITY_IOS
+		#if UNITY_IOS && !UNITY_EDITOR
 		float newTimeStep = 1f;
 		if( Input.touchCount > 0 )
 		{
@@ -134,7 +134,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		}
 	}
 
-	#if UNITY_IOS
+	#if UNITY_IOS && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
 	#endif
 	static void GetPosCallback( CK_FLOAT pos )
@@ -142,7 +142,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		myPos = (float) pos;
 	}
 
-	#if UNITY_IOS
+	#if UNITY_IOS && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	#endif
 	static void BeNotified1()

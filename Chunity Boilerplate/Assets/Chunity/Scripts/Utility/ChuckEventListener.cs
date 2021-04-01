@@ -68,7 +68,7 @@ public class ChuckEventListener : MonoBehaviour
     ChuckSubInstance myChuck = null;
     string myEventName = "";
 
-    #if UNITY_IOS
+    #if UNITY_IOS && !UNITY_EDITOR
     // This version of the class can only be used with a 
     // fixed number of this component, but its callbacks
     // are static, which means it can be used on iOS.
@@ -81,7 +81,7 @@ public class ChuckEventListener : MonoBehaviour
 
     private void Awake()
     {
-        #if UNITY_IOS
+        #if UNITY_IOS && !UNITY_EDITOR
         if( availableIndices == null )
         {
             availableIndices = new HashSet<int>();
@@ -106,14 +106,13 @@ public class ChuckEventListener : MonoBehaviour
         }
     }
 
-    #if UNITY_WEBGL
-    #else
+    #if !UNITY_WEBGL
 
     private Chuck.VoidCallback myVoidCallback;
 
     private void AllocateCallback()
     {
-        #if UNITY_IOS
+        #if UNITY_IOS && !UNITY_EDITOR
         // iOS allocation
         if( availableIndices.Count == 0 )
         {
@@ -131,7 +130,7 @@ public class ChuckEventListener : MonoBehaviour
 
     private void ReturnCallback()
     {
-        #if UNITY_IOS
+        #if UNITY_IOS && !UNITY_EDITOR
         activeCallbacks.Remove( myCallbackNumber );
         availableIndices.Add( myCallbackNumber );
         myCallbackNumber = -1;
@@ -140,7 +139,7 @@ public class ChuckEventListener : MonoBehaviour
         myVoidCallback = null;
     }
 
-    #endif // not UNITY_WEBGL
+    #endif // !UNITY_WEBGL
 
     private Action userCallback;
 
@@ -163,7 +162,7 @@ public class ChuckEventListener : MonoBehaviour
     }
 
 
-    #if UNITY_IOS
+    #if UNITY_IOS && !UNITY_EDITOR
     private static Chuck.VoidCallback GetMyCallback( int myNumber )
     {
         switch( myNumber )
@@ -253,5 +252,5 @@ public class ChuckEventListener : MonoBehaviour
             activeCallbacks[7].numTimesCalled++;
         }
     }
-    #endif //UNITY_IOS
+    #endif //UNITY_IOS && !UNITY_EDITOR
 }
