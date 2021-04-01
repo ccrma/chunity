@@ -42,7 +42,8 @@ public class ChunityExampleGlobalString : MonoBehaviour
 		{
 			if( !haveSetOnce )
 			{
-				mySyncer.SetNewValue( "impact.wav" );
+				// mySyncer.SetNewValue( "special:dope" );
+				mySyncer.SetNewValue( Application.streamingAssetsPath + '/' + "impact.wav" );
 				haveSetOnce = true;
 			}
 			myChuck.BroadcastEvent( "playTheFile" );

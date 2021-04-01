@@ -130,7 +130,7 @@ public class ChuckFloatSyncer : MonoBehaviour
         // iOS allocation
         if( availableIndices.Count == 0 )
         {
-            throw new Exception( "Ran out of callbacks in ChuckEventListener" );
+            throw new Exception( "Ran out of callbacks in ChuckFloatSyncer" );
         }
         myCallbackNumber = availableIndices.First();
         availableIndices.Remove( myCallbackNumber );
