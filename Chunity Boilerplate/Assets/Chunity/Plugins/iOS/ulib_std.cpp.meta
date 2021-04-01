@@ -32,13 +32,15 @@ PluginImporter:
     second:
       enabled: 0
       settings:
+        CPU: AnyCPU
         DefaultValueInitialized: true
+        OS: AnyOS
   - first:
       Standalone: Linux64
     second:
       enabled: 0
       settings:
-        CPU: x86
+        CPU: None
   - first:
       Standalone: OSXUniversal
     second:
@@ -61,7 +63,11 @@ PluginImporter:
       iPhone: iOS
     second:
       enabled: 1
-      settings: {}
+      settings:
+        AddToEmbeddedBinaries: false
+        CPU: AnyCPU
+        CompileFlags: -frtti -D__MACOSX_CORE__ -D__CHIP_MODE__ -D__UNITY_FLAT__
+        FrameworkDependencies: 
   userData: 
   assetBundleName: 
   assetBundleVariant: 
