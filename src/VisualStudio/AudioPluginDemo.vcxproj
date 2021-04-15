@@ -22,30 +22,30 @@
     <ProjectGuid>{F7CFEF5A-54BD-42E8-A59E-54ABAEB4EA9C}</ProjectGuid>
     <RootNamespace>AudioPluginDemo</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>NotSet</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -105,7 +105,7 @@
     </Link>
     <PostBuildEvent>
       <Command>mkdir ..\..\Assets\Plugins\x86
-copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
+copy "$(TargetPath)" ..\..\Assets\Plugins\x86\$(TargetName).dll
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -132,7 +132,7 @@ copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
     </Link>
     <PostBuildEvent>
       <Command>mkdir ..\..\Assets\Plugins\x86_64
-copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
+copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -163,7 +163,7 @@ copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     </Link>
     <PostBuildEvent>
       <Command>mkdir ..\..\Assets\Plugins\x86
-copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
+copy "$(TargetPath)" ..\..\Assets\Plugins\x86\$(TargetName).dll
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -197,7 +197,7 @@ copy $(TargetPath) ..\..\Assets\Plugins\x86\$(TargetName).dll
     </Link>
     <PostBuildEvent>
       <Command>mkdir ..\..\Assets\Plugins\x86_64
-copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
+copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -476,6 +476,7 @@ copy /y $(TargetPath) ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClInclude Include="..\IUnityGraphics.h" />
     <ClInclude Include="..\IUnityInterface.h" />
     <ClInclude Include="..\PluginList.h" />
+    <ClInclude Include="..\Plugin_ChucK.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
