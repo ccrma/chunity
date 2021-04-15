@@ -25,37 +25,49 @@ namespace ChucK_For_Unity {
     
     UNITY_INTERFACE_EXPORT bool setChuckInt( unsigned int chuckID, const char * name, t_CKINT val );
     UNITY_INTERFACE_EXPORT bool getChuckInt( unsigned int chuckID, const char * name, void (* callback)(t_CKINT) );
+    UNITY_INTERFACE_EXPORT bool getNamedChuckInt( unsigned int chuckID, const char * name, void (* callback)(const char *, t_CKINT) );
     
     UNITY_INTERFACE_EXPORT bool setChuckFloat( unsigned int chuckID, const char * name, t_CKFLOAT val );
     UNITY_INTERFACE_EXPORT bool getChuckFloat( unsigned int chuckID, const char * name, void (* callback)(t_CKFLOAT) );
+    UNITY_INTERFACE_EXPORT bool getNamedChuckFloat( unsigned int chuckID, const char * name, void (* callback)(const char *, t_CKFLOAT) );
     
     UNITY_INTERFACE_EXPORT bool setChuckString( unsigned int chuckID, const char * name, const char * val );
     UNITY_INTERFACE_EXPORT bool getChuckString( unsigned int chuckID, const char * name, void (* callback)(const char *) );
+    UNITY_INTERFACE_EXPORT bool getNamedChuckString( unsigned int chuckID, const char * name, void (* callback)(const char *, const char *) );
     
     UNITY_INTERFACE_EXPORT bool signalChuckEvent( unsigned int chuckID, const char * name );
     UNITY_INTERFACE_EXPORT bool broadcastChuckEvent( unsigned int chuckID, const char * name );
     UNITY_INTERFACE_EXPORT bool listenForChuckEventOnce( unsigned int chuckID, const char * name, void (* callback)(void) );
+    UNITY_INTERFACE_EXPORT bool listenForNamedChuckEventOnce( unsigned int chuckID, const char * name, void (* callback)(const char *) );
     UNITY_INTERFACE_EXPORT bool startListeningForChuckEvent( unsigned int chuckID, const char * name, void (* callback)(void) );
+    UNITY_INTERFACE_EXPORT bool startListeningForNamedChuckEvent( unsigned int chuckID, const char * name, void (* callback)(const char *) );
     UNITY_INTERFACE_EXPORT bool stopListeningForChuckEvent( unsigned int chuckID, const char * name, void (* callback)(void) );
+    UNITY_INTERFACE_EXPORT bool stopListeningForNamedChuckEvent( unsigned int chuckID, const char * name, void (* callback)(const char *) );
     
     UNITY_INTERFACE_EXPORT bool getGlobalUGenSamples( unsigned int chuckID, const char * name, SAMPLE * buffer, int numSamples );
     
     // int array methods
     UNITY_INTERFACE_EXPORT bool setGlobalIntArray( unsigned int chuckID, const char * name, t_CKINT arrayValues[], unsigned int numValues );
     UNITY_INTERFACE_EXPORT bool getGlobalIntArray( unsigned int chuckID, const char * name, void (* callback)(t_CKINT[], t_CKUINT));
+    UNITY_INTERFACE_EXPORT bool getNamedGlobalIntArray( unsigned int chuckID, const char * name, void (* callback)(const char *, t_CKINT[], t_CKUINT));
     UNITY_INTERFACE_EXPORT bool setGlobalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, t_CKINT value );
     UNITY_INTERFACE_EXPORT bool getGlobalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(t_CKINT) );
+    UNITY_INTERFACE_EXPORT bool getNamedGlobalIntArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(const char *, t_CKINT) );
     UNITY_INTERFACE_EXPORT bool setGlobalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, t_CKINT value );
     UNITY_INTERFACE_EXPORT bool getGlobalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(t_CKINT) );
+    UNITY_INTERFACE_EXPORT bool getNamedGlobalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(const char *, t_CKINT) );
     // TODO: set entire dict, add to dict in batch; get entire dict
     
     // float array methods
     UNITY_INTERFACE_EXPORT bool setGlobalFloatArray( unsigned int chuckID, const char * name, t_CKFLOAT arrayValues[], unsigned int numValues );
     UNITY_INTERFACE_EXPORT bool getGlobalFloatArray( unsigned int chuckID, const char * name, void (* callback)(t_CKFLOAT[], t_CKUINT));
+    UNITY_INTERFACE_EXPORT bool getNamedGlobalFloatArray( unsigned int chuckID, const char * name, void (* callback)(const char *, t_CKFLOAT[], t_CKUINT));
     UNITY_INTERFACE_EXPORT bool setGlobalFloatArrayValue( unsigned int chuckID, const char * name, unsigned int index, t_CKFLOAT value );
     UNITY_INTERFACE_EXPORT bool getGlobalFloatArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(t_CKFLOAT) );
+    UNITY_INTERFACE_EXPORT bool getNamedGlobalFloatArrayValue( unsigned int chuckID, const char * name, unsigned int index, void (* callback)(const char *, t_CKFLOAT) );
     UNITY_INTERFACE_EXPORT bool setGlobalAssociativeFloatArrayValue( unsigned int chuckID, const char * name, char * key, t_CKFLOAT value );
     UNITY_INTERFACE_EXPORT bool getGlobalAssociativeFloatArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(t_CKFLOAT) );
+    UNITY_INTERFACE_EXPORT bool getNamedGlobalAssociativeFloatArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(const char *, t_CKFLOAT) );
     
     
     bool EMSCRIPTEN_KEEPALIVE initChuckInstance( unsigned int chuckID, unsigned int sampleRate );
