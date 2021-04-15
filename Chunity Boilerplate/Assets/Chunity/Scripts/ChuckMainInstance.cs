@@ -548,6 +548,8 @@ public class ChuckMainInstance : MonoBehaviour
 
     private bool hasInit = false;
 
+    public bool enableMic = true;
+
 
     void Awake()
     {
@@ -564,7 +566,7 @@ public class ChuckMainInstance : MonoBehaviour
         mySource.outputAudioMixerGroup = Chuck.FindAudioMixerGroup( "ChuckMainInstanceDestination" );
 
         // setup mic
-        if( useMicrophone )
+        if( enableMic )
         {
             SetupMic();
         }

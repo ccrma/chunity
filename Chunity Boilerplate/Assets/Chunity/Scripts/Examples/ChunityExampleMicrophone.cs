@@ -17,6 +17,7 @@ public class ChunityExampleMicrophone : MonoBehaviour
 	{
 		GetComponent<ChuckSubInstance>().RunCode( @"
 			adc => PitShift p => dac;
+			1 => p.mix;
 			while( true )
 			{
 				Math.random2f(0.5, 2.0) => p.shift;

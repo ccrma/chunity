@@ -848,7 +848,11 @@ public class Chuck
     private static extern void getGlobalAssociativeFloatArrayValueWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String key, System.String gameObject, System.String method );
     
 #else
+    #if UNITY_IOS && !UNITY_EDITOR
+    const string PLUGIN_NAME = "__Internal";
+    #else
     const string PLUGIN_NAME = "AudioPluginChuck";
+    #endif
 
     // imports specific to Windows / Mac
     [DllImport( PLUGIN_NAME )]

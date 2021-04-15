@@ -18,7 +18,7 @@ public class ChunityExampleRunCode : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			// rotate my cube's transform
 			transform.Rotate( new Vector3( 0, 15, 5 ) );
@@ -26,7 +26,9 @@ public class ChunityExampleRunCode : MonoBehaviour
 			// play a chuck script
 			myChuck.RunCode( @"
 				SndBuf buffy => dac;
-				""special:dope"" => buffy.read;
+				// TODO: broken on iOS?
+				//""special:dope"" => buffy.read;
+				me.dir() + ""impact.wav"" => buffy.read;
 				buffy.length() => now;		
 	
 			" );

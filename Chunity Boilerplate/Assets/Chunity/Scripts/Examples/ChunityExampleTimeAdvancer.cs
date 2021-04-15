@@ -27,9 +27,10 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 	Chuck.FloatCallback myGetPosCallback;
 	Chuck.VoidCallback myTimeStepCallback;
 
-	int notifyCount;
 
-	float myPos;
+	static float myPos;
+	static bool beatHappened;
+	static int notifyCount;
 
 	// Use this for initialization
 	void Start()
@@ -78,9 +79,8 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		#if UNITY_WEBGL
 		// WebGL specific callback signature: game object name, method name
 		myChuck.StartListeningForChuckEvent( "notifier", gameObject.name, "BeNotified1" );
-
-		// NOTE: can use below call signature if the callback is a *static* method
 		#else
+		// NOTE: can use below call signature if the callback is a *static* method for iOS or WebGL
 		myChuck.StartListeningForChuckEvent( "notifier", myTimeStepCallback );
 		#endif
 	}
@@ -88,7 +88,17 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		// compute time step
+		#if UNITY_IOS && !UNITY_EDITOR
+		float newTimeStep = 1f;
+		if( Input.touchCount > 0 )
+		{
+			Touch touch = Input.GetTouch(0);
+			newTimeStep = Mathf.Clamp( touch.position.x, 250, 1000 ) / 1000.0f;
+		}
+		#else
 		float newTimeStep = Mathf.Clamp( Input.mousePosition.x, 250, 1000 ) / 1000.0f;
+        #endif
 
 		myChuck.SetFloat( "timeStep", newTimeStep );
 
@@ -103,8 +113,15 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 
 		transform.position = new Vector3( myPos % 4, 0, 0 );
 
+		// respond to callback
+		if( beatHappened )
+		{
+			transform.Rotate( new Vector3( 15, 30, 45 ) );
+			beatHappened = false;
+		}
+
 		// an example of how to stop calling a callback 
-		if( notifyCount > 5 )
+		if( notifyCount > 10 )
 		{
 			#if UNITY_WEBGL
 			// WebGL specific callback signature: game object name, method name
@@ -117,16 +134,20 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		}
 	}
 
-	//[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-	void GetPosCallback( CK_FLOAT pos )
+	#if UNITY_IOS && !UNITY_EDITOR
+	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
+	#endif
+	static void GetPosCallback( CK_FLOAT pos )
 	{
 		myPos = (float) pos;
 	}
 
-	//[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
-	void BeNotified1()
+	#if UNITY_IOS && !UNITY_EDITOR
+	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
+	#endif
+	static void BeNotified1()
 	{
-		transform.Rotate( new Vector3( 15, 30, 45 ) );
+		beatHappened = true;
 		notifyCount++;
 	}
 }

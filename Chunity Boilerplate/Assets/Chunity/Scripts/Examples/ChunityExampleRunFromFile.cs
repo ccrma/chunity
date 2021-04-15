@@ -26,7 +26,7 @@ public class ChunityExampleRunFromFile : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			// note that the .ck extension is optional, 
 			// just like with the command line version of chuck

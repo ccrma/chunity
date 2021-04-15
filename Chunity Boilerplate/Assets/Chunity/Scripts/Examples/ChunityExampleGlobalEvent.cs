@@ -15,7 +15,7 @@ public class ChunityExampleGlobalEvent : MonoBehaviour
 
 	public MeshRenderer myBox;
 
-	private int numTimesCallbackCalled = 0;
+	private static int numTimesCallbackCalled = 0;
 
 	void Start()
 	{
@@ -46,8 +46,10 @@ public class ChunityExampleGlobalEvent : MonoBehaviour
 		#endif
 	}
 
+	#if UNITY_IOS && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
-	void CallbackFunction()
+	#endif
+	static void CallbackFunction()
 	{
 		// store a message that the callback function was called
 		// (we can't do Unity-specific things in here, since ChucK will be calling this, not Unity)
