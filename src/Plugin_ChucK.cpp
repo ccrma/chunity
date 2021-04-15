@@ -64,7 +64,7 @@ namespace ChucK_For_Unity
 
 
     // C# "string" corresponds to passing char *
-    bool EMSCRIPTEN_KEEPALIVE runChuckCode( unsigned int chuckID, const char * code )
+    UNITY_INTERFACE_EXPORT bool EMSCRIPTEN_KEEPALIVE runChuckCode( unsigned int chuckID, const char * code )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
@@ -585,7 +585,7 @@ namespace ChucK_For_Unity
     
     
     
-    bool EMSCRIPTEN_KEEPALIVE initChuckInstance( unsigned int chuckID, unsigned int sampleRate )
+    UNITY_INTERFACE_EXPORT bool EMSCRIPTEN_KEEPALIVE initChuckInstance( unsigned int chuckID, unsigned int sampleRate )
     {
         if( chuck_instances.count( chuckID ) == 0 )
         {
@@ -696,7 +696,7 @@ namespace ChucK_For_Unity
     
     
     
-    bool EMSCRIPTEN_KEEPALIVE chuckManualAudioCallback( unsigned int chuckID, float * inBuffer, float * outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels )
+    UNITY_INTERFACE_EXPORT bool EMSCRIPTEN_KEEPALIVE chuckManualAudioCallback( unsigned int chuckID, float * inBuffer, float * outBuffer, unsigned int numFrames, unsigned int inChannels, unsigned int outChannels )
     {
         if( chuck_instances.count( chuckID ) > 0 )
         {
