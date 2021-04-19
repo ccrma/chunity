@@ -1008,10 +1008,16 @@ public class Chuck
     public delegate void NamedIntCallback( System.String name, CK_INT i );
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+    public delegate void IntCallbackWithID( CK_INT callbackID, CK_INT i );
+
+    [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void VoidCallback();
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void NamedVoidCallback( System.String name );
+
+    [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+    public delegate void VoidCallbackWithID( CK_INT callbackID );
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void FloatCallback( CK_FLOAT f );
@@ -1020,10 +1026,17 @@ public class Chuck
     public delegate void NamedFloatCallback( System.String name, CK_FLOAT f );
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+    public delegate void FloatCallbackWithID( CK_INT callbackID, CK_FLOAT f );
+
+    [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void StringCallback( System.String str );
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void NamedStringCallback( System.String name, System.String str );
+
+    [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+    public delegate void StringCallbackWithID( CK_INT callbackID, System.String str );
+
 
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void IntArrayCallback(
@@ -1035,6 +1048,14 @@ public class Chuck
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void NamedIntArrayCallback(
         System.String name,
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 1)]
+        CK_INT[] values,
+        CK_UINT numValues
+    );
+
+    [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+    public delegate void IntArrayCallbackWithID(
+        CK_INT callbackID,
         [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 1)]
         CK_INT[] values,
         CK_UINT numValues
@@ -1055,6 +1076,14 @@ public class Chuck
         CK_UINT numValues
     );
 
+    [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
+    public delegate void FloatArrayCallbackWithID(
+        CK_INT callbackID,
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R8, SizeParamIndex = 1)]
+        CK_FLOAT[] values,
+        CK_UINT numValues
+    );
+
     private MyLogCallback chout_delegate;
     private MyLogCallback cherr_delegate;
     private MyLogCallback stdout_delegate;
@@ -1067,6 +1096,10 @@ public class Chuck
     private Dictionary<string, NamedFloatCallback> namedFloatCallbacks;
     private Dictionary<string, NamedStringCallback> namedStringCallbacks;
     private Dictionary<string, NamedVoidCallback> namedVoidCallbacks;
+    private Dictionary<string, IntCallbackWithID> idIntCallbacks;
+    private Dictionary<string, FloatCallbackWithID> idFloatCallbacks;
+    private Dictionary<string, StringCallbackWithID> idStringCallbacks;
+    private Dictionary<string, VoidCallbackWithID> idVoidCallbacks;
 
 #if UNITY_WEBGL
     // method calls specific to WebGL
@@ -1211,6 +1244,9 @@ public class Chuck
     private static extern bool getNamedChuckInt( System.UInt32 chuckID, System.String name, NamedIntCallback callback );
 
     [DllImport( PLUGIN_NAME )]
+    private static extern bool getChuckIntWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, IntCallbackWithID callback );
+
+    [DllImport( PLUGIN_NAME )]
     private static extern bool setChuckFloat( System.UInt32 chuckID, System.String name, CK_FLOAT val );
 
     [DllImport( PLUGIN_NAME )]
@@ -1220,6 +1256,9 @@ public class Chuck
     private static extern bool getNamedChuckFloat( System.UInt32 chuckID, System.String name, NamedFloatCallback callback );
 
     [DllImport( PLUGIN_NAME )]
+    private static extern bool getChuckFloatWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, FloatCallbackWithID callback );
+
+    [DllImport( PLUGIN_NAME )]
     private static extern bool setChuckString( System.UInt32 chuckID, System.String name, System.String val );
 
     [DllImport( PLUGIN_NAME )]
@@ -1227,6 +1266,9 @@ public class Chuck
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getNamedChuckString( System.UInt32 chuckID, System.String name, NamedStringCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getChuckStringWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, StringCallbackWithID callback );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool signalChuckEvent( System.UInt32 chuckID, System.String name );
@@ -1241,16 +1283,25 @@ public class Chuck
     private static extern bool listenForNamedChuckEventOnce( System.UInt32 chuckID, System.String name, NamedVoidCallback callback );
 
     [DllImport( PLUGIN_NAME )]
+    private static extern bool listenForChuckEventOnceWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, VoidCallbackWithID callback );
+
+    [DllImport( PLUGIN_NAME )]
     private static extern bool startListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool startListeningForNamedChuckEvent( System.UInt32 chuckID, System.String name, NamedVoidCallback callback );
 
     [DllImport( PLUGIN_NAME )]
+    private static extern bool startListeningForChuckEventWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, VoidCallbackWithID callback );
+
+    [DllImport( PLUGIN_NAME )]
     private static extern bool stopListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool stopListeningForNamedChuckEvent( System.UInt32 chuckID, System.String name, NamedVoidCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool stopListeningForChuckEventWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, VoidCallbackWithID callback );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool setGlobalIntArray( System.UInt32 chuckID, System.String name, CK_INT[] arrayValues, System.UInt32 numValues );
@@ -1262,6 +1313,9 @@ public class Chuck
     private static extern bool getNamedGlobalIntArray( System.UInt32 chuckID, System.String name, NamedIntArrayCallback callback );
 
     [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalIntArrayWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, IntArrayCallbackWithID callback );
+
+    [DllImport( PLUGIN_NAME )]
     private static extern bool setGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, CK_INT value );
 
     [DllImport( PLUGIN_NAME )]
@@ -1269,6 +1323,9 @@ public class Chuck
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getNamedGlobalIntArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, NamedIntCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalIntArrayValueWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, System.UInt32 index, IntCallbackWithID callback );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool setGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, CK_INT value );
@@ -1280,6 +1337,9 @@ public class Chuck
     private static extern bool getNamedGlobalAssociativeIntArrayValue( System.UInt32 chuckID, System.String name, System.String key, NamedIntCallback callback );
 
     [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalAssociativeIntArrayValueWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, System.String key, IntCallbackWithID callback );
+
+    [DllImport( PLUGIN_NAME )]
     private static extern bool setGlobalFloatArray( System.UInt32 chuckID, System.String name, CK_FLOAT[] arrayValues, System.UInt32 numValues );
 
     [DllImport( PLUGIN_NAME )]
@@ -1287,6 +1347,9 @@ public class Chuck
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getNamedGlobalFloatArray( System.UInt32 chuckID, System.String name, NamedFloatArrayCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalFloatArrayWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, FloatArrayCallbackWithID callback );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool setGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, CK_FLOAT value );
@@ -1298,6 +1361,9 @@ public class Chuck
     private static extern bool getNamedGlobalFloatArrayValue( System.UInt32 chuckID, System.String name, System.UInt32 index, NamedFloatCallback callback );
 
     [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalFloatArrayValueWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, System.UInt32 index, FloatCallbackWithID callback );
+
+    [DllImport( PLUGIN_NAME )]
     private static extern bool setGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, CK_FLOAT value );
 
     [DllImport( PLUGIN_NAME )]
@@ -1305,6 +1371,9 @@ public class Chuck
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getNamedGlobalAssociativeFloatArrayValue( System.UInt32 chuckID, System.String name, System.String key, NamedFloatCallback callback );
+
+    [DllImport( PLUGIN_NAME )]
+    private static extern bool getGlobalAssociativeFloatArrayValueWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, System.String key, FloatCallbackWithID callback );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool setChoutCallback( System.UInt32 chuckID, MyLogCallback callback );
@@ -1353,6 +1422,10 @@ public class Chuck
         namedFloatCallbacks = new Dictionary<string, NamedFloatCallback>();
         namedStringCallbacks = new Dictionary<string, NamedStringCallback>();
         namedVoidCallbacks = new Dictionary<string, NamedVoidCallback>();
+        idIntCallbacks = new Dictionary<string, IntCallbackWithID>();
+        idFloatCallbacks = new Dictionary<string, FloatCallbackWithID>();
+        idStringCallbacks = new Dictionary<string, StringCallbackWithID>();
+        idVoidCallbacks = new Dictionary<string, VoidCallbackWithID>();
 
         // Create and store callbacks
         chout_delegate = new MyLogCallback( ChoutCallback );
