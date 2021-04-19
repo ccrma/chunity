@@ -4,6 +4,16 @@ using UnityEngine;
 using System;
 using System.Linq;
 
+
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+#endif
+using CK_FLOAT = System.Double;
+
 public class ChuckStringSyncer : MonoBehaviour
 {
 
@@ -84,65 +94,35 @@ public class ChuckStringSyncer : MonoBehaviour
 
     ChuckSubInstance myChuck = null;
     #if !UNITY_WEBGL
-    Chuck.StringCallback myStringCallback;
+    Chuck.StringCallbackWithID myStringCallback;
 
-    #if UNITY_IOS && !UNITY_EDITOR
-    // This version of the class can only be used with a 
-    // fixed number of this component, but its callbacks
-    // are static, which means it can be used on iOS.
-    const int numCallbacks = 8;
-
-    int myCallbackNumber = -1;
-    private static HashSet<int> availableIndices;
-    private static Dictionary<int, ChuckStringSyncer> activeCallbacks;
-    #endif // UNITY_IOS
+    private static Dictionary<CK_INT, ChuckStringSyncer> activeCallbacks;
+    private static CK_INT nextID = 0;
+    private CK_INT myID;
+    
 
     private void Awake()
     {
-        #if UNITY_IOS && !UNITY_EDITOR
-        if( availableIndices == null )
-        {
-            availableIndices = new HashSet<int>();
-            for( int i = 0; i < numCallbacks; i++ )
-            {
-                availableIndices.Add( i );
-            }
-        }
         if( activeCallbacks == null )
         {
-            activeCallbacks = new Dictionary<int, ChuckStringSyncer>();
+            activeCallbacks = new Dictionary<CK_INT, ChuckStringSyncer>();
         }
-        #endif
+        myID = nextID;
+        nextID++;
     }
 
 
     private void AllocateCallback()
     {
-        #if UNITY_IOS && !UNITY_EDITOR
-        // iOS allocation
-        if( availableIndices.Count == 0 )
-        {
-            throw new Exception( "Ran out of callbacks in ChuckStringSyncer" );
-        }
-        myCallbackNumber = availableIndices.First();
-        availableIndices.Remove( myCallbackNumber );
-        activeCallbacks[ myCallbackNumber ] = this;
-        myStringCallback = GetMyCallback( myCallbackNumber );
-        #else
-        // regular allocation
-        myStringCallback = MyCallback;
-        #endif
+        // register
+        activeCallbacks[myID] = this;
+        myStringCallback = StaticCallback;
     }
 
     private void ReturnCallback()
     {
-        #if UNITY_IOS && !UNITY_EDITOR
-        if( activeCallbacks.Remove( myCallbackNumber ) )
-        {
-            availableIndices.Add( myCallbackNumber );
-        }
-        myCallbackNumber = -1;
-        #endif
+        // deregister
+        activeCallbacks.Remove( myID );
         // always set my callback to null
         myStringCallback = null;
     }
@@ -162,7 +142,7 @@ public class ChuckStringSyncer : MonoBehaviour
         #else
         if( myChuck != null && myStringCallback != null && myStringName != "" )
         {
-            myChuck.GetString( myStringName, myStringCallback );
+            myChuck.GetString( myStringName, myStringCallback, myID );
         }
         #endif
     }
@@ -178,96 +158,12 @@ public class ChuckStringSyncer : MonoBehaviour
         StopSyncing();
     }
 
-    #if UNITY_IOS && !UNITY_EDITOR
-    private static Chuck.StringCallback GetMyCallback( int myNumber )
+    private static void StaticCallback( CK_INT id, string newValue )
     {
-        switch( myNumber )
+        if( activeCallbacks.ContainsKey( id ) )
         {
-            case 0: return Callback0;
-            case 1: return Callback1;
-            case 2: return Callback2;
-            case 3: return Callback3;
-            case 4: return Callback4;
-            case 5: return Callback5;
-            case 6: return Callback6;
-            case 7: return Callback7;
-            default: return null;
-        }
-    }
-    
-    // dumb repetitive code to get around the fact that
-    // we have to use static callbacks for iOS
-    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
-    private static void Callback0( string newValue )
-    {
-        if( activeCallbacks.ContainsKey( 0 ) )
-        {
-            activeCallbacks[0].myStringValue = newValue;
+            activeCallbacks[id].MyCallback( newValue );
         }
     }
 
-    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
-    private static void Callback1( string newValue )
-    {
-        if( activeCallbacks.ContainsKey( 1 ) )
-        {
-            activeCallbacks[1].myStringValue = newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
-    private static void Callback2( string newValue )
-    {
-        if( activeCallbacks.ContainsKey( 2 ) )
-        {
-            activeCallbacks[2].myStringValue = newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
-    private static void Callback3( string newValue )
-    {
-        if( activeCallbacks.ContainsKey( 3 ) )
-        {
-            activeCallbacks[3].myStringValue = newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
-    private static void Callback4( string newValue )
-    {
-        if( activeCallbacks.ContainsKey( 4 ) )
-        {
-            activeCallbacks[4].myStringValue = newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
-    private static void Callback5( string newValue )
-    {
-        if( activeCallbacks.ContainsKey( 5 ) )
-        {
-            activeCallbacks[5].myStringValue = newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
-    private static void Callback6( string newValue )
-    {
-        if( activeCallbacks.ContainsKey( 6 ) )
-        {
-            activeCallbacks[6].myStringValue = newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
-    private static void Callback7( string newValue )
-    {
-        if( activeCallbacks.ContainsKey( 7 ) )
-        {
-            activeCallbacks[7].myStringValue = newValue;
-        }
-    }
-
-    #endif // UNITY_IOS
 }
