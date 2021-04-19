@@ -129,6 +129,18 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: CreateGetIntCallback
+    // desc: construct the callback necessary for GetInt
+    // ----------------------------------------------------
+    public Chuck.IntCallbackWithID CreateGetIntCallback( Action<CK_INT, CK_INT> callbackFunction )
+    {
+        return Chuck.CreateIDGetIntCallback( callbackFunction );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: GetInt
     // desc: eventually call the callback with the value 
     //       of global int variableName
@@ -150,6 +162,20 @@ public class ChuckSubInstance : MonoBehaviour
     public bool GetInt( string variableName, Chuck.NamedIntCallback callback )
     {
         return chuckMainInstance.GetInt( variableName, callback );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: GetInt
+    // desc: eventually call the callback with the 
+    //       name of the variable and the value 
+    //       of global int variableName
+    // ----------------------------------------------------
+    public bool GetInt( string variableName, Chuck.IntCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.GetInt( variableName, callback, callbackID );
     }
 
 
@@ -192,6 +218,18 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: CreateGetFloatCallback
+    // desc: construct the callback necessary for GetFloat
+    // ----------------------------------------------------
+    public Chuck.FloatCallbackWithID CreateGetFloatCallback( Action<CK_INT, CK_FLOAT> callbackFunction )
+    {
+        return Chuck.CreateIDGetFloatCallback( callbackFunction );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: GetFloat
     // desc: eventually call the callback with the value 
     //       of global float variableName
@@ -213,6 +251,20 @@ public class ChuckSubInstance : MonoBehaviour
     public bool GetFloat( string variableName, Chuck.NamedFloatCallback callback )
     {
         return chuckMainInstance.GetFloat( variableName, callback );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: GetFloat
+    // desc: eventually call the callback with the
+    //       name of the variable and the value 
+    //       of global float variableName
+    // ----------------------------------------------------
+    public bool GetFloat( string variableName, Chuck.FloatCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.GetFloat( variableName, callback, callbackID );
     }
 
 
@@ -255,6 +307,18 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: CreateGetStringCallback
+    // desc: construct the callback necessary for GetString
+    // ----------------------------------------------------
+    public Chuck.StringCallbackWithID CreateGetStringCallback( Action<CK_INT, System.String> callbackFunction )
+    {
+        return Chuck.CreateIDGetStringCallback( callbackFunction );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: GetString
     // desc: eventually call the callback with the value 
     //       of global string variableName
@@ -276,6 +340,20 @@ public class ChuckSubInstance : MonoBehaviour
     public bool GetString( string variableName, Chuck.NamedStringCallback callback )
     {
         return chuckMainInstance.GetString( variableName, callback );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: GetString
+    // desc: eventually call the callback with the
+    //       name of the variable and the value 
+    //       of global string variableName
+    // ----------------------------------------------------
+    public bool GetString( string variableName, Chuck.StringCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.GetString( variableName, callback, callbackID );
     }
 
 
@@ -334,6 +412,19 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: CreateVoidCallback
+    // desc: create the callback necessary for waiting on
+    //       chuck events
+    // ----------------------------------------------------
+    public Chuck.VoidCallbackWithID CreateVoidCallback( Action<CK_INT> callbackFunction )
+    {
+        return Chuck.CreateIDVoidCallback( callbackFunction );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: ListenForChuckEventOnce
     // desc: call the callback only the next time that
     //       global Event variableName signals it
@@ -354,6 +445,19 @@ public class ChuckSubInstance : MonoBehaviour
     public bool ListenForChuckEventOnce( string variableName, Chuck.NamedVoidCallback callback )
     {
         return chuckMainInstance.ListenForChuckEventOnce( variableName, callback );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: ListenForChuckEventOnce
+    // desc: call the callback only the next time that
+    //       global Event variableName signals it
+    // ----------------------------------------------------
+    public bool ListenForChuckEventOnce( string variableName, Chuck.VoidCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.ListenForChuckEventOnce( variableName, callback, callbackID );
     }
 
 
@@ -388,6 +492,20 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: StartListeningForChuckEvent
+    // desc: call the callback every time that 
+    //       global Event variableName signals it
+    //       (until cancelled)
+    // ----------------------------------------------------
+    public bool StartListeningForChuckEvent( string variableName, Chuck.VoidCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.StartListeningForChuckEvent( variableName, callback, callbackID );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: StopListeningForChuckEvent
     // desc: cancel the callback registered to 
     //       global Event variableName
@@ -414,6 +532,19 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: StopListeningForChuckEvent
+    // desc: cancel the callback registered to 
+    //       global Event variableName
+    // ----------------------------------------------------
+    public bool StopListeningForChuckEvent( string variableName, Chuck.VoidCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.StopListeningForChuckEvent( variableName, callback, callbackID );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: CreateGetIntArrayCallback
     // desc: create a callback for getting an int array
     // ----------------------------------------------------
@@ -432,6 +563,18 @@ public class ChuckSubInstance : MonoBehaviour
     public Chuck.NamedIntArrayCallback CreateGetIntArrayCallback( Action<string, CK_INT[], CK_UINT> callbackFunction )
     {
         return Chuck.CreateNamedGetIntArrayCallback( callbackFunction );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: CreateGetIntArrayCallback
+    // desc: create a callback for getting an int array with its name
+    // ----------------------------------------------------
+    public Chuck.IntArrayCallbackWithID CreateGetIntArrayCallback( Action<CK_INT, CK_INT[], CK_UINT> callbackFunction )
+    {
+        return Chuck.CreateIDGetIntArrayCallback( callbackFunction );
     }
 
 
@@ -474,6 +617,18 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: GetIntArray
+    // desc: get the name and value of global int variableName[]
+    // ----------------------------------------------------
+    public bool GetIntArray( string variableName, Chuck.IntArrayCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.GetIntArray( variableName, callback, callbackID );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: SetIntArrayValue
     // desc: set the value of global int variableName[index]
     // ----------------------------------------------------
@@ -504,6 +659,18 @@ public class ChuckSubInstance : MonoBehaviour
     public bool GetIntArrayValue( string variableName, uint index, Chuck.NamedIntCallback callback )
     {
         return chuckMainInstance.GetIntArrayValue( variableName, index, callback );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: GetIntArrayValue
+    // desc: get the name and value of global int variableName[index]
+    // ----------------------------------------------------
+    public bool GetIntArrayValue( string variableName, uint index, Chuck.IntCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.GetIntArrayValue( variableName, index, callback, callbackID );
     }
 
 
@@ -546,6 +713,18 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: GetAssociativeIntArrayValue
+    // desc: get the name and value of global int variableName[key]
+    // ----------------------------------------------------
+    public bool GetAssociativeIntArrayValue( string variableName, string key, Chuck.IntCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.GetAssociativeIntArrayValue( variableName, key, callback, callbackID );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: CreateGetFloatArrayCallback
     // desc: create a callback for getting a float array
     // ----------------------------------------------------
@@ -564,6 +743,18 @@ public class ChuckSubInstance : MonoBehaviour
     public Chuck.NamedFloatArrayCallback CreateGetFloatArrayCallback( Action<string, CK_FLOAT[], CK_UINT> callbackFunction )
     {
         return Chuck.CreateNamedGetFloatArrayCallback( callbackFunction );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: CreateGetFloatArrayCallback
+    // desc: create a callback for getting a float array
+    // ----------------------------------------------------
+    public Chuck.FloatArrayCallbackWithID CreateGetFloatArrayCallback( Action<CK_INT, CK_FLOAT[], CK_UINT> callbackFunction )
+    {
+        return Chuck.CreateIDGetFloatArrayCallback( callbackFunction );
     }
 
 
@@ -606,6 +797,18 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: GetFloatArray
+    // desc: get the name and value of global float variableName[]
+    // ----------------------------------------------------
+    public bool GetFloatArray( string variableName, Chuck.FloatArrayCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.GetFloatArray( variableName, callback, callbackID );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: SetFloatArrayValue
     // desc: set the value of global float variableName[index]
     // ----------------------------------------------------
@@ -642,6 +845,18 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: GetFloatArrayValue
+    // desc: get the name and value of global float variableName[index]
+    // ----------------------------------------------------
+    public bool GetFloatArrayValue( string variableName, uint index, Chuck.FloatCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.GetFloatArrayValue( variableName, index, callback, callbackID );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: SetAssociativeFloatArrayValue
     // desc: set the value of global float variableName[key]
     // ----------------------------------------------------
@@ -672,6 +887,18 @@ public class ChuckSubInstance : MonoBehaviour
     public bool GetAssociativeFloatArrayValue( string variableName, string key, Chuck.NamedFloatCallback callback )
     {
         return chuckMainInstance.GetAssociativeFloatArrayValue( variableName, key, callback );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: GetAssociativeFloatArrayValue
+    // desc: get the name and value of global float variableName[key]
+    // ----------------------------------------------------
+    public bool GetAssociativeFloatArrayValue( string variableName, string key, Chuck.FloatCallbackWithID callback, CK_INT callbackID )
+    {
+        return chuckMainInstance.GetAssociativeFloatArrayValue( variableName, key, callback, callbackID );
     }
 
 
