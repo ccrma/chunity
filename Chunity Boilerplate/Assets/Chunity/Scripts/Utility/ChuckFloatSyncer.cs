@@ -92,65 +92,34 @@ public class ChuckFloatSyncer : MonoBehaviour
 
     ChuckSubInstance myChuck = null;
     #if !UNITY_WEBGL
-    Chuck.FloatCallback myFloatCallback;
+    Chuck.FloatCallbackWithID myFloatCallback;
 
-    #if UNITY_IOS && !UNITY_EDITOR
-    // This version of the class can only be used with a 
-    // fixed number of this component, but its callbacks
-    // are static, which means it can be used on iOS.
-    const int numCallbacks = 8;
-
-    int myCallbackNumber = -1;
-    private static HashSet<int> availableIndices;
-    private static Dictionary<int, ChuckFloatSyncer> activeCallbacks;
-    #endif // UNITY_IOS
+    private static Dictionary<CK_INT, ChuckFloatSyncer> activeCallbacks;
+    private static CK_INT nextID = 0;
+    CK_INT myID = -1;
 
     private void Awake()
     {
-        #if UNITY_IOS && !UNITY_EDITOR
-        if( availableIndices == null )
-        {
-            availableIndices = new HashSet<int>();
-            for( int i = 0; i < numCallbacks; i++ )
-            {
-                availableIndices.Add( i );
-            }
-        }
         if( activeCallbacks == null )
         {
-            activeCallbacks = new Dictionary<int, ChuckFloatSyncer>();
+            activeCallbacks = new Dictionary<CK_INT, ChuckFloatSyncer>();
         }
-        #endif
+        myID = nextID;
+        nextID++;
     }
 
 
     private void AllocateCallback()
     {
-        #if UNITY_IOS && !UNITY_EDITOR
-        // iOS allocation
-        if( availableIndices.Count == 0 )
-        {
-            throw new Exception( "Ran out of callbacks in ChuckFloatSyncer" );
-        }
-        myCallbackNumber = availableIndices.First();
-        availableIndices.Remove( myCallbackNumber );
-        activeCallbacks[ myCallbackNumber ] = this;
-        myFloatCallback = GetMyCallback( myCallbackNumber );
-        #else
         // regular allocation
-        myFloatCallback = MyCallback;
-        #endif
+        myFloatCallback = StaticCallback;
+        activeCallbacks[myID] = this;
     }
 
     private void ReturnCallback()
     {
-        #if UNITY_IOS && !UNITY_EDITOR
-        if( activeCallbacks.Remove( myCallbackNumber ) )
-        {
-            availableIndices.Add( myCallbackNumber );
-        }
-        myCallbackNumber = -1;
-        #endif
+        // deallocate
+        activeCallbacks.Remove( myID );
         // always set my callback to null
         myFloatCallback = null;
     }
@@ -169,7 +138,7 @@ public class ChuckFloatSyncer : MonoBehaviour
         #else
         if( myChuck != null && myFloatCallback != null && myFloatName != "" )
         {
-            myChuck.GetFloat( myFloatName, myFloatCallback );
+            myChuck.GetFloat( myFloatName, myFloatCallback, myID );
         }
         #endif
     }
@@ -185,99 +154,12 @@ public class ChuckFloatSyncer : MonoBehaviour
         StopSyncing();
     }
 
-
-    #if UNITY_IOS && !UNITY_EDITOR
-    private static Chuck.FloatCallback GetMyCallback( int myNumber )
+    private static void StaticCallback( CK_INT id, CK_FLOAT newValue )
     {
-        switch( myNumber )
+        if( activeCallbacks.ContainsKey( id ) )
         {
-            case 0: return Callback0;
-            case 1: return Callback1;
-            case 2: return Callback2;
-            case 3: return Callback3;
-            case 4: return Callback4;
-            case 5: return Callback5;
-            case 6: return Callback6;
-            case 7: return Callback7;
-            default: return null;
+            activeCallbacks[id].MyCallback( newValue );
         }
     }
     
-    // dumb repetitive code to get around the fact that
-    // we have to use static callbacks for iOS
-    [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-    private static void Callback0( CK_FLOAT newValue )
-    {
-        if( activeCallbacks.ContainsKey( 0 ) )
-        {
-            activeCallbacks[0].myFloatValue = (float) newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-    private static void Callback1( CK_FLOAT newValue )
-    {
-        if( activeCallbacks.ContainsKey( 1 ) )
-        {
-            activeCallbacks[1].myFloatValue = (float) newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-    private static void Callback2( CK_FLOAT newValue )
-    {
-        if( activeCallbacks.ContainsKey( 2 ) )
-        {
-            activeCallbacks[2].myFloatValue = (float) newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-    private static void Callback3( CK_FLOAT newValue )
-    {
-        if( activeCallbacks.ContainsKey( 3 ) )
-        {
-            activeCallbacks[3].myFloatValue = (float) newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-    private static void Callback4( CK_FLOAT newValue )
-    {
-        if( activeCallbacks.ContainsKey( 4 ) )
-        {
-            activeCallbacks[4].myFloatValue = (float) newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-    private static void Callback5( CK_FLOAT newValue )
-    {
-        if( activeCallbacks.ContainsKey( 5 ) )
-        {
-            activeCallbacks[5].myFloatValue = (float) newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-    private static void Callback6( CK_FLOAT newValue )
-    {
-        if( activeCallbacks.ContainsKey( 6 ) )
-        {
-            activeCallbacks[6].myFloatValue = (float) newValue;
-        }
-    }
-
-    [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
-    private static void Callback7( CK_FLOAT newValue )
-    {
-        if( activeCallbacks.ContainsKey( 7 ) )
-        {
-            activeCallbacks[7].myFloatValue = (float) newValue;
-        }
-    }
-
-    
-
-    #endif // UNITY_IOS
 }

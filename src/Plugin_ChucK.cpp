@@ -185,6 +185,15 @@ namespace ChucK_For_Unity
 
         return chuck_instances[chuckID]->getGlobalInt( name, callback );
     }
+
+
+
+    UNITY_INTERFACE_EXPORT bool getChuckIntWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, t_CKINT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        return chuck_instances[chuckID]->getGlobalInt( name, callbackID, callback );
+    }
     
     
     
@@ -212,6 +221,15 @@ namespace ChucK_For_Unity
 
         return chuck_instances[chuckID]->getGlobalFloat( name, callback );
     }
+
+
+
+    UNITY_INTERFACE_EXPORT bool getChuckFloatWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, t_CKFLOAT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        return chuck_instances[chuckID]->getGlobalFloat( name, callbackID, callback );
+    }
     
     
     
@@ -238,6 +256,15 @@ namespace ChucK_For_Unity
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
 
         return chuck_instances[chuckID]->getGlobalString( name, callback );
+    }
+
+
+
+    UNITY_INTERFACE_EXPORT bool getChuckStringWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, const char*) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+
+        return chuck_instances[chuckID]->getGlobalString( name, callbackID, callback );
     }
     
     
@@ -277,6 +304,16 @@ namespace ChucK_For_Unity
         return chuck_instances[chuckID]->listenForGlobalEvent(
             name, callback, FALSE );
     }
+
+
+
+    UNITY_INTERFACE_EXPORT bool listenForChuckEventOnceWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->listenForGlobalEvent(
+            name, callbackID, callback, FALSE );
+    }
     
     
     
@@ -297,6 +334,16 @@ namespace ChucK_For_Unity
         return chuck_instances[chuckID]->listenForGlobalEvent(
             name, callback, TRUE );
     }
+
+
+
+    UNITY_INTERFACE_EXPORT bool startListeningForChuckEventWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->listenForGlobalEvent(
+            name, callbackID, callback, TRUE );
+    }
     
     
     
@@ -316,6 +363,16 @@ namespace ChucK_For_Unity
         
         return chuck_instances[chuckID]->stopListeningForGlobalEvent(
             name, callback );
+    }
+
+
+
+    UNITY_INTERFACE_EXPORT bool stopListeningForChuckEventWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->stopListeningForGlobalEvent(
+            name, callbackID, callback );
     }
     
     
@@ -368,6 +425,16 @@ namespace ChucK_For_Unity
         return chuck_instances[chuckID]->getGlobalIntArray(
             name, callback );
     }
+
+
+
+    UNITY_INTERFACE_EXPORT bool getGlobalIntArrayWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, t_CKINT[], t_CKUINT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->getGlobalIntArray(
+            name, callbackID, callback );
+    }
     
     
     
@@ -400,6 +467,16 @@ namespace ChucK_For_Unity
         
         return chuck_instances[chuckID]->getGlobalIntArrayValue(
             name, index, callback );
+    }
+
+
+
+    UNITY_INTERFACE_EXPORT bool getGlobalIntArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, unsigned int index, void(*callback)(t_CKINT, t_CKINT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->getGlobalIntArrayValue(
+            name, callbackID, index, callback );
     }
     
     
@@ -436,6 +513,16 @@ namespace ChucK_For_Unity
         return chuck_instances[chuckID]->getGlobalAssociativeIntArrayValue(
             name, key, callback );
     }
+
+
+
+    UNITY_INTERFACE_EXPORT bool getGlobalAssociativeIntArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, char* key, void(*callback)(t_CKINT, t_CKINT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->getGlobalAssociativeIntArrayValue(
+            name, callbackID, key, callback );
+    }
     
     
     
@@ -470,6 +557,16 @@ namespace ChucK_For_Unity
         return chuck_instances[chuckID]->getGlobalFloatArray(
             name, callback );
     }
+
+
+
+    UNITY_INTERFACE_EXPORT bool getGlobalFloatArrayWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, t_CKFLOAT[], t_CKUINT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->getGlobalFloatArray(
+            name, callbackID, callback );
+    }
     
     
     
@@ -502,6 +599,16 @@ namespace ChucK_For_Unity
         
         return chuck_instances[chuckID]->getGlobalFloatArrayValue(
             name, index, callback );
+    }
+
+
+
+    UNITY_INTERFACE_EXPORT bool getGlobalFloatArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, unsigned int index, void(*callback)(t_CKINT, t_CKFLOAT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->getGlobalFloatArrayValue(
+            name, callbackID, index, callback );
     }
     
     
@@ -537,6 +644,16 @@ namespace ChucK_For_Unity
         
         return chuck_instances[chuckID]->getGlobalAssociativeFloatArrayValue(
             name, key, callback );
+    }
+
+
+
+    UNITY_INTERFACE_EXPORT bool getGlobalAssociativeFloatArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, char* key, void(*callback)(t_CKINT, t_CKFLOAT) )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        
+        return chuck_instances[chuckID]->getGlobalAssociativeFloatArrayValue(
+            name, callbackID, key, callback );
     }
     
     
@@ -634,7 +751,7 @@ namespace ChucK_For_Unity
             msg->reply = ( ck_msg_func )NULL;
             
             // tell the VM to clear
-            chuck->vm()->execute_chuck_msg_with_globals( msg );
+            chuck->vm()->globals_manager()->execute_chuck_msg_with_globals( msg );
             
             return true;
         }
@@ -659,7 +776,7 @@ namespace ChucK_For_Unity
             msg->reply = ( ck_msg_func )NULL;
             
             // tell the VM to clear
-            chuck->vm()->execute_chuck_msg_with_globals( msg );
+            chuck->vm()->globals_manager()->execute_chuck_msg_with_globals( msg );
             
             return true;
         }
