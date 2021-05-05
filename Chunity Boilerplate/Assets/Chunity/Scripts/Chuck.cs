@@ -1325,7 +1325,7 @@ public class Chuck
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void NamedIntArrayCallback(
         System.String name,
-        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 1)]
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 2)]
         CK_INT[] values,
         CK_UINT numValues
     );
@@ -1333,7 +1333,7 @@ public class Chuck
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void IntArrayCallbackWithID(
         CK_INT callbackID,
-        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 1)]
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.U8, SizeParamIndex = 2)]
         CK_INT[] values,
         CK_UINT numValues
     );
@@ -1348,7 +1348,7 @@ public class Chuck
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void NamedFloatArrayCallback(
         System.String name,
-        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R8, SizeParamIndex = 1)]
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R8, SizeParamIndex = 2)]
         CK_FLOAT[] values,
         CK_UINT numValues
     );
@@ -1356,7 +1356,7 @@ public class Chuck
     [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
     public delegate void FloatArrayCallbackWithID(
         CK_INT callbackID,
-        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R8, SizeParamIndex = 1)]
+        [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.R8, SizeParamIndex = 2)]
         CK_FLOAT[] values,
         CK_UINT numValues
     );
