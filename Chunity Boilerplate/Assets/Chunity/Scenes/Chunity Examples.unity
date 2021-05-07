@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657856, g: 0.49641234, b: 0.57481724, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -94,9 +94,8 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
     m_ExportTrainingData: 0
-    m_TrainingDataDestination: TrainingData
-    m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -149,6 +148,14 @@ AudioListener:
   m_GameObject: {fileID: 56092023}
   m_Enabled: 1
 --- !u!124 &56092025
+Behaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 56092023}
+  m_Enabled: 1
+--- !u!92 &56092026
 Behaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -336,6 +343,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &255029682
 AudioSource:
   m_ObjectHideFlags: 0
@@ -495,6 +503,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &394512435
 AudioSource:
   m_ObjectHideFlags: 0
@@ -731,6 +740,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &402380042
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1030,6 +1040,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &522326293
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1265,6 +1276,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &523318881
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1500,6 +1512,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &543287626
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1736,6 +1749,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &626474974
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2053,7 +2067,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ebd44c97c4e04328abf7e75de2c77cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useMicrophone: 0
   microphoneIdentifier: 
+  enableMic: 1
 --- !u!82 &658998728
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2201,7 +2217,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 728908341}
   m_Enabled: 1
-  serializedVersion: 10
+  serializedVersion: 9
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
@@ -2305,6 +2321,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &946420847
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2649,6 +2666,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2723,6 +2741,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &1215681576
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2959,6 +2978,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &1243518079
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3193,6 +3213,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &1250383277
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3439,6 +3460,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &1490268495
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3673,6 +3695,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &1841820385
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4048,6 +4071,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &1901990625
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4213,6 +4237,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &1953669290
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4442,7 +4467,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2003159373}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 33baef78eeae64d619e5866e77981a6d, type: 3}
   m_Name: 
@@ -4461,6 +4486,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &2003159377
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4564,7 +4590,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2003159373}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1d45288f452bb465db2c835b384b7f59, type: 3}
   m_Name: 
@@ -4637,6 +4663,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -4711,6 +4738,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chuckMainInstance: {fileID: 658998727}
   spatialize: 0
+  persistToNextScene: 0
 --- !u!82 &2138699092
 AudioSource:
   m_ObjectHideFlags: 0

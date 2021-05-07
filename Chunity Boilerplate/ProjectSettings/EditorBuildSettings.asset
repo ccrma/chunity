@@ -9,13 +9,13 @@ EditorBuildSettings:
     path: Assets/Chunity/Scenes/Chunity Examples.unity
     guid: eb0e65aaeacfc4f96969624bdc126050
   - enabled: 0
-    path: Assets/Chunity/Scenes/Chunity Persist Across Scene 1 -- Start.unity
+    path: Assets/Unused Scenes/Chunity Persist Across Scene 1 -- Start.unity
     guid: 0c1164ff70b134024849bcc37ea3f949
   - enabled: 0
-    path: Assets/Chunity/Scenes/Chunity Persist Across Scene 2.unity
+    path: Assets/Unused Scenes/Chunity Persist Across Scene 2.unity
     guid: 7af0821bb6f37460996c607852d84d8f
   - enabled: 0
-    path: Assets/Chunity/Scenes/Chunity Persist Across Scene 3.unity
+    path: Assets/Unused Scenes/Chunity Persist Across Scene 3.unity
     guid: f527a275c967a46088e7fd59d90eaef4
   - enabled: 1
     path: Assets/Chunity/Scenes/iOS Examples.unity
