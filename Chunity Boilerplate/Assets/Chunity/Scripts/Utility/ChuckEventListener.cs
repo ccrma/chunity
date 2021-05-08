@@ -140,6 +140,9 @@ public class ChuckEventListener : MonoBehaviour
         StopListening();
     }
 
+    #if UNITY_IOS && !UNITY_EDITOR
+    [AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallbackWithID))]
+    #endif
     private static void StaticCallback( CK_INT id )
     {
         if( activeCallbacks.ContainsKey( id ) )
