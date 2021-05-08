@@ -226,10 +226,11 @@ Chuck_VM_Code * emit_engine_emit_prog( Chuck_Emitter * emit, a_Program prog,
         prog = prog->next;
     }
     
-    // error-checking: was dac-replacement initted?
+    // 1.4.0.1: error-checking: was dac-replacement initted?
+    // (see chuck_compile.h for an explanation on replacement dacs
     if( emit->should_replace_dac )
     {
-        if( !emit->env->vm()->is_global_ugen_init( emit->dac_replacement ) )
+        if( !emit->env->vm()->globals_manager()->is_global_ugen_init( emit->dac_replacement ) )
         {
             EM_error2( 0, "compiler error: dac replacement '%s' was never initialized...",
                 emit->dac_replacement.c_str() );
@@ -2904,6 +2905,8 @@ t_CKBOOL emit_engine_emit_exp_primary( Chuck_Emitter * emit, a_Exp_Primary exp )
         }
         else if( exp->var == insert_symbol( "dac" ) )
         {
+            // 1.4.0.1: see chuck_compile.h for an explanation of 
+            // replacement dacs
             // should replace dac with global ugen?
             if( emit->should_replace_dac )
             {
@@ -4222,7 +4225,7 @@ t_CKBOOL emit_engine_emit_exp_decl( Chuck_Emitter * emit, a_Exp_Decl decl,
                     if( globalType == te_globalEvent )
                     {
                         // init and construct it now!
-                        if( !emit->env->vm()->init_global_event( value->name, t ) )
+                        if( !emit->env->vm()->globals_manager()->init_global_event( value->name, t ) )
                         {
                             // if the type doesn't exactly match (different kinds of Event), then fail.
                             EM_error2( decl->linepos,
@@ -4235,7 +4238,7 @@ t_CKBOOL emit_engine_emit_exp_decl( Chuck_Emitter * emit, a_Exp_Decl decl,
                     else if( globalType == te_globalUGen )
                     {
                         // init and construct it now!
-                        if( !emit->env->vm()->init_global_ugen( value->name, t ) )
+                        if( !emit->env->vm()->globals_manager()->init_global_ugen( value->name, t ) )
                         {
                             // if the type doesn't exactly match (different kinds of Event), then fail.
                             EM_error2( decl->linepos,

@@ -70,6 +70,17 @@ class  CBufferSimple; // added 1.3.0.0
 
 
 
+// enum
+enum Chuck_Global_Get_Callback_Type
+{
+    ck_get_plain,
+    ck_get_name,
+    ck_get_id
+};
+
+
+
+
 //-----------------------------------------------------------------------------
 // name: struct Chuck_VM_Object
 // desc: base vm object
@@ -429,9 +440,17 @@ public:
 //-----------------------------------------------------------------------------
 struct Chuck_Global_Event_Listener
 {
-    void (* callback)(void);
+    union {
+        void (* void_callback)(void);
+        void (* named_callback)(const char *);
+        void (* id_callback)(t_CKINT);
+    };
     t_CKBOOL listen_forever;
-    Chuck_Global_Event_Listener() : callback(NULL), listen_forever(FALSE) {};
+    Chuck_Global_Get_Callback_Type callback_type;
+    std::string name;
+    t_CKINT id;
+    Chuck_Global_Event_Listener() : void_callback(NULL), listen_forever(FALSE), 
+        callback_type(ck_get_plain), name(""), id(0) {};
 };
 
 
@@ -444,14 +463,25 @@ struct Chuck_Global_Event_Listener
 struct Chuck_Event : Chuck_Object
 {
 public:
+    // signal/broadcast "local" -- signal ChucK Events
     void signal();
     void broadcast();
     void wait( Chuck_VM_Shred * shred, Chuck_VM * vm );
     t_CKBOOL remove( Chuck_VM_Shred * shred );
+
+    // 1.4.0.0: global events -- signal/broadcast code running
+    // externally, elsewhere in the host
     void signal_global();
     void broadcast_global();
+
+    // 1.4.0.1: global events multiple callbacks.
+    // can listen with a callback(), callback( event name ), or callback( id )
     void global_listen( void (* cb)(void), t_CKBOOL listen_forever );
+    void global_listen( std::string name, void (* cb)(const char *), t_CKBOOL listen_forever );
+    void global_listen( t_CKINT id, void (* cb)(t_CKINT), t_CKBOOL listen_forever );
     t_CKBOOL remove_listen( void (* cb)(void) );
+    t_CKBOOL remove_listen( std::string name, void (* cb)(const char *) );
+    t_CKBOOL remove_listen( t_CKINT id, void (* cb)(t_CKINT) );
 
 public: // internal
     // added 1.3.0.0: queue_broadcast now takes event_buffer
@@ -463,6 +493,8 @@ public:
 protected:
     std::queue<Chuck_VM_Shred *> m_queue;
     #ifndef __DISABLE_THREADS__
+    // 1.4.0.1 TODO: rewrite queue_broadcast to use a lock-free queue 
+    // and avoid the use of a lock in events
     XMutex m_queue_lock;
     #endif
     std::queue<Chuck_Global_Event_Listener> m_global_queue;
