@@ -48,7 +48,7 @@ var asyncLoadFile = function( url, onload, onerror )
 
 var loadWasm = new Promise( function( resolve, reject )
 {
-    asyncLoadFile( whereIsChuck + '/chuckscript.wasm', resolve, reject ); 
+    asyncLoadFile( whereIsChuck + '/webchuck.wasm', resolve, reject ); 
 });
 
 var preloadFilenames = async function( filenamesToPreload )
@@ -87,7 +87,7 @@ var startAudioContext = async function()
     audioContext = new AudioContext({
         //sampleRate: 48000
     });
-    await audioContext.audioWorklet.addModule( whereIsChuck + '/chucknode.js');
+    await audioContext.audioWorklet.addModule( whereIsChuck + '/webchuck.js');
 }
 
 var startChuck = async function() 

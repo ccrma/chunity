@@ -91,7 +91,6 @@ public class ChuckFloatSyncer : MonoBehaviour
     // =========== INTERNAL MECHANICS ========== //
 
     ChuckSubInstance myChuck = null;
-    #if !UNITY_WEBGL
     Chuck.FloatCallbackWithID myFloatCallback;
 
     private static Dictionary<CK_INT, ChuckFloatSyncer> activeCallbacks;
@@ -125,7 +124,6 @@ public class ChuckFloatSyncer : MonoBehaviour
     }
 
 
-    #endif // !UNITY_WEBGL
     string myFloatName = "";
 
     private void Update()

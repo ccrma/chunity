@@ -92,7 +92,6 @@ public class ChuckIntSyncer : MonoBehaviour
     // =========== INTERNAL MECHANICS ========== //
 
     ChuckSubInstance myChuck = null;
-    #if !UNITY_WEBGL
     Chuck.IntCallbackWithID myIntCallback;
 
     private static Dictionary<CK_INT, ChuckIntSyncer> activeCallbacks;
@@ -125,7 +124,6 @@ public class ChuckIntSyncer : MonoBehaviour
         myIntCallback = null;
     }
 
-    #endif // !UNITY_WEBGL
 
     string myIntName = "";
 

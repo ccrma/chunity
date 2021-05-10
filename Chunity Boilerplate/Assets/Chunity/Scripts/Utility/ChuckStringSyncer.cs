@@ -93,7 +93,6 @@ public class ChuckStringSyncer : MonoBehaviour
     // =========== INTERNAL MECHANICS ========== //
 
     ChuckSubInstance myChuck = null;
-    #if !UNITY_WEBGL
     Chuck.StringCallbackWithID myStringCallback;
 
     private static Dictionary<CK_INT, ChuckStringSyncer> activeCallbacks;
@@ -127,7 +126,6 @@ public class ChuckStringSyncer : MonoBehaviour
         myStringCallback = null;
     }
 
-    #endif // !UNITY_WEBGL
 
 
     string myStringName = "";

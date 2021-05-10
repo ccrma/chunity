@@ -88,7 +88,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 		}
 	}
 
-	#if UNITY_IOS && !UNITY_EDITOR
+	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntArrayCallback))]
 	#endif
 	static void GetInitialArrayCallback( CK_INT[] values, CK_UINT numValues )
@@ -100,7 +100,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 		}
 	}
 
-	#if UNITY_IOS && !UNITY_EDITOR
+	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntCallback))]
 	#endif 
 	static void GetANumberCallback( CK_INT value )

@@ -88,7 +88,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
-	#if UNITY_IOS && !UNITY_EDITOR
+	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallback))]
 	#endif
 	static void GetInitialArrayCallback( CK_FLOAT[] values, CK_UINT numValues )
@@ -100,7 +100,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
-	#if UNITY_IOS && !UNITY_EDITOR
+	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
 	#endif
 	static void GetANumberCallback( CK_FLOAT value )

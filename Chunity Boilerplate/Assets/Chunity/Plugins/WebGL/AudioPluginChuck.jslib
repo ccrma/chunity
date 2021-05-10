@@ -282,6 +282,24 @@ mergeInto(LibraryManager.library, {
             });
         })(callback);
     },
+    getNamedChuckInt: function( chuckID, name, callback )
+    {
+        (function( c, n ) {
+            theChuck.getInt( Pointer_stringify( name ) ).then( function( result )
+            {
+                dynCall( 'vii', c, [n, result] );
+            });
+        })(callback, name);
+    },
+    getChuckIntWithID: function( chuckID, callbackID, name, callback )
+    {
+        (function( c, i ) {
+            theChuck.getInt( Pointer_stringify( name ) ).then( function( result )
+            {
+                dynCall( 'vii', c, [i, result] );
+            });
+        })(callback, callbackID);
+    },
     getChuckIntWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
         (function( g, m ) {
@@ -303,6 +321,24 @@ mergeInto(LibraryManager.library, {
                 dynCall( 'vf', c, [result] );
             });
         })(callback); 
+    },
+    getNamedChuckFloat: function( chuckID, name, callback )
+    {
+        (function( c, n ) {
+            theChuck.getFloat( Pointer_stringify( name ) ).then( function( result )
+            {
+                dynCall( 'vif', c, [n, result] );
+            });
+        })(callback, name); 
+    },
+    getChuckFloatWithID: function( chuckID, callbackID, name, callback )
+    {
+        (function( c, i ) {
+            theChuck.getFloat( Pointer_stringify( name ) ).then( function( result )
+            {
+                dynCall( 'vif', c, [i, result] );
+            });
+        })(callback, callbackID); 
     },
     getChuckFloatWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
@@ -332,6 +368,36 @@ mergeInto(LibraryManager.library, {
             });
         })(callback);
     },
+    getNamedChuckString: function( chuckID, name, callback )
+    {
+        (function( c, n ) {
+            theChuck.getString( Pointer_stringify( name ) ).then( function( result ) {
+                // need to turn JS result string into Module heap string.
+                var bufferSize = lengthBytesUTF8( result ) + 1;
+                var buffer = _malloc( bufferSize );
+                stringToUTF8( result, buffer, bufferSize );
+                // send it along!
+                dynCall( 'vif', c, [n, buffer] );
+                // be nice to memory
+                _free( buffer );
+            });
+        })(callback, name);
+    },
+    getChuckStringWithID: function( chuckID, callbackID, name, callback )
+    {
+        (function( c, i ) {
+            theChuck.getString( Pointer_stringify( name ) ).then( function( result ) {
+                // need to turn JS result string into Module heap string.
+                var bufferSize = lengthBytesUTF8( result ) + 1;
+                var buffer = _malloc( bufferSize );
+                stringToUTF8( result, buffer, bufferSize );
+                // send it along!
+                dynCall( 'vif', c, [i, buffer] );
+                // be nice to memory
+                _free( buffer );
+            });
+        })(callback, callbackID);
+    },
     getChuckStringWithUnityStyleCallback: function( chuckID, name, gameObject, method )
     {
         (function( g, m ) {
@@ -356,6 +422,24 @@ mergeInto(LibraryManager.library, {
                 dynCall( 'v', c, 0 );
             });
         })(callback);
+        return true;
+    },
+    listenForNamedChuckEventOnce: function( chuckID, name, callback )
+    {
+        (function( c, n ) {
+            theChuck.listenForEventOnce( Pointer_stringify( name ), function() {
+                dynCall( 'vi', c, [n] );
+            });
+        })(callback, name);
+        return true;
+    },
+    listenForChuckEventOnceWithID: function( chuckID, callbackID, name, callback )
+    {
+        (function( c, i ) {
+            theChuck.listenForEventOnce( Pointer_stringify( name ), function() {
+                dynCall( 'vi', c, [i] );
+            });
+        })(callback, callbackID);
         return true;
     },
     listenForChuckEventOnceWithUnityStyleCallback: function( chuckID, name, gameObject, method )
