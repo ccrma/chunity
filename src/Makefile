@@ -77,7 +77,7 @@ SF_COBJS=$(SF_CSRCS:.c=.o)
 LO_COBJS=$(LO_CSRCS:.c=.o)
 OUTPUT=libAudioPluginChuck.so
 
-CXXFLAGS=-I. -Ichuck/src/core -Ichuck/src/core/lo -D__PLATFORM_LINUX__ -O2 -fPIC -fno-strict-aliasing -D__CK_SNDFILE_NATIVE__
+CXXFLAGS=-I. -Ichuck/src/core -Ichuck/src/core/lo -D__PLATFORM_LINUX__ -O2 -fPIC -fno-strict-aliasing -D__CK_SNDFILE_NATIVE__ -DHAVE_CONFIG_H
 
 
 LDFLAGS=-shared -rdynamic -fPIC 
@@ -97,7 +97,7 @@ chuck/src/core/chuck.tab.c chuck/src/core/chuck.tab.h: chuck/src/core/chuck.y
 chuck/src/core/chuck.yy.c: chuck/src/core/chuck.lex
 	$(LEX) -ochuck/src/core/chuck.yy.c chuck/src/core/chuck.lex
 
-$(OUTPUT): chuck/src/core/chuck.tab.c chuck/src/core/chuck.tab.h chuck/src/core/chuck.yy.c $(OBJS) $(COBJS)
+$(OUTPUT): chuck/src/core/chuck.tab.c chuck/src/core/chuck.tab.h chuck/src/core/chuck.yy.c $(OBJS) $(COBJS) $(SF_COBJS) $(LO_COBJS)
 	$(CXX) $(LDFLAGS) -o $(OUTPUT) $(OBJS) $(COBJS) $(SF_COBJS) $(LO_COBJS) $(LDFLAGS2)
 	cp $(OUTPUT) ../Assets/Plugins/
 

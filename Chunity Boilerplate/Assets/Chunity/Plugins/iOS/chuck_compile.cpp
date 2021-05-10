@@ -55,10 +55,7 @@
 #endif
 
 #include "ulib_regex.h"
-
-#ifndef __DISABLE_SERIAL__
 #include "chuck_io.h"
-#endif
 
 #if defined(__PLATFORM_WIN32__)
 #include "dirent_win32.h"
@@ -78,7 +75,8 @@ t_CKBOOL load_external_modules( Chuck_Compiler * compiler,
                                 const char * extension, 
                                 std::list<std::string> & chugin_search_paths,
                                 std::list<std::string> & named_dls);
-t_CKBOOL load_module( Chuck_Compiler * compiler, Chuck_Env * env, f_ck_query query, const char * name, const char * nspc );
+t_CKBOOL load_module( Chuck_Compiler * compiler, Chuck_Env * env,
+                      f_ck_query query, const char * name, const char * nspc );
 
 
 
@@ -642,10 +640,11 @@ t_CKBOOL load_internal_modules( Chuck_Compiler * compiler )
     // load it
     type_engine_load_context( env, context );
     
-//#ifndef __DISABLE_MIDI__
+    // still compile MidiMsg even if __DISABLE_MIDI__
     if( !init_class_Midi( env ) ) goto error;
+#ifndef __DISABLE_MIDI__
     if( !init_class_MidiRW( env ) ) goto error;
-//#endif // __DISABLE_MIDI__
+#endif // __DISABLE_MIDI__
 
     // load
     EM_log( CK_LOG_SEVERE, "module osc..." );

@@ -54,7 +54,7 @@ t_CKBOOL Chuck_VM_Object::our_locks_in_effect = TRUE;
 const t_CKINT Chuck_IO::INT32 = 0x1;
 const t_CKINT Chuck_IO::INT16 = 0x2;
 const t_CKINT Chuck_IO::INT8 = 0x4;
-#ifndef __DISABLE__THREADS
+#ifndef __DISABLE_THREADS__
 const t_CKINT Chuck_IO::MODE_SYNC = 0;
 const t_CKINT Chuck_IO::MODE_ASYNC = 1;
 #else
@@ -2074,8 +2074,55 @@ void Chuck_Event::global_listen( void (* cb)(void),
     Chuck_Global_Event_Listener new_listener;
     
     // store cb and whether to listen until canceled
-    new_listener.callback = cb;
+    new_listener.void_callback = cb;
     new_listener.listen_forever = listen_forever;
+    new_listener.callback_type = ck_get_plain;
+    
+    // store storage
+    m_global_queue.push( new_listener );
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: global_listen()
+// desc: register a callback to a global event
+//-----------------------------------------------------------------------------
+void Chuck_Event::global_listen( std::string name, void (* cb)(const char *),
+    t_CKBOOL listen_forever )
+{
+    // storage
+    Chuck_Global_Event_Listener new_listener;
+    
+    // store cb and whether to listen until canceled
+    new_listener.named_callback = cb;
+    new_listener.listen_forever = listen_forever;
+    new_listener.callback_type = ck_get_name;
+    new_listener.name = name;
+    
+    // store storage
+    m_global_queue.push( new_listener );
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: global_listen()
+// desc: register a callback to a global event
+//-----------------------------------------------------------------------------
+void Chuck_Event::global_listen( t_CKINT id, void (* cb)(t_CKINT),
+    t_CKBOOL listen_forever )
+{
+    // storage
+    Chuck_Global_Event_Listener new_listener;
+    
+    // store cb and whether to listen until canceled
+    new_listener.id_callback = cb;
+    new_listener.listen_forever = listen_forever;
+    new_listener.callback_type = ck_get_id;
+    new_listener.id = id;
     
     // store storage
     m_global_queue.push( new_listener );
@@ -2101,7 +2148,97 @@ t_CKBOOL Chuck_Event::remove_listen( void (* cb)(void) )
     while( !m_global_queue.empty() )
     {
         // check if the callback we are looking for
-        if( m_global_queue.front().callback != cb )
+        if( m_global_queue.front().callback_type != ck_get_plain || m_global_queue.front().void_callback != cb )
+        {
+            // if not, enqueue it into temp
+            temp.push( m_global_queue.front() );
+        }
+        else
+        {
+            // flag, don't add to temp
+            removed = TRUE;
+        }
+
+        // pop the top
+        m_global_queue.pop();
+    }
+
+    // copy temp back to queue
+    m_global_queue = temp;
+    // release lock
+    #ifndef __DISABLE_THREADS__
+    m_queue_lock.release();
+    #endif
+
+    return removed;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: remove_listen()
+// desc: deregister a callback to a global event
+//-----------------------------------------------------------------------------
+t_CKBOOL Chuck_Event::remove_listen( std::string name, void (* cb)(const char *)  )
+{
+    std::queue<Chuck_Global_Event_Listener> temp;
+    t_CKBOOL removed = FALSE;
+
+    // lock
+    #ifndef __DISABLE_THREADS__
+    m_queue_lock.acquire();
+    #endif
+    // while something in queue
+    while( !m_global_queue.empty() )
+    {
+        // check if the callback we are looking for
+        if( m_global_queue.front().callback_type != ck_get_name || m_global_queue.front().named_callback != cb )
+        {
+            // if not, enqueue it into temp
+            temp.push( m_global_queue.front() );
+        }
+        else
+        {
+            // flag, don't add to temp
+            removed = TRUE;
+        }
+
+        // pop the top
+        m_global_queue.pop();
+    }
+
+    // copy temp back to queue
+    m_global_queue = temp;
+    // release lock
+    #ifndef __DISABLE_THREADS__
+    m_queue_lock.release();
+    #endif
+
+    return removed;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: remove_listen()
+// desc: deregister a callback to a global event
+//-----------------------------------------------------------------------------
+t_CKBOOL Chuck_Event::remove_listen( t_CKINT id, void (* cb)(t_CKINT)  )
+{
+    std::queue<Chuck_Global_Event_Listener> temp;
+    t_CKBOOL removed = FALSE;
+
+    // lock
+    #ifndef __DISABLE_THREADS__
+    m_queue_lock.acquire();
+    #endif
+    // while something in queue
+    while( !m_global_queue.empty() )
+    {
+        // check if the callback we are looking for
+        if( m_global_queue.front().callback_type != ck_get_id || m_global_queue.front().id_callback != cb )
         {
             // if not, enqueue it into temp
             temp.push( m_global_queue.front() );
@@ -2146,9 +2283,26 @@ void Chuck_Event::signal_global()
         // pop the top
         m_global_queue.pop();
         // call callback
-        if( listener.callback != NULL )
+        switch( listener.callback_type )
         {
-            listener.callback();
+        case ck_get_plain:
+            if( listener.void_callback != NULL )
+            {
+                listener.void_callback();
+            }
+            break;
+        case ck_get_name:
+            if( listener.named_callback != NULL )
+            {
+                listener.named_callback( listener.name.c_str() );
+            }
+            break;
+        case ck_get_id:
+            if( listener.id_callback != NULL )
+            {
+                listener.id_callback( listener.id );
+            }
+            break;
         }
         // if call forever, add back to m_global_queue
         if( listener.listen_forever )
@@ -2183,9 +2337,26 @@ void Chuck_Event::broadcast_global()
         // pop the top
         m_global_queue.pop();
         // call callback
-        if( listener.callback != NULL )
+        switch( listener.callback_type )
         {
-            listener.callback();
+        case ck_get_plain:
+            if( listener.void_callback != NULL )
+            {
+                listener.void_callback();
+            }
+            break;
+        case ck_get_name:
+            if( listener.named_callback != NULL )
+            {
+                listener.named_callback( listener.name.c_str() );
+            }
+            break;
+        case ck_get_id:
+            if( listener.id_callback != NULL )
+            {
+                listener.id_callback( listener.id );
+            }
+            break;
         }
         // if call forever, add back to m_global_queue
         if( listener.listen_forever )

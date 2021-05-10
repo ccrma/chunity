@@ -156,6 +156,9 @@ public class ChuckStringSyncer : MonoBehaviour
         StopSyncing();
     }
 
+    #if UNITY_IOS && !UNITY_EDITOR
+    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallbackWithID))]
+    #endif
     private static void StaticCallback( CK_INT id, string newValue )
     {
         if( activeCallbacks.ContainsKey( id ) )
