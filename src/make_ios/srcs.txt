@@ -121,5 +121,5 @@ chuck/src/core/util_string.cpp
 chuck/src/core/util_string.h
 chuck/src/core/util_thread.cpp
 chuck/src/core/util_thread.h
-chuck/src/core/chuck/src/core/util_xforms.c
+chuck/src/core/util_xforms.c
 chuck/src/core/util_xforms.h
