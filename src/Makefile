@@ -24,6 +24,7 @@ chuck/src/core/chuck_ugen.cpp \
 chuck/src/core/chuck_otf.cpp \
 chuck/src/core/chuck_stats.cpp \
 chuck/src/core/chuck_shell.cpp \
+chuck/src/core/chuck_globals.cpp \
 chuck/src/core/chuck_io.cpp \
 chuck/src/core/chuck_carrier.cpp \
 chuck/src/core/hidio_sdl.cpp \
