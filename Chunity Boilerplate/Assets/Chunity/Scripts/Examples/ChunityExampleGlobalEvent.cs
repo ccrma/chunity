@@ -15,14 +15,14 @@ public class ChunityExampleGlobalEvent : MonoBehaviour
 
 	public MeshRenderer myBox;
 
-	private int numTimesCallbackCalled = 0;
+	private static int numTimesCallbackCalled = 0;
 
 	void Start()
 	{
 		// get reference to chuck instance
 		myChuck = GetComponent<ChuckSubInstance>();
 		// create the callback we will pass
-		myCallback = Chuck.CreateVoidCallback( CallbackFunction );
+		myCallback = CallbackFunction;
 
 		// run code: make a global event, and every 250 ms, broadcast it to all listeners
 		myChuck.RunCode( @"
@@ -34,11 +34,22 @@ public class ChunityExampleGlobalEvent : MonoBehaviour
 			}
 		" );
 
+		#if UNITY_WEBGL
+		// use WebGL specific callback signature: (game object name, method name)
+		myChuck.StartListeningForChuckEvent( "notifier", gameObject.name, "CallbackFunction" );
+
+		// NOTE: can also use below method of passing callback directly ONLY if 
+		// the callback is changed to be a *static* method
+        #else
 		// register myCallback as a listener of Event "notifier" until I tell it to stop
 		myChuck.StartListeningForChuckEvent( "notifier", myCallback );
+		#endif
 	}
 
-	void CallbackFunction()
+	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
+	#endif
+	static void CallbackFunction()
 	{
 		// store a message that the callback function was called
 		// (we can't do Unity-specific things in here, since ChucK will be calling this, not Unity)

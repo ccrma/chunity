@@ -2,6 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
+
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+#endif
+using CK_FLOAT = System.Double;
 
 public class ChuckEventListener : MonoBehaviour
 {
@@ -22,11 +32,15 @@ public class ChuckEventListener : MonoBehaviour
         StopListening();
 
         // start up again
-        myVoidCallback = Chuck.CreateVoidCallback( MyCallback );
         userCallback = callback;
         myChuck = chuck;
         myEventName = eventToListenFor;
-        myChuck.StartListeningForChuckEvent( myEventName, myVoidCallback );
+        #if UNITY_WEBGL
+        myChuck.StartListeningForChuckEvent( myEventName, gameObject.name, "MyDirectCallback" );
+        #else
+        AllocateCallback();
+        myChuck.StartListeningForChuckEvent( myEventName, myVoidCallback, myID );
+        #endif
     }
 
 
@@ -37,12 +51,20 @@ public class ChuckEventListener : MonoBehaviour
     // ----------------------------------------------------
     public void StopListening()
     {
+        #if UNITY_WEBGL
+        if( myChuck != null && myEventName != "" )
+        {
+            myChuck.StopListeningForChuckEvent( myEventName, gameObject.name, "MyDirectCallback" );
+        }
+        #else
         if( myChuck != null && myVoidCallback != null )
         {
-            myChuck.StopListeningForChuckEvent( myEventName, myVoidCallback );
+            myChuck.StopListeningForChuckEvent( myEventName, myVoidCallback, myID );
         }
+        ReturnCallback();
+        #endif
+
         myChuck = null;
-        myVoidCallback = null;
         myEventName = "";
     }
 
@@ -55,6 +77,22 @@ public class ChuckEventListener : MonoBehaviour
     ChuckSubInstance myChuck = null;
     string myEventName = "";
 
+    private static Dictionary<CK_INT, ChuckEventListener> activeCallbacks;
+    private static CK_INT nextID = 0;
+    private CK_INT myID = -1;
+    private Chuck.VoidCallbackWithID myVoidCallback;
+
+
+    private void Awake()
+    {
+        if( activeCallbacks == null )
+        {
+            activeCallbacks = new Dictionary<CK_INT, ChuckEventListener>();
+        }
+        myID = nextID;
+        nextID++;
+    }
+
     private void Update()
     {
         while( numTimesCalled > 0 )
@@ -64,13 +102,36 @@ public class ChuckEventListener : MonoBehaviour
         }
     }
 
-    private Chuck.VoidCallback myVoidCallback;
+
+
+    private void AllocateCallback()
+    {
+        
+        // regular allocation
+        myVoidCallback = ChuckEventListener.StaticCallback;
+        activeCallbacks[myID] = this;
+    }
+
+    private void ReturnCallback()
+    {
+        // stop tracking
+        activeCallbacks.Remove( myID );
+        // always set my callback to null
+        myVoidCallback = null;
+    }
+
     private Action userCallback;
 
     private int numTimesCalled = 0;
+    
     private void MyCallback()
     {
         numTimesCalled++;
+    }
+
+    private void MyDirectCallback()
+    {
+        userCallback();
     }
 
 
@@ -78,4 +139,16 @@ public class ChuckEventListener : MonoBehaviour
     {
         StopListening();
     }
+
+    #if UNITY_IOS && !UNITY_EDITOR
+    [AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallbackWithID))]
+    #endif
+    private static void StaticCallback( CK_INT id )
+    {
+        if( activeCallbacks.ContainsKey( id ) )
+        {
+            activeCallbacks[id].MyCallback();
+        }
+    }
+
 }

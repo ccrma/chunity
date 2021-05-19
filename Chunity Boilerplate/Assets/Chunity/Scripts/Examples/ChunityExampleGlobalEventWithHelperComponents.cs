@@ -35,7 +35,7 @@ public class ChunityExampleGlobalEventWithHelperComponents : MonoBehaviour
 
 	void Update()
 	{
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			gameObject.GetComponent<ChuckEventListener>().StopListening();
 		}

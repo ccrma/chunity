@@ -137,9 +137,6 @@
     <ClCompile Include="..\chuck\src\core\chuck_vm.cpp">
       <Filter>core</Filter>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\core\chuck_win32.c">
-      <Filter>core</Filter>
-    </ClCompile>
     <ClCompile Include="..\chuck\src\core\hidio_sdl.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -225,6 +222,12 @@
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="..\chuck\src\core\chuck_carrier.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chuck\src\core\chuck_win32.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chuck\src\core\chuck_globals.cpp">
       <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -465,6 +468,10 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="..\chuck\src\core\chuck.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Plugin_ChucK.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_globals.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>

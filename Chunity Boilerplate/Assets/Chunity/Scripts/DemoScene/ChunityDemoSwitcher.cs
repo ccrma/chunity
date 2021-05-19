@@ -29,6 +29,40 @@ public class ChunityDemoSwitcher : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        #if UNITY_IOS && !UNITY_EDITOR
+        // only repsond to the initial touch
+        if( Input.touchCount > 0 )
+        {
+            Touch touch = Input.GetTouch(0);
+            if( touch.phase == TouchPhase.Began )
+            {
+                float horizontalPosition = touch.position.x;
+                bool leftClick = horizontalPosition < 600;
+                bool rightClick = horizontalPosition > 1800;
+                // switch to previous or next demo
+                if( leftClick || rightClick )
+                {
+                    // deactivate this one
+                    DeactivateDemo( myDemos[myCurrentDemo] );
+                    
+                    // update demo number
+                    if( leftClick )
+                    {
+                        myCurrentDemo += myDemos.Length - 1;
+                    }
+                    else
+                    {
+                        myCurrentDemo++;
+                    }
+                    myCurrentDemo %= myDemos.Length;
+                    
+                    // activate the new demo
+                    ActivateDemo( myDemos[myCurrentDemo] );
+                }
+            }
+        }
+
+        #else
         if( Input.GetKeyDown( "return" ) )
         {
             // deactivate current demo
@@ -48,6 +82,7 @@ public class ChunityDemoSwitcher : MonoBehaviour
             // activate the new demo
             ActivateDemo( myDemos[myCurrentDemo] );
         }
+        #endif
     }
 
     void ActivateDemo( ChunityDemoDescription demo )

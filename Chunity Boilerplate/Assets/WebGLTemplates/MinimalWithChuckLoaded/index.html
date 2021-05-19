@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | %UNITY_WEB_NAME%</title>
+  </head>
+  
+  <body>
+    <div id="unityContainer" style="width: %UNITY_WIDTH%px; height: %UNITY_HEIGHT%px; margin: auto"></div>
+    <button id="startButton">Start</button>
+    <script type="text/javascript" src="./js/defer.js"></script>
+    <script>
+        // override
+        var whereIsChuck = "./js";
+    </script>
+    <script type="text/javascript" src="./js/webchuck_host.js"></script>
+    <script src="%UNITY_WEBGL_LOADER_URL%"></script>
+    <script>
+    var startButton = document.getElementById( "startButton" );
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    var audioContext = undefined;
+    var chunityAudioListener = undefined;
+    var unityInstance = undefined;
+    startButton.addEventListener( "click", async function() {
+        startButton.disabled = true;
+        await startChuck();
+        await theChuckReady;
+        chunityAudioListener = audioContext.listener;
+        
+        unityInstance = UnityLoader.instantiate("unityContainer", "%UNITY_WEBGL_BUILD_URL%");    
+    });
+    </script>
+  </body>
+  
+</html>

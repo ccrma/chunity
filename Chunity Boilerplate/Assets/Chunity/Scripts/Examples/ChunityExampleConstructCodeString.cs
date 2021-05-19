@@ -23,7 +23,7 @@ public class ChunityExampleConstructCodeString : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			// convert float array to string array
 			string[] stringMidiNotes = new string[myMidiNotes.Length];

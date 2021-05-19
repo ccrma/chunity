@@ -2,6 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+#endif
+using CK_FLOAT = System.Double;
+
 public class ChunityExampleGlobalFloatArray : MonoBehaviour
 {
 	// This example shows how to use various methods
@@ -11,7 +21,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 	Chuck.FloatArrayCallback myFloatArrayCallback;
 	Chuck.FloatCallback myFloatCallback;
 
-	public double[] myMidiNotes = { 60, 65, 69, 72 };
+	public CK_FLOAT[] myMidiNotes = { 60, 65, 69, 72 };
 
 	// Use this for initialization
 	void Start()
@@ -37,16 +47,15 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 			}
 		" );
 
-		myFloatArrayCallback = myChuck.CreateGetFloatArrayCallback( GetInitialArrayCallback );
-		myFloatCallback = myChuck.CreateGetFloatCallback( GetANumberCallback );
+		myFloatArrayCallback = GetInitialArrayCallback;
+		myFloatCallback = GetANumberCallback;
 	}
 
 	// Update is called once per frame
 	private int numPresses = 0;
 	void Update()
 	{
-
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			// on first press, set entire array
 			if( numPresses == 0 )
@@ -61,8 +70,16 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 
 			// test some gets too
 			myChuck.GetFloatArray( "myFloatNotes", myFloatArrayCallback );
+			#if UNITY_WEBGL
+			// WebGL specific float callback signature: game object name, method name
+			myChuck.GetFloatArrayValue( "myFloatNotes", 1, gameObject.name, "GetANumberCallback" );
+			myChuck.GetAssociativeFloatArrayValue( "myFloatNotes", "numPlayed", gameObject.name, "GetANumberCallback" );
+		
+			// NOTE: can do it the below way if the callback is made into a *static* method
+			#else
 			myChuck.GetFloatArrayValue( "myFloatNotes", 1, myFloatCallback );
 			myChuck.GetAssociativeFloatArrayValue( "myFloatNotes", "numPlayed", myFloatCallback );
+			#endif
 			
             // actually play it!
 			myChuck.BroadcastEvent( "playMyNotes" );
@@ -71,16 +88,22 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
-	void GetInitialArrayCallback( double[] values, ulong numValues )
+	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallback))]
+	#endif
+	static void GetInitialArrayCallback( CK_FLOAT[] values, CK_UINT numValues )
 	{
-		Debug.Log( "Array has " + numValues.ToString() + " numbers which are: " );
+		Debug.Log( "Float array has " + numValues.ToString() + " numbers which are: " );
 		for( int i = 0; i < values.Length; i++ )
 		{
 			Debug.Log( "        " + values[i].ToString() );
 		}
 	}
 
-	void GetANumberCallback( double value )
+	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
+	#endif
+	static void GetANumberCallback( CK_FLOAT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );
 	}

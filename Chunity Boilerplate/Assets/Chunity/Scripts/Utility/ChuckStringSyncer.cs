@@ -2,6 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
+
+
+#if UNITY_WEBGL
+using CK_INT = System.Int32;
+using CK_UINT = System.UInt32;
+#else
+using CK_INT = System.Int64;
+using CK_UINT = System.UInt64;
+#endif
+using CK_FLOAT = System.Double;
 
 public class ChuckStringSyncer : MonoBehaviour
 {
@@ -23,7 +34,9 @@ public class ChuckStringSyncer : MonoBehaviour
         // start up again
         myChuck = chuck;
         myStringName = stringToSync;
-        myStringCallback = Chuck.CreateGetStringCallback( MyCallback );
+        #if !UNITY_WEBGL
+        AllocateCallback();
+        #endif
     }
 
 
@@ -68,6 +81,10 @@ public class ChuckStringSyncer : MonoBehaviour
     {
         myChuck = null;
         myStringName = "";
+
+        #if !UNITY_WEBGL
+        ReturnCallback();
+        #endif
     }
 
 
@@ -76,15 +93,56 @@ public class ChuckStringSyncer : MonoBehaviour
     // =========== INTERNAL MECHANICS ========== //
 
     ChuckSubInstance myChuck = null;
-    Chuck.StringCallback myStringCallback;
+    Chuck.StringCallbackWithID myStringCallback;
+
+    private static Dictionary<CK_INT, ChuckStringSyncer> activeCallbacks;
+    private static CK_INT nextID = 0;
+    private CK_INT myID;
+    
+
+    private void Awake()
+    {
+        if( activeCallbacks == null )
+        {
+            activeCallbacks = new Dictionary<CK_INT, ChuckStringSyncer>();
+        }
+        myID = nextID;
+        nextID++;
+    }
+
+
+    private void AllocateCallback()
+    {
+        // register
+        activeCallbacks[myID] = this;
+        myStringCallback = StaticCallback;
+    }
+
+    private void ReturnCallback()
+    {
+        // deregister
+        activeCallbacks.Remove( myID );
+        // always set my callback to null
+        myStringCallback = null;
+    }
+
+
+
     string myStringName = "";
 
     private void Update()
     {
+        #if UNITY_WEBGL
+        if( myChuck != null && myStringName != "" )
+        {
+            myChuck.GetString( myStringName, gameObject.name, "MyCallback" );
+        }
+        #else
         if( myChuck != null && myStringCallback != null && myStringName != "" )
         {
-            myChuck.GetString( myStringName, myStringCallback );
+            myChuck.GetString( myStringName, myStringCallback, myID );
         }
+        #endif
     }
 
     private string myStringValue = "";
@@ -97,4 +155,16 @@ public class ChuckStringSyncer : MonoBehaviour
     {
         StopSyncing();
     }
+
+    #if UNITY_IOS && !UNITY_EDITOR
+    [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallbackWithID))]
+    #endif
+    private static void StaticCallback( CK_INT id, string newValue )
+    {
+        if( activeCallbacks.ContainsKey( id ) )
+        {
+            activeCallbacks[id].MyCallback( newValue );
+        }
+    }
+
 }

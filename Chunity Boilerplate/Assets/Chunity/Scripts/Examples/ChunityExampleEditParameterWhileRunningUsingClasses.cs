@@ -45,7 +45,7 @@ public class ChunityExampleEditParameterWhileRunningUsingClasses : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		if( Input.GetKeyDown( "space" ) )
+		if( ChunityDemo.InteractWithDemo() )
 		{
 			// update the state of my SinOsc
 			GetComponent<ChuckSubInstance>().RunCode( @"

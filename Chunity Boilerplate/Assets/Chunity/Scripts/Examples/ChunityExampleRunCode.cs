@@ -18,29 +18,21 @@ public class ChunityExampleRunCode : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-#if UNITY_IOS
-		for (int i = 0; i < Input.touchCount; ++i)
+		if( ChunityDemo.InteractWithDemo() )
 		{
-			if (Input.GetTouch(i).phase == TouchPhase.Began)
-			{
-#else
-		if( Input.GetKeyDown( "space" ) )
-		{
-#endif
 			// rotate my cube's transform
 			transform.Rotate( new Vector3( 0, 15, 5 ) );
 
 			// play a chuck script
 			myChuck.RunCode( @"
 				SndBuf buffy => dac;
-				""special:dope"" => buffy.read;
+				// TODO: broken on iOS?
+				//""special:dope"" => buffy.read;
+				me.dir() + ""impact.wav"" => buffy.read;
 				buffy.length() => now;		
 	
 			" );
 		}
-#if UNITY_IOS
-		}
-#endif
 
 	}
 }
