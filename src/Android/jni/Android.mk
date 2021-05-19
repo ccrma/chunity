@@ -22,6 +22,7 @@ LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/chuck_scan.cpp \
 ../../chuck/src/core/chuck_type.cpp \
 ../../chuck/src/core/chuck_emit.cpp \
+../../chuck/src/core/chuck_globals.cpp \
 ../../chuck/src/core/chuck_compile.cpp \
 ../../chuck/src/core/chuck_dl.cpp \
 ../../chuck/src/core/chuck_oo.cpp \
