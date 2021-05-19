@@ -344,6 +344,58 @@ Chuck_Object::~Chuck_Object()
 
 
 //-----------------------------------------------------------------------------
+// name: dump()
+// desc: output current state (can be overridden)
+//-----------------------------------------------------------------------------
+void Chuck_Object::dump() // 1.4.0.2
+{
+    // TODO: implement!
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: apropos()
+// desc: output interface (can be overriden; but probably shouldn't be)
+//-----------------------------------------------------------------------------
+void Chuck_Object::apropos() // 1.4.0.2
+{
+    // type to unpack
+    Chuck_Type * type = this->type_ref;
+
+    // if type is generic "@array"
+    if( type->xid == te_array )
+    {
+        // get more specific
+        Chuck_Array * arr = (Chuck_Array *)this;
+        // however, a number of chuck array allocations still do not
+        // set the m_array_type member; update to this only if it exists
+        if( arr->m_array_type != NULL )
+            type = arr->m_array_type;
+    }
+
+    // unpack type and output its info
+    type->apropos();
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: ~Chuck_Array()
+// desc: destructor
+//-----------------------------------------------------------------------------
+Chuck_Array::~Chuck_Array()
+{
+    // decrement reference count; added (ge): 1.4.0.2
+    SAFE_RELEASE(m_array_type);
+}
+
+
+
+
+//-----------------------------------------------------------------------------
 // name: Chuck_Array4()
 // desc: constructor
 //-----------------------------------------------------------------------------
@@ -627,8 +679,27 @@ t_CKINT Chuck_Array4::set_capacity( t_CKINT capacity )
     // sanity check
     assert( capacity >= 0 );
 
-    // ensure size
-    set_size( capacity );
+    // ensure size (removed 1.4.0.2 in favor of actually setting capacity)
+    // set_size( capacity );
+    
+    // if clearing size
+    if( capacity < m_vector.size() )
+    {
+        // zero out section
+        zero( capacity, m_vector.size() );
+    }
+    
+    // what the size was
+    t_CKINT capacity_prev = m_vector.capacity();
+    // reserve vector
+    m_vector.reserve( capacity );
+    
+    // if clearing size
+    if( m_vector.capacity() > capacity_prev )
+    {
+        // zero out section
+        zero( capacity_prev, m_vector.capacity() );
+    }
 
     return m_vector.capacity();
 }
@@ -1968,11 +2039,11 @@ void Chuck_Array32::zero( t_CKUINT start, t_CKUINT end )
 t_CKUINT Chuck_Event::our_can_wait = 0;
 
 //-----------------------------------------------------------------------------
-// name: signal()
+// name: signal_local()
 // desc: signal a event/condition variable, shreduling the next waiting shred
-//       (if there is one or more)
+//       (if there is one or more); local in this case means within VM
 //-----------------------------------------------------------------------------
-void Chuck_Event::signal()
+void Chuck_Event::signal_local()
 {
     #ifndef __DISABLE_THREADS__
     m_queue_lock.acquire();
@@ -2411,10 +2482,11 @@ void Chuck_Event::queue_broadcast( CBufferSimple * event_buffer )
 
 
 //-----------------------------------------------------------------------------
-// name: broadcast()
+// name: broadcast_local()
 // desc: broadcast a event/condition variable, shreduling all waiting shreds
+//       local here means within VM
 //-----------------------------------------------------------------------------
-void Chuck_Event::broadcast()
+void Chuck_Event::broadcast_local()
 {
     // lock queue
     #ifndef __DISABLE_THREADS__
@@ -2428,7 +2500,7 @@ void Chuck_Event::broadcast()
         m_queue_lock.release();
         #endif
         // signal the next shred
-        this->signal();
+        this->signal_local();
         // lock again
         #ifndef __DISABLE_THREADS__
         m_queue_lock.acquire();
@@ -3433,7 +3505,7 @@ THREAD_RETURN ( THREAD_TYPE Chuck_IO_File::writeStr_thread ) ( void *data )
     args->fileio_obj->write ( args->stringArg );
     Chuck_Event *e = args->fileio_obj->m_asyncEvent;
     delete args;
-    e->broadcast(); // wake up
+    e->broadcast_local(); // wake up
     e->broadcast_global();
 
     return (THREAD_RETURN)0;
@@ -3443,7 +3515,7 @@ THREAD_RETURN ( THREAD_TYPE Chuck_IO_File::writeInt_thread ) ( void *data )
 {
     async_args *args = (async_args *)data;
     args->fileio_obj->write ( args->intArg );
-    args->fileio_obj->m_asyncEvent->broadcast(); // wake up
+    args->fileio_obj->m_asyncEvent->broadcast_local(); // wake up
     args->fileio_obj->m_asyncEvent->broadcast_global();
     delete args;
 
@@ -3454,7 +3526,7 @@ THREAD_RETURN ( THREAD_TYPE Chuck_IO_File::writeFloat_thread ) ( void *data )
 {
     async_args *args = (async_args *)data;
     args->fileio_obj->write ( args->floatArg );
-    args->fileio_obj->m_asyncEvent->broadcast(); // wake up
+    args->fileio_obj->m_asyncEvent->broadcast_local(); // wake up
     args->fileio_obj->m_asyncEvent->broadcast_global();
     delete args;
 
@@ -3466,18 +3538,26 @@ THREAD_RETURN ( THREAD_TYPE Chuck_IO_File::writeFloat_thread ) ( void *data )
 
 
 
-Chuck_IO_Chout::Chuck_IO_Chout( Chuck_Carrier * carrier ) {
+//-----------------------------------------------------------------------------
+// name: Chuck_IO_Chout()
+// desc: constructor
+//-----------------------------------------------------------------------------
+Chuck_IO_Chout::Chuck_IO_Chout( Chuck_Carrier * carrier )
+{
     // store
     carrier->chout = this;
     // add ref
     this->add_ref();
+    // zero out
+    m_callback = NULL;
     // initialize (added 1.3.0.0)
     initialize_object( this, carrier->env->t_chout );
     // lock so can't be deleted conventionally
     this->lock();
 }
 
-Chuck_IO_Chout::~Chuck_IO_Chout() {
+Chuck_IO_Chout::~Chuck_IO_Chout()
+{
     m_callback = NULL;
 }
 
@@ -3558,18 +3638,28 @@ void Chuck_IO_Chout::write( t_CKFLOAT val )
 }
 
 
-Chuck_IO_Cherr::Chuck_IO_Cherr( Chuck_Carrier * carrier ) {
+
+
+//-----------------------------------------------------------------------------
+// name: Chuck_IO_Cherr()
+// desc: constructor
+//-----------------------------------------------------------------------------
+Chuck_IO_Cherr::Chuck_IO_Cherr( Chuck_Carrier * carrier )
+{
     // store
     carrier->cherr = this;
     // add ref
     this->add_ref();
+    // zero out
+    m_callback = NULL;
     // initialize (added 1.3.0.0)
     initialize_object( this, carrier->env->t_cherr );
     // lock so can't be deleted conventionally
     this->lock();
 }
 
-Chuck_IO_Cherr::~Chuck_IO_Cherr() {
+Chuck_IO_Cherr::~Chuck_IO_Cherr()
+{
     m_callback = NULL;
 }
 

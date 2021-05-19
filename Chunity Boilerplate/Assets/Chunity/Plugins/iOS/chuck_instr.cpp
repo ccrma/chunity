@@ -39,6 +39,7 @@
 #include "chuck_ugen.h"
 #include "chuck_dl.h"
 #include "chuck_errmsg.h"
+#include "chuck_globals.h" // added 1.4.0.2
 
 #include "util_string.h"
 
@@ -2280,7 +2281,6 @@ void Chuck_Instr_Reg_Push_Mem_Vec4::execute( Chuck_VM * vm, Chuck_VM_Shred * shr
 //-----------------------------------------------------------------------------
 void Chuck_Instr_Reg_Push_Global::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
 {
-    
     // get global map content
     switch( m_type ) {
         case te_globalInt:
@@ -2336,7 +2336,25 @@ void Chuck_Instr_Reg_Push_Global::execute( Chuck_VM * vm, Chuck_VM_Shred * shred
             t_CKUINT *& reg_sp = (t_CKUINT *&)shred->reg->sp;
             t_CKUINT val = (t_CKUINT) vm->globals_manager()->get_global_ugen( m_name );
             
-            // push global map content into event-reg stack
+            // push global map content into ugen-reg stack
+            push_( reg_sp, val );
+        }
+            break;
+        case te_globalObject:
+        {
+            if( !vm->globals_manager()->is_global_object_valid( m_name ) )
+            {
+                // we have a problem
+                CK_FPRINTF_STDERR(
+                                  "[chuck](VM): UninitializedObjectException: on line[%lu] in shred[id=%lu:%s]\n[chuck](VM): ... (hint: need to declare global Object earlier in file)\n",
+                                  m_linepos, shred->xid, shred->name.c_str());
+                goto error;
+            }
+            
+            t_CKUINT *& reg_sp = (t_CKUINT *&)shred->reg->sp;
+            t_CKUINT val = (t_CKUINT) vm->globals_manager()->get_global_object( m_name );
+            
+            // push global map content into object-reg stack
             push_( reg_sp, val );
         }
             break;
@@ -2408,6 +2426,9 @@ void Chuck_Instr_Reg_Push_Global_Addr::execute( Chuck_VM * vm, Chuck_VM_Shred * 
             break;
         case te_globalUGen:
             addr = (t_CKUINT) vm->globals_manager()->get_ptr_to_global_ugen( m_name );
+            break;
+        case te_globalObject:
+            addr = (t_CKUINT) vm->globals_manager()->get_ptr_to_global_object( m_name );
             break;
         case te_globalArraySymbol:
             addr = (t_CKUINT) vm->globals_manager()->get_ptr_to_global_array( m_name );
@@ -3661,6 +3682,10 @@ void Chuck_Instr_Alloc_Word_Global::execute( Chuck_VM * vm, Chuck_VM_Shred * shr
                 EM_error2( 0, "global UGen arrays are currently disabled." );
                 goto error;
                 break;
+            case te_globalObject:
+                EM_error2( 0, "global Object arrays are currently disabled." );
+                goto error;
+                break;
             case te_globalArraySymbol:
                 EM_error2( 0, "(internal error) symbol-only global type used in allocation" );
                 goto error;
@@ -3692,6 +3717,11 @@ void Chuck_Instr_Alloc_Word_Global::execute( Chuck_VM * vm, Chuck_VM_Shred * shr
                 // ugens are already init in emit
                 // but might need to execute ctors (below)
                 addr = (t_CKUINT) vm->globals_manager()->get_global_ugen( m_name );
+                break;
+            case te_globalObject:
+                // object are already init in emit
+                // but might need to execute ctors (below)
+                addr = (t_CKUINT) vm->globals_manager()->get_global_object( m_name );
                 break;
             case te_globalArraySymbol:
                 EM_error2( 0, "(internal error) symbol-only global type used in allocation" );
@@ -6615,7 +6645,8 @@ void Chuck_Instr_Cast_object2string::execute( Chuck_VM * vm, Chuck_VM_Shred * sh
     // return
     Chuck_DL_Return RETURN;
     // get toString from it (added 1.3.0.0 -- Chuck_DL_Api::Api::instance())
-    object_toString( obj, NULL, &RETURN, vm, NULL, Chuck_DL_Api::Api::instance() );
+    object_toString( obj, NULL, &RETURN, vm, shred, Chuck_DL_Api::Api::instance() );
+    // get pointer
     Chuck_String * str = RETURN.v_string;
     // set it
     push_( sp, (t_CKUINT)str );

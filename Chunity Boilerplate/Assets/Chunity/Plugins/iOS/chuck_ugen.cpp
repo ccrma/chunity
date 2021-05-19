@@ -202,11 +202,13 @@ void Chuck_UGen::init()
     m_last = 0.0f;
     m_op = UGEN_OP_TICK;
     m_gain = 1.0f;
-    m_pan = 1.0f;
     m_next = 0.0f;
     m_use_next = FALSE;
     m_max_block_size = -1;
-    
+    // if this is part of a stereo UGen, this parameter will be initialized
+    // according to the underly panning law (1.4.0.2)
+    m_pan = 1.0f;
+
     m_sum_v = NULL;
     m_current_v = NULL;
 
@@ -221,7 +223,7 @@ void Chuck_UGen::init()
     m_inlet = m_outlet = NULL;
     m_multi_in_v = m_multi_out_v = NULL;
     
-    // 1.4.0.1: yes more hacks. buffered flag allows 
+    // 1.4.0.2 (jack): yes more hacks. buffered flag allows 
     // global ugens' samples to be gotten
     m_is_buffered = FALSE;
     // buffer empty for any ugen that is not buffered
@@ -430,7 +432,7 @@ void Chuck_UGen::get_buffer( SAMPLE * buffer, t_CKINT num_elem )
 // desc: added 1.3.3.1
 //       destination ugen for a given source channel
 //-----------------------------------------------------------------------------
-Chuck_UGen *Chuck_UGen::src_chan( t_CKUINT chan )
+Chuck_UGen * Chuck_UGen::src_chan( t_CKUINT chan )
 {
     if( this->m_num_outs == 1)
         return this;
@@ -445,7 +447,7 @@ Chuck_UGen *Chuck_UGen::src_chan( t_CKUINT chan )
 // desc: added 1.3.3.1
 //       destination ugen for a given source channel
 //-----------------------------------------------------------------------------
-Chuck_UGen *Chuck_UGen::dst_for_src_chan( t_CKUINT chan )
+Chuck_UGen * Chuck_UGen::dst_for_src_chan( t_CKUINT chan )
 {
     if( this->m_num_ins == 1)
         return this;

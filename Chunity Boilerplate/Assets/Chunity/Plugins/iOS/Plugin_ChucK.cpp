@@ -8,6 +8,7 @@
 
 
 #include "Plugin_ChucK.h"
+#include "chuck_globals.h"
 
 #include <iostream>
 #include <map>
@@ -164,8 +165,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool setChuckInt( unsigned int chuckID, const char * name, t_CKINT val )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->setGlobalInt( name, val );
+        return gm->setGlobalInt( name, val );
     }
     
     
@@ -173,8 +176,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getChuckInt( unsigned int chuckID, const char * name, void (* callback)(t_CKINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->getGlobalInt( name, callback );
+        return gm->getGlobalInt( name, callback );
     }
 
 
@@ -182,8 +187,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getNamedChuckInt( unsigned int chuckID, const char * name, void (* callback)(const char *, t_CKINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->getGlobalInt( name, callback );
+        return gm->getGlobalInt( name, callback );
     }
 
 
@@ -191,8 +198,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getChuckIntWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, t_CKINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->getGlobalInt( name, callbackID, callback );
+        return gm->getGlobalInt( name, callbackID, callback );
     }
     
     
@@ -200,8 +209,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool setChuckFloat( unsigned int chuckID, const char * name, t_CKFLOAT val )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->setGlobalFloat( name, val );
+        return gm->setGlobalFloat( name, val );
     }
     
     
@@ -209,8 +220,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getChuckFloat( unsigned int chuckID, const char * name, void (* callback)(t_CKFLOAT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->getGlobalFloat( name, callback );
+        return gm->getGlobalFloat( name, callback );
     }
 
 
@@ -218,8 +231,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getNamedChuckFloat( unsigned int chuckID, const char * name, void (* callback)(const char *, t_CKFLOAT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->getGlobalFloat( name, callback );
+        return gm->getGlobalFloat( name, callback );
     }
 
 
@@ -227,8 +242,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getChuckFloatWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, t_CKFLOAT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->getGlobalFloat( name, callbackID, callback );
+        return gm->getGlobalFloat( name, callbackID, callback );
     }
     
     
@@ -236,8 +253,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool setChuckString( unsigned int chuckID, const char * name, const char * val )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->setGlobalString( name, val );
+        return gm->setGlobalString( name, val );
     }
     
     
@@ -245,8 +264,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getChuckString( unsigned int chuckID, const char * name, void (* callback)(const char *) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->getGlobalString( name, callback );
+        return gm->getGlobalString( name, callback );
     }
 
 
@@ -254,8 +275,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getNamedChuckString( unsigned int chuckID, const char * name, void (* callback)(const char *, const char *) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->getGlobalString( name, callback );
+        return gm->getGlobalString( name, callback );
     }
 
 
@@ -263,8 +286,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getChuckStringWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, const char*) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->getGlobalString( name, callbackID, callback );
+        return gm->getGlobalString( name, callbackID, callback );
     }
     
     
@@ -272,8 +297,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool signalChuckEvent( unsigned int chuckID, const char * name )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->signalGlobalEvent( name );
+        return gm->signalGlobalEvent( name );
     }
     
     
@@ -281,8 +308,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool broadcastChuckEvent( unsigned int chuckID, const char * name )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
 
-        return chuck_instances[chuckID]->broadcastGlobalEvent( name );
+        return gm->broadcastGlobalEvent( name );
     }
     
     
@@ -290,8 +319,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool listenForChuckEventOnce( unsigned int chuckID, const char * name, void (* callback)(void) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->listenForGlobalEvent(
+        return gm->listenForGlobalEvent(
             name, callback, FALSE );
     }
 
@@ -300,8 +331,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool listenForNamedChuckEventOnce( unsigned int chuckID, const char * name, void (* callback)(const char *) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->listenForGlobalEvent(
+        return gm->listenForGlobalEvent(
             name, callback, FALSE );
     }
 
@@ -310,8 +343,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool listenForChuckEventOnceWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->listenForGlobalEvent(
+        return gm->listenForGlobalEvent(
             name, callbackID, callback, FALSE );
     }
     
@@ -320,8 +355,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool startListeningForChuckEvent( unsigned int chuckID, const char * name, void (* callback)(void) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->listenForGlobalEvent(
+        return gm->listenForGlobalEvent(
             name, callback, TRUE );
     }
 
@@ -330,8 +367,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool startListeningForNamedChuckEvent( unsigned int chuckID, const char * name, void (* callback)(const char *) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->listenForGlobalEvent(
+        return gm->listenForGlobalEvent(
             name, callback, TRUE );
     }
 
@@ -340,8 +379,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool startListeningForChuckEventWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->listenForGlobalEvent(
+        return gm->listenForGlobalEvent(
             name, callbackID, callback, TRUE );
     }
     
@@ -350,8 +391,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool stopListeningForChuckEvent( unsigned int chuckID, const char * name, void (* callback)(void) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->stopListeningForGlobalEvent(
+        return gm->stopListeningForGlobalEvent(
             name, callback );
     }
 
@@ -360,8 +403,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool stopListeningForNamedChuckEvent( unsigned int chuckID, const char * name, void (* callback)(const char *) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->stopListeningForGlobalEvent(
+        return gm->stopListeningForGlobalEvent(
             name, callback );
     }
 
@@ -370,8 +415,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool stopListeningForChuckEventWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->stopListeningForGlobalEvent(
+        return gm->stopListeningForGlobalEvent(
             name, callbackID, callback );
     }
     
@@ -380,8 +427,10 @@ namespace ChucK_For_Unity
         const char * name, SAMPLE * buffer, int numSamples )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        if( !chuck_instances[chuckID]->getGlobalUGenSamples(
+        if( !gm->getGlobalUGenSamples(
             name, buffer, numSamples ) )
         {
             // failed. fill with zeroes.
@@ -399,8 +448,10 @@ namespace ChucK_For_Unity
         const char * name, t_CKINT arrayValues[], unsigned int numValues )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->setGlobalIntArray(
+        return gm->setGlobalIntArray(
             name, arrayValues, numValues );
     }
     
@@ -410,8 +461,10 @@ namespace ChucK_For_Unity
         const char * name, void (* callback)(t_CKINT[], t_CKUINT))
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalIntArray(
+        return gm->getGlobalIntArray(
             name, callback );
     }
 
@@ -421,8 +474,10 @@ namespace ChucK_For_Unity
         const char * name, void (* callback)(const char *, t_CKINT[], t_CKUINT))
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalIntArray(
+        return gm->getGlobalIntArray(
             name, callback );
     }
 
@@ -431,8 +486,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getGlobalIntArrayWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, t_CKINT[], t_CKUINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalIntArray(
+        return gm->getGlobalIntArray(
             name, callbackID, callback );
     }
     
@@ -442,8 +499,10 @@ namespace ChucK_For_Unity
         const char * name, unsigned int index, t_CKINT value )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->setGlobalIntArrayValue(
+        return gm->setGlobalIntArrayValue(
             name, index, value );
     }
     
@@ -453,8 +512,10 @@ namespace ChucK_For_Unity
         const char * name, unsigned int index, void (* callback)(t_CKINT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalIntArrayValue(
+        return gm->getGlobalIntArrayValue(
             name, index, callback );
     }
 
@@ -464,8 +525,10 @@ namespace ChucK_For_Unity
         const char * name, unsigned int index, void (* callback)(const char *, t_CKINT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalIntArrayValue(
+        return gm->getGlobalIntArrayValue(
             name, index, callback );
     }
 
@@ -474,8 +537,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getGlobalIntArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, unsigned int index, void(*callback)(t_CKINT, t_CKINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalIntArrayValue(
+        return gm->getGlobalIntArrayValue(
             name, callbackID, index, callback );
     }
     
@@ -485,8 +550,10 @@ namespace ChucK_For_Unity
         unsigned int chuckID, const char * name, char * key, t_CKINT value )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->setGlobalAssociativeIntArrayValue(
+        return gm->setGlobalAssociativeIntArrayValue(
             name, key, value );
     }
     
@@ -497,8 +564,10 @@ namespace ChucK_For_Unity
         void (* callback)(t_CKINT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalAssociativeIntArrayValue(
+        return gm->getGlobalAssociativeIntArrayValue(
             name, key, callback );
     }
 
@@ -509,8 +578,10 @@ namespace ChucK_For_Unity
         void (* callback)(const char *, t_CKINT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalAssociativeIntArrayValue(
+        return gm->getGlobalAssociativeIntArrayValue(
             name, key, callback );
     }
 
@@ -519,8 +590,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getGlobalAssociativeIntArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, char* key, void(*callback)(t_CKINT, t_CKINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalAssociativeIntArrayValue(
+        return gm->getGlobalAssociativeIntArrayValue(
             name, callbackID, key, callback );
     }
     
@@ -531,8 +604,10 @@ namespace ChucK_For_Unity
         const char * name, t_CKFLOAT arrayValues[], unsigned int numValues )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->setGlobalFloatArray(
+        return gm->setGlobalFloatArray(
             name, arrayValues, numValues );
     }
     
@@ -542,8 +617,10 @@ namespace ChucK_For_Unity
         const char * name, void (* callback)(t_CKFLOAT[], t_CKUINT))
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalFloatArray(
+        return gm->getGlobalFloatArray(
             name, callback );
     }
 
@@ -553,8 +630,10 @@ namespace ChucK_For_Unity
         const char * name, void (* callback)(const char *, t_CKFLOAT[], t_CKUINT))
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalFloatArray(
+        return gm->getGlobalFloatArray(
             name, callback );
     }
 
@@ -563,8 +642,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getGlobalFloatArrayWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, void(*callback)(t_CKINT, t_CKFLOAT[], t_CKUINT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalFloatArray(
+        return gm->getGlobalFloatArray(
             name, callbackID, callback );
     }
     
@@ -574,8 +655,10 @@ namespace ChucK_For_Unity
         const char * name, unsigned int index, t_CKFLOAT value )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->setGlobalFloatArrayValue(
+        return gm->setGlobalFloatArrayValue(
             name, index, value );
     }
     
@@ -585,8 +668,10 @@ namespace ChucK_For_Unity
         const char * name, unsigned int index, void (* callback)(t_CKFLOAT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalFloatArrayValue(
+        return gm->getGlobalFloatArrayValue(
             name, index, callback );
     }
 
@@ -596,8 +681,10 @@ namespace ChucK_For_Unity
         const char * name, unsigned int index, void (* callback)(const char *, t_CKFLOAT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalFloatArrayValue(
+        return gm->getGlobalFloatArrayValue(
             name, index, callback );
     }
 
@@ -606,8 +693,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getGlobalFloatArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, unsigned int index, void(*callback)(t_CKINT, t_CKFLOAT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalFloatArrayValue(
+        return gm->getGlobalFloatArrayValue(
             name, callbackID, index, callback );
     }
     
@@ -617,8 +706,10 @@ namespace ChucK_For_Unity
         unsigned int chuckID, const char * name, char * key, t_CKFLOAT value )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->setGlobalAssociativeFloatArrayValue(
+        return gm->setGlobalAssociativeFloatArrayValue(
             name, key, value );
     }
     
@@ -629,8 +720,10 @@ namespace ChucK_For_Unity
         void (* callback)(t_CKFLOAT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalAssociativeFloatArrayValue(
+        return gm->getGlobalAssociativeFloatArrayValue(
             name, key, callback );
     }
 
@@ -641,8 +734,10 @@ namespace ChucK_For_Unity
         void (* callback)(const char *, t_CKFLOAT) )
     {
        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+       Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+       if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalAssociativeFloatArrayValue(
+        return gm->getGlobalAssociativeFloatArrayValue(
             name, key, callback );
     }
 
@@ -651,8 +746,10 @@ namespace ChucK_For_Unity
     UNITY_INTERFACE_EXPORT bool getGlobalAssociativeFloatArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char* name, char* key, void(*callback)(t_CKINT, t_CKFLOAT) )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
         
-        return chuck_instances[chuckID]->getGlobalAssociativeFloatArrayValue(
+        return gm->getGlobalAssociativeFloatArrayValue(
             name, callbackID, key, callback );
     }
     

@@ -34,6 +34,7 @@
 #include "chuck_vm.h"
 #include "chuck_errmsg.h"
 #include "chuck_instr.h"
+#include "chuck_globals.h" // added 1.4.0.2
 #include <sstream>
 #include <iostream>
 
@@ -226,8 +227,8 @@ Chuck_VM_Code * emit_engine_emit_prog( Chuck_Emitter * emit, a_Program prog,
         prog = prog->next;
     }
     
-    // 1.4.0.1: error-checking: was dac-replacement initted?
-    // (see chuck_compile.h for an explanation on replacement dacs
+    // 1.4.0.2 (jack): error-checking: was dac-replacement initted?
+    // (see chuck_compile.h for an explanation on replacement dacs)
     if( emit->should_replace_dac )
     {
         if( !emit->env->vm()->globals_manager()->is_global_ugen_init( emit->dac_replacement ) )
@@ -2905,7 +2906,7 @@ t_CKBOOL emit_engine_emit_exp_primary( Chuck_Emitter * emit, a_Exp_Primary exp )
         }
         else if( exp->var == insert_symbol( "dac" ) )
         {
-            // 1.4.0.1: see chuck_compile.h for an explanation of 
+            // 1.4.0.2 (jack): see chuck_compile.h for an explanation of
             // replacement dacs
             // should replace dac with global ugen?
             if( emit->should_replace_dac )
@@ -3730,7 +3731,7 @@ t_CKBOOL emit_engine_emit_exp_dot_member( Chuck_Emitter * emit,
     // make sure that the base type is object
     assert( t_base->info != NULL );
 
-    // if base is static
+    // if base is static?
     if( !base_static )
     {
         // if is a func
@@ -3809,7 +3810,7 @@ t_CKBOOL emit_engine_emit_exp_dot_member( Chuck_Emitter * emit,
         // emit the type
         // commented out so built-in static member variables don't have an 
         // extra thing on the stack - spencer
-        //emit->append( new Chuck_Instr_Reg_Push_Imm( (t_CKUINT)t_base ) );
+        // emit->append( new Chuck_Instr_Reg_Push_Imm( (t_CKUINT)t_base ) );
 
         // if is a func
         if( isfunc( emit->env, member->self->type ) )
@@ -4044,7 +4045,7 @@ t_CKBOOL emit_engine_emit_exp_decl( Chuck_Emitter * emit, a_Exp_Decl decl,
     t_CKBOOL needs_global_ctor = FALSE;
     
     t_CKTYPE t = type_engine_find_type( emit->env, decl->type->xid );
-    te_GlobalType globalType;
+    te_GlobalType globalType; // added 1.4.0.1 (jack)
     
     if( decl->is_global )
     {
@@ -4074,11 +4075,18 @@ t_CKBOOL emit_engine_emit_exp_decl( Chuck_Emitter * emit, a_Exp_Decl decl,
             // need to call ctors
             needs_global_ctor = TRUE;
         }
+        else if( isa( t, emit->env->t_object ) )
+        {
+            // kind-of-object (te_Type might not be te_object, so we store globalObject in our own field)
+            globalType = te_globalObject;
+            // need to call ctors
+            needs_global_ctor = TRUE;
+        }
         else
         {
             // fail if type unsupported
             EM_error2( decl->linepos, (std::string("unsupported type for global keyword: ") + t->name).c_str() );
-            EM_error2( decl->linepos, "... (supported types: int, float, string, Event, UGen)" );
+            EM_error2( decl->linepos, "... (supported types: int, float, string, Event, UGen, Object)" );
             return FALSE;
         }
     }
@@ -4240,10 +4248,23 @@ t_CKBOOL emit_engine_emit_exp_decl( Chuck_Emitter * emit, a_Exp_Decl decl,
                         // init and construct it now!
                         if( !emit->env->vm()->globals_manager()->init_global_ugen( value->name, t ) )
                         {
-                            // if the type doesn't exactly match (different kinds of Event), then fail.
+                            // if the type doesn't exactly match (different kinds of UGen), then fail.
                             EM_error2( decl->linepos,
                                 "global UGen '%s' has different type '%s' than already existing global UGen of the same name",
                                 value->name.c_str(), t->name.c_str() );
+                            return FALSE;
+                        }
+                    }
+                    // if it's a ugen, we need to initialize it and check if the exact type matches
+                    else if( globalType == te_globalObject )
+                    {
+                        // init and construct it now!
+                        if( !emit->env->vm()->globals_manager()->init_global_object( value->name, t ) )
+                        {
+                            // if the type doesn't exactly match (different types), then fail.
+                            EM_error2( decl->linepos,
+                                      "global Object '%s' has different type '%s' than already existing global Object of the same name",
+                                      value->name.c_str(), t->name.c_str() );
                             return FALSE;
                         }
                     }
@@ -4894,6 +4915,10 @@ t_CKBOOL emit_engine_emit_symbol( Chuck_Emitter * emit, S_Symbol symbol,
         else if( isa( v->type, emit->env->t_array ) )
         {
             global_type = te_globalArraySymbol;
+        }
+        else if( isa( v->type, emit->env->t_object ) )
+        {
+            global_type = te_globalObject;
         }
         else
         {

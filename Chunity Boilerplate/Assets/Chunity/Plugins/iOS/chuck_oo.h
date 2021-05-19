@@ -175,6 +175,14 @@ public:
     virtual ~Chuck_Object();
 
 public:
+    // output current state (can be overridden)
+    virtual void dump();
+
+public:
+    // output type info (can be overriden; but probably shouldn't be)
+    virtual void apropos();
+    
+public:
     // virtual table
     Chuck_VTable * vtable;
     // reference to type
@@ -208,8 +216,8 @@ struct Chuck_Array : Chuck_Object
     // functionality that we can keep in common...
 
 public:
-    // Chuck_Array();
-    // virtual ~Chuck_Array() { }
+    Chuck_Array() : m_array_type(NULL) { }
+    virtual ~Chuck_Array();
 
     virtual t_CKINT size( ) = 0; // const { return m_size; } // array size
     virtual t_CKINT capacity( ) = 0; // const { return m_capacity; } // array capacity
@@ -221,7 +229,7 @@ public:
     virtual t_CKINT erase( const std::string & key ) = 0; // erase
     virtual void clear( ) = 0; // clear
     
-    Chuck_Type *m_array_type;
+    Chuck_Type * m_array_type;
 };
 
 
@@ -464,17 +472,18 @@ struct Chuck_Event : Chuck_Object
 {
 public:
     // signal/broadcast "local" -- signal ChucK Events
-    void signal();
-    void broadcast();
+    void signal_local();
+    void broadcast_local();
     void wait( Chuck_VM_Shred * shred, Chuck_VM * vm );
     t_CKBOOL remove( Chuck_VM_Shred * shred );
 
-    // 1.4.0.0: global events -- signal/broadcast code running
+public:
+    // 1.4.0.0 (jack): global events -- signal/broadcast code running
     // externally, elsewhere in the host
     void signal_global();
     void broadcast_global();
 
-    // 1.4.0.1: global events multiple callbacks.
+    // 1.4.0.2 (jack): global events multiple callbacks.
     // can listen with a callback(), callback( event name ), or callback( id )
     void global_listen( void (* cb)(void), t_CKBOOL listen_forever );
     void global_listen( std::string name, void (* cb)(const char *), t_CKBOOL listen_forever );
@@ -493,7 +502,7 @@ public:
 protected:
     std::queue<Chuck_VM_Shred *> m_queue;
     #ifndef __DISABLE_THREADS__
-    // 1.4.0.1 TODO: rewrite queue_broadcast to use a lock-free queue 
+    // 1.4.0.2 (ge/jack) TODO: rewrite queue_broadcast to use a lock-free queue 
     // and avoid the use of a lock in events
     XMutex m_queue_lock;
     #endif
