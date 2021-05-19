@@ -227,6 +227,9 @@
     <ClCompile Include="..\chuck\src\core\chuck_win32.c">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\chuck\src\core\chuck_globals.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PluginList.h" />
@@ -468,6 +471,9 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="..\Plugin_ChucK.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_globals.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="core">
