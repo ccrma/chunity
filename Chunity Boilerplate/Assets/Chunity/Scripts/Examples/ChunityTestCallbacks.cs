@@ -20,15 +20,22 @@ public class ChunityTestCallbacks : MonoBehaviour
         myChuck = GetComponent<ChuckSubInstance>();
         StartCoroutine( IntTests() );
         StartCoroutine( FloatTests() );
-        // StringTests();
-        // StartCoroutine( EventTests() );
-        // IntArrayTests();
-        // FloatArrayTests();
+        StringTests();
+        StartCoroutine( EventTests() );
+        IntArrayTests();
+        FloatArrayTests();
     }
 
     static void Success( string testName, bool b )
     {
-        Debug.Log( testName + ( b ? ": success" : ": failure" ) );
+        if( b )
+        {
+            Debug.Log( testName + ": success" );
+        }
+        else
+        {
+            Debug.Log( "WARNING: " + testName + " failed" );
+        }
     }
 
 
@@ -67,9 +74,7 @@ public class ChunityTestCallbacks : MonoBehaviour
     static void IntName( string varName, CK_INT value )
     {
         Success( "named int name", varName == "myInt" );
-        Debug.Log( "named int name was " + varName );
         Success( "named int value", value == 39 );
-        Debug.Log( "named int value was " + value.ToString() );
     }
 
     #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
