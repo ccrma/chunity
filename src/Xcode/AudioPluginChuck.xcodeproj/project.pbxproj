@@ -80,6 +80,7 @@
 		04F2545D1EA69BAF00B36889 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04F2545C1EA69BAF00B36889 /* Foundation.framework */; };
 		04F2545F1EA69C3A00B36889 /* MultitouchSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04F2545E1EA69C3A00B36889 /* MultitouchSupport.framework */; };
 		04F254631EA7D82F00B36889 /* Plugin_ChucK.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F254611EA7D82F00B36889 /* Plugin_ChucK.cpp */; };
+		04F9FB26264DBD9F008B7F74 /* chuck_globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F9FB25264DBD9F008B7F74 /* chuck_globals.cpp */; };
 		2BC2A8D5144C433D00D5EF79 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BC2A8D4144C433D00D5EF79 /* OpenGL.framework */; };
 		3BC406E41AFB7CDF00E92CB9 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC406E31AFB7CDF00E92CB9 /* CoreMIDI.framework */; };
 		8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
@@ -258,6 +259,8 @@
 		04F2545C1EA69BAF00B36889 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		04F2545E1EA69C3A00B36889 /* MultitouchSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultitouchSupport.framework; path = ../../../../../../../../../System/Library/PrivateFrameworks/MultitouchSupport.framework; sourceTree = "<group>"; };
 		04F254611EA7D82F00B36889 /* Plugin_ChucK.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plugin_ChucK.cpp; path = ../Plugin_ChucK.cpp; sourceTree = "<group>"; };
+		04F9FB24264DBD9E008B7F74 /* chuck_globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chuck_globals.h; path = ../src/core/chuck_globals.h; sourceTree = "<group>"; };
+		04F9FB25264DBD9F008B7F74 /* chuck_globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chuck_globals.cpp; path = ../src/core/chuck_globals.cpp; sourceTree = "<group>"; };
 		0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = /System/Library/Frameworks/CoreFoundation.framework; sourceTree = "<absolute>"; };
 		2BC2A8D4144C433D00D5EF79 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		3BC406E31AFB7CDF00E92CB9 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
@@ -308,6 +311,8 @@
 				0492AD5A1F6B83A7005FE7CE /* chuck_errmsg.h */,
 				0492AD5B1F6B83A7005FE7CE /* chuck_frame.cpp */,
 				0492AD5C1F6B83A7005FE7CE /* chuck_frame.h */,
+				04F9FB25264DBD9F008B7F74 /* chuck_globals.cpp */,
+				04F9FB24264DBD9E008B7F74 /* chuck_globals.h */,
 				0492AD5D1F6B83A7005FE7CE /* chuck_instr.cpp */,
 				0492AD5E1F6B83A7005FE7CE /* chuck_instr.h */,
 				0492AD5F1F6B83A7005FE7CE /* chuck_io.cpp */,
@@ -620,6 +625,7 @@
 				0492AE271F6B83A8005FE7CE /* util_opsc.cpp in Sources */,
 				0492ADE31F6B83A7005FE7CE /* chuck.cpp in Sources */,
 				0492AE2C1F6B83A8005FE7CE /* util_thread.cpp in Sources */,
+				04F9FB26264DBD9F008B7F74 /* chuck_globals.cpp in Sources */,
 				0492AE251F6B83A8005FE7CE /* util_math.c in Sources */,
 				0492ADEC1F6B83A7005FE7CE /* chuck_instr.cpp in Sources */,
 				0492ADFB1F6B83A7005FE7CE /* hidio_sdl.cpp in Sources */,
