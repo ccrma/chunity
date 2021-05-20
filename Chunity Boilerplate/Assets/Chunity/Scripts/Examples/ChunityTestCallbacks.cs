@@ -20,7 +20,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         myChuck = GetComponent<ChuckSubInstance>();
         StartCoroutine( IntTests() );
         StartCoroutine( FloatTests() );
-        StringTests();
+        StartCoroutine( StringTests() ); 
         StartCoroutine( EventTests() );
         IntArrayTests();
         FloatArrayTests();
@@ -136,17 +136,23 @@ public class ChunityTestCallbacks : MonoBehaviour
 
 
     // ------------------ String tests --------------------- //
-    void StringTests()
+    IEnumerator StringTests()
     {
         myChuck.RunCode(@"
             global string myString;
         ");
         myChuck.SetString( "myString", "hello" );
+        yield return new WaitForSeconds( 0.1f );
         myChuck.GetString( "myString", StringPlain );
+        yield return new WaitForSeconds( 0.1f );
         myChuck.SetString( "myString", "hi" );
+        yield return new WaitForSeconds( 0.1f );
         myChuck.GetString( "myString", StringName );
+        yield return new WaitForSeconds( 0.1f );
         myChuck.SetString( "myString", "yo" );
+        yield return new WaitForSeconds( 0.1f );
         myChuck.GetString( "myString", StringID, -1010 );
+        yield return new WaitForSeconds( 0.1f );
     }
 
     #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
