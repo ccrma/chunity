@@ -26,6 +26,7 @@ LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/chuck_compile.cpp \
 ../../chuck/src/core/chuck_dl.cpp \
 ../../chuck/src/core/chuck_oo.cpp \
+../../chuck/src/core/chuck_io.cpp \
 ../../chuck/src/core/chuck_lang.cpp \
 ../../chuck/src/core/chuck_ugen.cpp \
 ../../chuck/src/core/chuck_stats.cpp \
@@ -53,8 +54,7 @@ LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/util_network.c \
 ../../chuck/src/core/util_raw.c \
 ../../chuck/src/core/util_xforms.c \
-../../chuck/src/core/chuck.tab.c \
-../../chuck/src/core/chuck.yy.c \
+../../chuck/src/core/chuck_win32.c \
 ../../chuck/src/core/util_sndfile.c \
 ../../chuck/src/core/lo/address.c \
 ../../chuck/src/core/lo/blob.c \
@@ -72,7 +72,7 @@ LOCAL_CPP_FEATURES := rtti exceptions
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../ $(LOCAL_PATH)/../../chuck/src/core $(LOCAL_PATH)/../../chuck/src/core/lo
 
-LOCAL_CFLAGS += -D__PLATFORM_LINUX__ -D__ANDROID__ -D__DISABLE_OTF_SERVER__ -D__DISABLE_FILEIO__ -D__DISABLE_SERIAL__ -D__DISABLE_MIDI__ -D__DISABLE_SHELL__ -DHAVE_CONFIG_H -fPIC -fno-strict-aliasing 
+LOCAL_CFLAGS += -D__PLATFORM_LINUX__ -D__ANDROID__ -D__DISABLE_OTF_SERVER__ -D__DISABLE_FILEIO__ -D__DISABLE_SERIAL__ -D__DISABLE_MIDI__ -D__DISABLE_SHELL__ -D__DISABLE_PROMPTER__ -D__DISABLE_CONSOLE__ -D__DISABLE_KBHIT__ -DHAVE_CONFIG_H -fPIC -fno-strict-aliasing 
 
 #TODO: -lsndfile for SndBuf ? -lasound for MIDI (currently disabled)?
 LOCAL_LDLIBS := -lstdc++ -ldl -lm 
