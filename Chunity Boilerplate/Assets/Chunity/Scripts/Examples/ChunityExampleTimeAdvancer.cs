@@ -134,7 +134,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		}
 	}
 
-	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+	#if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
 	#endif
 	static void GetPosCallback( CK_FLOAT pos )
@@ -142,7 +142,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		myPos = (float) pos;
 	}
 
-	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+	#if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	#endif
 	static void BeNotified1()

@@ -60,7 +60,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         yield return new WaitForSeconds( 0.1f );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntCallback))]
 	#endif
     static void IntPlain( CK_INT value )
@@ -68,7 +68,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "int plain value", value == 37 );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.NamedIntCallback))]
 	#endif
     static void IntName( string varName, CK_INT value )
@@ -77,7 +77,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "named int value", value == 39 );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntCallbackWithID))]
 	#endif
     static void IntID( CK_INT id, CK_INT value )
@@ -107,7 +107,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         yield return new WaitForSeconds( 0.1f );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
 	#endif
     static void FloatPlain( CK_FLOAT value )
@@ -115,7 +115,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "float plain value", value == 37.5 );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.NamedFloatCallback))]
 	#endif
     static void FloatName( string varName, CK_FLOAT value )
@@ -124,7 +124,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "named float value", value == 39.8 );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallbackWithID))]
 	#endif
     static void FloatID( CK_INT id, CK_FLOAT value )
@@ -149,7 +149,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         myChuck.GetString( "myString", StringID, -1010 );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.StringCallback))]
 	#endif
     static void StringPlain( string value )
@@ -157,7 +157,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "plain string value", value == "hello" );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.NamedStringCallback))]
 	#endif
     static void StringName( string varName, string value )
@@ -166,7 +166,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "named string value", value == "hi" );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.StringCallbackWithID))]
 	#endif
     static void StringID( CK_INT id, string value )
@@ -218,7 +218,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         myChuck.BroadcastEvent( "myEvent" );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	#endif
     static void VoidPlain()
@@ -226,7 +226,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "plain event callback", true );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.NamedVoidCallback))]
 	#endif
     static void VoidName( string varName )
@@ -234,7 +234,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "named event callback", varName == "myEvent" );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallbackWithID))]
 	#endif
     static void VoidID( CK_INT id )
@@ -273,7 +273,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         myChuck.GetAssociativeIntArrayValue( "myIntArray", "key3", IntID, 8080 );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntArrayCallback))]
 	#endif
     static void IntArrayPlain( CK_INT[] value, CK_UINT length )
@@ -282,7 +282,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "int array plain length", length == 3 );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.NamedIntArrayCallback))]
 	#endif
     static void IntArrayName( string name, CK_INT[] value, CK_UINT length )
@@ -292,7 +292,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "named int array name", name == "myIntArray" );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntArrayCallbackWithID))]
 	#endif
     static void IntArrayID( CK_INT id, CK_INT[] value, CK_UINT length )
@@ -303,7 +303,7 @@ public class ChunityTestCallbacks : MonoBehaviour
     }
 
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.NamedIntCallback))]
 	#endif
     static void IntArrayValueName( string varName, CK_INT value )
@@ -343,7 +343,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         myChuck.GetAssociativeFloatArrayValue( "myFloatArray", "key3", FloatID, 9090 );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallback))]
 	#endif
     static void FloatArrayPlain( CK_FLOAT[] value, CK_UINT length )
@@ -352,7 +352,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "float array length", length == 3 );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.NamedFloatArrayCallback))]
 	#endif
     static void FloatArrayName( string name, CK_FLOAT[] value, CK_UINT length )
@@ -362,7 +362,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         Success( "named float array name", name == "myFloatArray" );
     }
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallbackWithID))]
 	#endif
     static void FloatArrayID( CK_INT id, CK_FLOAT[] value, CK_UINT length )
@@ -373,7 +373,7 @@ public class ChunityTestCallbacks : MonoBehaviour
     }
 
 
-    #if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+    #if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.NamedFloatCallback))]
 	#endif
     static void FloatArrayValueName( string varName, CK_FLOAT value )
