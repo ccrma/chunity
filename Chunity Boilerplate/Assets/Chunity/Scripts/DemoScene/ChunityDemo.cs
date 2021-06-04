@@ -6,7 +6,7 @@ public class ChunityDemo
 {
     public static bool InteractWithDemo()
 	{
-		#if UNITY_IOS && !UNITY_EDITOR
+		#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
 		// is there a finger on the screen?
 		if( Input.touchCount > 0 )
         {
