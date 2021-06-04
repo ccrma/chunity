@@ -11,6 +11,7 @@ LOCAL_MODULE := AudioPluginChuck
 LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/chuck.cpp \
 ../../chuck/src/core/chuck_absyn.cpp \
+../../chuck/src/core/chuck_android.cpp \
 ../../chuck/src/core/chuck_parse.cpp \
 ../../chuck/src/core/chuck_errmsg.cpp \
 ../../chuck/src/core/chuck_frame.cpp \
@@ -75,7 +76,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../ $(LOCAL_PATH)/../../chuck/src/core $(LO
 LOCAL_CFLAGS += -D__PLATFORM_LINUX__ -D__ANDROID__ -D__DISABLE_OTF_SERVER__ -D__DISABLE_FILEIO__ -D__DISABLE_SERIAL__ -D__DISABLE_MIDI__ -D__DISABLE_SHELL__ -D__DISABLE_PROMPTER__ -D__DISABLE_CONSOLE__ -D__DISABLE_KBHIT__ -DHAVE_CONFIG_H -fPIC -fno-strict-aliasing 
 
 #TODO: -lsndfile for SndBuf ? -lasound for MIDI (currently disabled)?
-LOCAL_LDLIBS := -lstdc++ -ldl -lm 
+LOCAL_LDLIBS := -lstdc++ -ldl -lm
 
 LOCAL_LDFLAGS += -shared -rdynamic -fPIC
 
