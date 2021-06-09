@@ -5,6 +5,9 @@ using UnityEngine;
 #if UNITY_WEBGL
 using CK_INT = System.Int32;
 using CK_UINT = System.UInt32;
+#elif UNITY_ANDROID
+using CK_INT = System.IntPtr;
+using CK_UINT = System.UIntPtr;
 #else
 using CK_INT = System.Int64;
 using CK_UINT = System.UInt64;
@@ -21,7 +24,7 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 	Chuck.IntArrayCallback myIntArrayCallback;
 	Chuck.IntCallback myIntCallback;
 
-	public CK_INT[] myMidiNotes = { 60, 65, 69, 72 };
+	public CK_INT[] myMidiNotes = { (CK_INT)60, (CK_INT)65, (CK_INT)69, (CK_INT)72 };
 
 	// Use this for initialization
 	void Start()
@@ -63,9 +66,9 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 				myChuck.SetIntArray( "myNotes", myMidiNotes );
 			}
 			// on any press, change the value of index 1
-			myChuck.SetIntArrayValue( "myNotes", 1, 60 + numPresses );
+			myChuck.SetIntArrayValue( "myNotes", 1, (CK_INT)(60 + numPresses) );
 			// set a dictionary value too
-			myChuck.SetAssociativeIntArrayValue( "myNotes", "numPlayed", numPresses );
+			myChuck.SetAssociativeIntArrayValue( "myNotes", "numPlayed", (CK_INT)numPresses );
 			// actually play it!
 			myChuck.BroadcastEvent( "playMyNotes" );
 

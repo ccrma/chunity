@@ -7,6 +7,9 @@ using System.Linq;
 #if UNITY_WEBGL
 using CK_INT = System.Int32;
 using CK_UINT = System.UInt32;
+#elif UNITY_ANDROID
+using CK_INT = System.IntPtr;
+using CK_UINT = System.UIntPtr;
 #else
 using CK_INT = System.Int64;
 using CK_UINT = System.UInt64;
@@ -78,8 +81,8 @@ public class ChuckEventListener : MonoBehaviour
     string myEventName = "";
 
     private static Dictionary<CK_INT, ChuckEventListener> activeCallbacks;
-    private static CK_INT nextID = 0;
-    private CK_INT myID = -1;
+    private static CK_INT nextID = (CK_INT)0;
+    private CK_INT myID = (CK_INT)(-1);
     private Chuck.VoidCallbackWithID myVoidCallback;
 
 
@@ -90,7 +93,7 @@ public class ChuckEventListener : MonoBehaviour
             activeCallbacks = new Dictionary<CK_INT, ChuckEventListener>();
         }
         myID = nextID;
-        nextID++;
+        nextID += 1;
     }
 
     private void Update()
