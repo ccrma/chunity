@@ -92,7 +92,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 	void Update()
 	{
 		// compute time step
-		#if UNITY_IOS && !UNITY_EDITOR
+		#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
 		float newTimeStep = 1f;
 		if( Input.touchCount > 0 )
 		{
