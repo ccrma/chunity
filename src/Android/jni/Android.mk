@@ -11,7 +11,6 @@ LOCAL_MODULE := AudioPluginChuck
 LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/chuck.cpp \
 ../../chuck/src/core/chuck_absyn.cpp \
-../../chuck/src/core/chuck_android.cpp \
 ../../chuck/src/core/chuck_parse.cpp \
 ../../chuck/src/core/chuck_errmsg.cpp \
 ../../chuck/src/core/chuck_frame.cpp \
@@ -44,6 +43,7 @@ LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/ulib_regex.cpp \
 ../../chuck/src/core/util_buffers.cpp \
 ../../chuck/src/core/util_console.cpp \
+../../chuck/src/core/util_platforms.cpp \
 ../../chuck/src/core/util_string.cpp \
 ../../chuck/src/core/util_thread.cpp \
 ../../chuck/src/core/util_opsc.cpp \
