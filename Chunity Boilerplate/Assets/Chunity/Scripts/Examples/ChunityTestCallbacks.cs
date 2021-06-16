@@ -327,7 +327,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         myChuck.SetFloatArray( "myFloatArray", new CK_FLOAT[] {0.5, 0.7, 37.9} );
         myChuck.GetFloatArray( "myFloatArray", FloatArrayPlain );
         myChuck.GetFloatArray( "myFloatArray", FloatArrayName );
-        myChuck.GetFloatArray( "myFloatArray", FloatArrayID, (System.IntPtr)4040 );
+        myChuck.GetFloatArray( "myFloatArray", FloatArrayID, (CK_INT)4040 );
 
         // one element at a time
         myChuck.SetFloatArrayValue( "myFloatArray", 1, 37.5 );
