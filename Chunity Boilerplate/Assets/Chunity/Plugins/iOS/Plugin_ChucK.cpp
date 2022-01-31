@@ -37,6 +37,7 @@ extern "C"
 
 namespace ChucK_For_Unity
 {
+#ifndef __ANDROID__
     enum Param
     {
         P_CHUCKID,
@@ -57,9 +58,12 @@ namespace ChucK_For_Unity
             unsigned char pad[(sizeof(Data) + 15) & ~15]; // This entire structure must be a multiple of 16 bytes (and and instance 16 byte aligned) for PS3 SPU DMA requirements
         };
     };
+#endif
     
     std::map< unsigned int, ChucK * > chuck_instances;
+#ifndef __ANDROID__
     std::map< unsigned int, EffectData::Data * > data_instances;
+#endif
     std::string chuck_global_data_dir;
 
 
@@ -891,6 +895,7 @@ namespace ChucK_For_Unity
             // don't track it anymore
             chuck_instances.erase( chuckID );
 
+            #ifndef __ANDROID__
             if( data_instances.count( chuckID ) > 0 )
             {
                 data_instances[chuckID]->myId = -1;
@@ -899,6 +904,7 @@ namespace ChucK_For_Unity
 
             // wait a bit
             usleep( 30000 );
+            #endif
 
             // cleanup this chuck early
             delete chuck;
@@ -932,8 +938,9 @@ namespace ChucK_For_Unity
 
 
     // on launch, reset all ids (necessary when relaunching a lot in unity editor)
-    UNITY_INTERFACE_EXPORT void cleanRegisteredChucks() {
-    
+    UNITY_INTERFACE_EXPORT void cleanRegisteredChucks() 
+    {
+        #ifndef __ANDROID__
         // first, invalidate all callbacks' references to chucks
         for( std::map< unsigned int, EffectData::Data * >::iterator it =
              data_instances.begin(); it != data_instances.end(); it++ )
@@ -944,6 +951,7 @@ namespace ChucK_For_Unity
         
         // wait for callbacks to finish their current run
         usleep( 30000 );
+        #endif
         
         // next, delete chucks
         for( std::map< unsigned int, ChucK * >::iterator it =
@@ -955,15 +963,17 @@ namespace ChucK_For_Unity
         
         // delete stored chuck pointers
         chuck_instances.clear();
+        #ifndef __ANDROID__
         // delete data instances
         data_instances.clear();
+        #endif      
         
         // clear out callbacks also
         setStdoutCallback( NULL );
         setStderrCallback( NULL );
     }
 
-    
+#ifndef __ANDROID__
     bool RegisterChuckData( EffectData::Data * data, const unsigned int id )
     {
         // only store if id has been used / a chuck is already initialized
@@ -1127,5 +1137,6 @@ namespace ChucK_For_Unity
         return UNITY_AUDIODSP_OK;
     }
 
+#endif
 #endif
 }

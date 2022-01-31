@@ -29,7 +29,7 @@ public class ChunityDemoSwitcher : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        #if UNITY_IOS && !UNITY_EDITOR
+        #if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
         // only repsond to the initial touch
         if( Input.touchCount > 0 )
         {

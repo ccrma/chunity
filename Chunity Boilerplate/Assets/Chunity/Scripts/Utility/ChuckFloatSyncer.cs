@@ -7,6 +7,9 @@ using System.Linq;
 #if UNITY_WEBGL
 using CK_INT = System.Int32;
 using CK_UINT = System.UInt32;
+#elif UNITY_ANDROID
+using CK_INT = System.IntPtr;
+using CK_UINT = System.UIntPtr;
 #else
 using CK_INT = System.Int64;
 using CK_UINT = System.UInt64;
@@ -94,8 +97,8 @@ public class ChuckFloatSyncer : MonoBehaviour
     Chuck.FloatCallbackWithID myFloatCallback;
 
     private static Dictionary<CK_INT, ChuckFloatSyncer> activeCallbacks;
-    private static CK_INT nextID = 0;
-    CK_INT myID = -1;
+    private static CK_INT nextID = (CK_INT)0;
+    CK_INT myID = (CK_INT)(-1);
 
     private void Awake()
     {
@@ -104,7 +107,7 @@ public class ChuckFloatSyncer : MonoBehaviour
             activeCallbacks = new Dictionary<CK_INT, ChuckFloatSyncer>();
         }
         myID = nextID;
-        nextID++;
+        nextID += 1;
     }
 
 
@@ -152,7 +155,7 @@ public class ChuckFloatSyncer : MonoBehaviour
         StopSyncing();
     }
 
-    #if UNITY_IOS && !UNITY_EDITOR
+    #if AOT
     [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallbackWithID))]
     #endif
     private static void StaticCallback( CK_INT id, CK_FLOAT newValue )

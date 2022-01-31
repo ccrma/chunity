@@ -9,6 +9,9 @@ using System.Runtime.InteropServices;
 #if UNITY_WEBGL
 using CK_INT = System.Int32;
 using CK_UINT = System.UInt32;
+#elif UNITY_ANDROID
+using CK_INT = System.IntPtr;
+using CK_UINT = System.UIntPtr;
 #else
 using CK_INT = System.Int64;
 using CK_UINT = System.UInt64;
@@ -229,7 +232,7 @@ public class Chuck
 
     public bool SetInt( System.UInt32 chuckId, string variableName, CK_INT value )
     {
-        return setChuckInt( chuckId, variableName, (int) value );
+        return setChuckInt( chuckId, variableName, value );
     }
 
     public static Chuck.IntCallback CreateGetIntCallback( Action<CK_INT> callbackFunction )
@@ -879,7 +882,7 @@ public class Chuck
         return getGlobalIntArrayWithID( chuckId, callbackID, variableName, callback );
     }
 
-    public bool SetIntArrayValue( string chuckName, string variableName, uint index, long value )
+    public bool SetIntArrayValue( string chuckName, string variableName, uint index, CK_INT value )
     {
         if( ids.ContainsKey( chuckName ) )
         {
@@ -892,9 +895,9 @@ public class Chuck
         }
     }
 
-    public bool SetIntArrayValue( System.UInt32 chuckId, string variableName, uint index, long value )
+    public bool SetIntArrayValue( System.UInt32 chuckId, string variableName, uint index, CK_INT value )
     {
-        return setGlobalIntArrayValue( chuckId, variableName, index, (int) value );
+        return setGlobalIntArrayValue( chuckId, variableName, index, value );
     }
 
     public bool GetIntArrayValue( string chuckName, string variableName, uint index, Chuck.IntCallback callback )
@@ -951,7 +954,7 @@ public class Chuck
         return getGlobalIntArrayValueWithID( chuckId, callbackID, variableName, index, callback );
     }
 
-    public bool SetAssociativeIntArrayValue( string chuckName, string variableName, string key, long value )
+    public bool SetAssociativeIntArrayValue( string chuckName, string variableName, string key, CK_INT value )
     {
         if( ids.ContainsKey( chuckName ) )
         {
@@ -964,9 +967,9 @@ public class Chuck
         }
     }
 
-    public bool SetAssociativeIntArrayValue( System.UInt32 chuckId, string variableName, string key, long value )
+    public bool SetAssociativeIntArrayValue( System.UInt32 chuckId, string variableName, string key, CK_INT value )
     {
-        return setGlobalAssociativeIntArrayValue( chuckId, variableName, key, (int) value );
+        return setGlobalAssociativeIntArrayValue( chuckId, variableName, key, value );
     }
 
     public bool GetAssociativeIntArrayValue( string chuckName, string variableName, string key, Chuck.IntCallback callback )

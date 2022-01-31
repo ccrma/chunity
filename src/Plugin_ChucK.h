@@ -1,6 +1,9 @@
 #pragma once
 
+#ifndef __ANDROID__
 #include "AudioPluginUtil.h"
+#endif // !__ANDROID__
+
 #include "IUnityInterface.h"
 #include "IUnityGraphics.h"
 

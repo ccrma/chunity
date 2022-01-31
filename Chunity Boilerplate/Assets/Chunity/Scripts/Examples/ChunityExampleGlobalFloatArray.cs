@@ -6,6 +6,9 @@ using UnityEngine;
 #if UNITY_WEBGL
 using CK_INT = System.Int32;
 using CK_UINT = System.UInt32;
+#elif UNITY_ANDROID
+using CK_INT = System.IntPtr;
+using CK_UINT = System.UIntPtr;
 #else
 using CK_INT = System.Int64;
 using CK_UINT = System.UInt64;
@@ -88,7 +91,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
-	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+	#if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallback))]
 	#endif
 	static void GetInitialArrayCallback( CK_FLOAT[] values, CK_UINT numValues )
@@ -100,7 +103,7 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
-	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+	#if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
 	#endif
 	static void GetANumberCallback( CK_FLOAT value )

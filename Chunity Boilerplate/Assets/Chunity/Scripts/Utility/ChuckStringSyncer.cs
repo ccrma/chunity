@@ -8,6 +8,9 @@ using System.Linq;
 #if UNITY_WEBGL
 using CK_INT = System.Int32;
 using CK_UINT = System.UInt32;
+#elif UNITY_ANDROID
+using CK_INT = System.IntPtr;
+using CK_UINT = System.UIntPtr;
 #else
 using CK_INT = System.Int64;
 using CK_UINT = System.UInt64;
@@ -96,7 +99,7 @@ public class ChuckStringSyncer : MonoBehaviour
     Chuck.StringCallbackWithID myStringCallback;
 
     private static Dictionary<CK_INT, ChuckStringSyncer> activeCallbacks;
-    private static CK_INT nextID = 0;
+    private static CK_INT nextID = (CK_INT)0;
     private CK_INT myID;
     
 
@@ -107,7 +110,7 @@ public class ChuckStringSyncer : MonoBehaviour
             activeCallbacks = new Dictionary<CK_INT, ChuckStringSyncer>();
         }
         myID = nextID;
-        nextID++;
+        nextID += 1;
     }
 
 
@@ -156,7 +159,7 @@ public class ChuckStringSyncer : MonoBehaviour
         StopSyncing();
     }
 
-    #if UNITY_IOS && !UNITY_EDITOR
+    #if AOT
     [AOT.MonoPInvokeCallback(typeof(Chuck.StringCallbackWithID))]
     #endif
     private static void StaticCallback( CK_INT id, string newValue )

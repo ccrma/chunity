@@ -5,6 +5,9 @@ using UnityEngine;
 #if UNITY_WEBGL
 using CK_INT = System.Int32;
 using CK_UINT = System.UInt32;
+#elif UNITY_ANDROID
+using CK_INT = System.IntPtr;
+using CK_UINT = System.UIntPtr;
 #else
 using CK_INT = System.Int64;
 using CK_UINT = System.UInt64;
@@ -89,7 +92,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 	void Update()
 	{
 		// compute time step
-		#if UNITY_IOS && !UNITY_EDITOR
+		#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
 		float newTimeStep = 1f;
 		if( Input.touchCount > 0 )
 		{
@@ -134,7 +137,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		}
 	}
 
-	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+	#if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallback))]
 	#endif
 	static void GetPosCallback( CK_FLOAT pos )
@@ -142,7 +145,7 @@ public class ChunityExampleTimeAdvancer : MonoBehaviour
 		myPos = (float) pos;
 	}
 
-	#if (UNITY_IOS || UNITY_WEBGL) && !UNITY_EDITOR
+	#if AOT
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	#endif
 	static void BeNotified1()
