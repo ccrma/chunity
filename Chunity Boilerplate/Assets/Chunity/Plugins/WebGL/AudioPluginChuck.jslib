@@ -285,11 +285,18 @@ mergeInto(LibraryManager.library, {
     getNamedChuckInt: function( chuckID, name, callback )
     {
         (function( c, n ) {
-            theChuck.getInt( Pointer_stringify( name ) ).then( function( result )
+            theChuck.getInt( n ).then( function( result )
             {
-                dynCall( 'vii', c, [n, result] );
+                // need to turn JS name string into Module heap string.
+                var bufferSize = lengthBytesUTF8( n ) + 1;
+                var buffer = _malloc( bufferSize );
+                stringToUTF8( n, buffer, bufferSize );
+                // send it along!
+                dynCall( 'vfi', c, [buffer, result] );
+                // be nice to memory
+                _free( buffer );
             });
-        })(callback, name);
+        })(callback, Pointer_stringify(name));
     },
     getChuckIntWithID: function( chuckID, callbackID, name, callback )
     {
@@ -325,11 +332,18 @@ mergeInto(LibraryManager.library, {
     getNamedChuckFloat: function( chuckID, name, callback )
     {
         (function( c, n ) {
-            theChuck.getFloat( Pointer_stringify( name ) ).then( function( result )
+            theChuck.getFloat( n ).then( function( result )
             {
-                dynCall( 'vif', c, [n, result] );
+                // need to turn JS name string into Module heap string.
+                var bufferSize = lengthBytesUTF8( n ) + 1;
+                var buffer = _malloc( bufferSize );
+                stringToUTF8( n, buffer, bufferSize );
+                // send it along!
+                dynCall( 'vff', c, [buffer, result] );
+                // be nice to memory
+                _free( buffer );
             });
-        })(callback, name); 
+        })(callback, Pointer_stringify(name)); 
     },
     getChuckFloatWithID: function( chuckID, callbackID, name, callback )
     {
@@ -371,17 +385,24 @@ mergeInto(LibraryManager.library, {
     getNamedChuckString: function( chuckID, name, callback )
     {
         (function( c, n ) {
-            theChuck.getString( Pointer_stringify( name ) ).then( function( result ) {
+            theChuck.getString( n ).then( function( result ) {
                 // need to turn JS result string into Module heap string.
                 var bufferSize = lengthBytesUTF8( result ) + 1;
                 var buffer = _malloc( bufferSize );
                 stringToUTF8( result, buffer, bufferSize );
+
+                // and name
+                var nameBufferSize = lengthBytesUTF8( n );
+                var nameBuffer = _malloc( nameBufferSize );
+                stringToUTF8( n, nameBuffer, nameBufferSize );
+
                 // send it along!
-                dynCall( 'vif', c, [n, buffer] );
+                dynCall( 'vff', c, [nameBuffer, buffer] );
                 // be nice to memory
                 _free( buffer );
+                _free( nameBuffer );
             });
-        })(callback, name);
+        })(callback, Pointer_stringify(name));
     },
     getChuckStringWithID: function( chuckID, callbackID, name, callback )
     {
