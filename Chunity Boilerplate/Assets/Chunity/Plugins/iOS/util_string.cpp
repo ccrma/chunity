@@ -361,7 +361,7 @@ done:
 
 /* from http://developer.apple.com/library/mac/#qa/qa1549/_index.html */
 
-#if !defined(__PLATFORM_WIN32__) && !defined(__EMSCRIPTEN__)
+#if !defined(__PLATFORM_WIN32__) && !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
 
 #include <glob.h>
 
@@ -379,17 +379,24 @@ char* CreatePathByExpandingTildePath(const char* path)
         v = globbuf.gl_pathv; //list of matched pathnames
         expandedPath = v[0]; //number of matched pathnames, gl_pathc == 1
 
-        result = (char*)calloc(1, strlen(expandedPath) + 1); //the extra char is for the null-termination
+        size_t toCopy = strlen(expandedPath) + 1; //the extra char is for the null-termination
+        result = (char*)calloc(1, toCopy);
         if(result)
-            strncpy(result, expandedPath, strlen(expandedPath) + 1); //copy the null-termination as well
-
+        {
+            //copy the null-termination as well
+            memcpy(result, expandedPath, toCopy);
+            // was: strncpy(result, expandedPath,strlen(expandedPath) + 1);
+            // which was generating a warning on linux/gcc
+            // warning: ‘char* strncpy(char*, const char*, size_t)’ specified
+            // bound depends on the length of the source argument [-Wstringop-overflow=]
+        }
         globfree(&globbuf);
     }
 
     return result;
 }
 
-#endif // __PLATFORM_WIN32__ && __EMSCRIPTEN__
+#endif // __PLATFORM_WIN32__ && __EMSCRIPTEN__ && __ANDROID__
 
 
 // get full path to file
@@ -431,8 +438,8 @@ std::string get_full_path( const std::string & fp )
 
 std::string expand_filepath( std::string & fp )
 {
-#if defined(__WINDOWS_DS__) || defined(__WINDOWS_ASIO__) || defined(__EMSCRIPTEN__)
-    // no expansion in Windows systems or Emscripten
+#if defined(__WINDOWS_DS__) || defined(__WINDOWS_ASIO__) || defined(__EMSCRIPTEN__) || defined(__ANDROID__)
+    // no expansion in Windows systems or Emscripten or Android
     return fp;
 #else
     
