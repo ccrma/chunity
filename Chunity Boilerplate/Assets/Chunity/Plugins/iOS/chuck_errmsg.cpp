@@ -43,9 +43,9 @@
 #endif
 
 // global
-int EM_tokPos = 0;
-int EM_lineNum = 1;
-int EM_extLineNum = 1;
+t_CKINT EM_tokPos = 0;
+t_CKINT EM_lineNum = 1;
+t_CKINT EM_extLineNum = 1;
 t_CKBOOL anyErrors= FALSE;
 
 // local global
@@ -222,10 +222,7 @@ ChuckOutStream::~ChuckOutStream()
 ChuckOutStream& ChuckOutStream::operator<<( const std::string val )
 {
     m_stream << val;
-    if( val == CK_STDENDL )
-    {
-        this->flush();
-    }
+    if( m_isErr || (val == CK_STDENDL) ) { this->flush(); }
     return *this;
 }
 
@@ -233,13 +230,15 @@ ChuckOutStream& ChuckOutStream::operator<<( const std::string val )
 ChuckOutStream& ChuckOutStream::operator<<( const char * val )
 {
     m_stream << val;
+    if( m_isErr || std::string(val) == CK_STDENDL ) { this->flush(); }
     return *this;
 }
 
 
-ChuckOutStream& ChuckOutStream::operator<<( const double val )
+ChuckOutStream& ChuckOutStream::operator<<(const double val)
 {
     m_stream << val;
+    if( m_isErr ) { this->flush(); }
     return *this;
 }
 
@@ -247,6 +246,7 @@ ChuckOutStream& ChuckOutStream::operator<<( const double val )
 ChuckOutStream& ChuckOutStream::operator<<( const float val )
 {
     m_stream << val;
+    if (m_isErr) { this->flush(); }
     return *this;
 }
 
@@ -254,6 +254,7 @@ ChuckOutStream& ChuckOutStream::operator<<( const float val )
 ChuckOutStream& ChuckOutStream::operator<<( const unsigned long long val )
 {
     m_stream << val;
+    if (m_isErr) { this->flush(); }
     return *this;
 }
 
@@ -261,6 +262,7 @@ ChuckOutStream& ChuckOutStream::operator<<( const unsigned long long val )
 ChuckOutStream& ChuckOutStream::operator<<( const long long val )
 {
     m_stream << val;
+    if (m_isErr) { this->flush(); }
     return *this;
 }
 
@@ -268,6 +270,7 @@ ChuckOutStream& ChuckOutStream::operator<<( const long long val )
 ChuckOutStream& ChuckOutStream::operator<<( const unsigned long val )
 {
     m_stream << val;
+    if (m_isErr) { this->flush(); }
     return *this;
 }
 
@@ -275,6 +278,7 @@ ChuckOutStream& ChuckOutStream::operator<<( const unsigned long val )
 ChuckOutStream& ChuckOutStream::operator<<( const long val )
 {
     m_stream << val;
+    if (m_isErr) { this->flush(); }
     return *this;
 }
 
@@ -282,6 +286,7 @@ ChuckOutStream& ChuckOutStream::operator<<( const long val )
 ChuckOutStream& ChuckOutStream::operator<<( const unsigned int val )
 {
     m_stream << val;
+    if (m_isErr) { this->flush(); }
     return *this;
 }
 
@@ -289,6 +294,7 @@ ChuckOutStream& ChuckOutStream::operator<<( const unsigned int val )
 ChuckOutStream& ChuckOutStream::operator<<( const int val )
 {
     m_stream << val;
+    if (m_isErr) { this->flush(); }
     return *this;
 }
 
@@ -296,11 +302,9 @@ ChuckOutStream& ChuckOutStream::operator<<( const int val )
 ChuckOutStream& ChuckOutStream::operator<<( const bool val )
 {
     m_stream << val;
+    if (m_isErr) { this->flush(); }
     return *this;
 }
-
-
-
 
 
 void ChuckOutStream::set_callback( void (*callback)( const char * ) )
@@ -404,7 +408,7 @@ void EM_newline(void)
 // content after rightmost '/'
 const char * mini( const char * str )
 {
-    int len = strlen( str );
+    t_CKINT len = strlen( str );
     const char * p = str + len;
     while( p != str && *p != '/' && *p != '\\' ) p--;
     return ( p == str || strlen(p+1) == 0 ? p : p+1 );
