@@ -155,7 +155,7 @@ public class ChuckFloatSyncer : MonoBehaviour
         StopSyncing();
     }
 
-    #if AOT
+    #if ( UNITY_IOS || UNITY_ANDROID ) && !UNITY_EDITOR
     [AOT.MonoPInvokeCallback(typeof(Chuck.FloatCallbackWithID))]
     #endif
     private static void StaticCallback( CK_INT id, CK_FLOAT newValue )

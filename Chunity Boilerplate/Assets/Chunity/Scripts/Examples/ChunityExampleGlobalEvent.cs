@@ -46,7 +46,7 @@ public class ChunityExampleGlobalEvent : MonoBehaviour
 		#endif
 	}
 
-	#if AOT
+	#if ( UNITY_IOS || UNITY_ANDROID ) && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.VoidCallback))]
 	#endif
 	static void CallbackFunction()

@@ -156,7 +156,7 @@ public class ChuckIntSyncer : MonoBehaviour
         StopSyncing();
     }
 
-    #if AOT
+    #if ( UNITY_IOS || UNITY_ANDROID ) && !UNITY_EDITOR
     [AOT.MonoPInvokeCallback(typeof(Chuck.IntCallbackWithID))]
     #endif
     private static void StaticCallback( CK_INT id, CK_INT newValue )
