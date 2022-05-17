@@ -1,0 +1,24 @@
+2.0.0
+
+Updated to the latest version of ChucK, 1.4.1.1. Included new features for callback functions that additionally pass back the name of the global variable or a custom user-provided ID.
+
+Platform support:
+Release:
+macOS
+Windows
+
+Beta Release:
+iOS
+Linux
+
+Alpha Pre-release (not all functions fully work):
+Android
+WebGL
+Chugins on macOS and Windows
+
+
+1.0.2
+
+Beta support for Linux. Tested only briefly on Ubuntu 18.04.
+
+Addition of ChuckMainInstance > bool useMicrophone. Uncheck to disable loading of the microphone (for example, if you are on a system that has no microphones or you don't have access to the microphone).
