@@ -237,7 +237,7 @@
 		0492ADDB1F6B83A7005FE7CE /* util_sndfile.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util_sndfile.c; path = ../chuck/src/core/util_sndfile.c; sourceTree = SOURCE_ROOT; };
 		0492ADDC1F6B83A7005FE7CE /* util_sndfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util_sndfile.h; path = ../chuck/src/core/util_sndfile.h; sourceTree = SOURCE_ROOT; };
 		0492ADDD1F6B83A7005FE7CE /* util_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util_string.cpp; path = ../chuck/src/core/util_string.cpp; sourceTree = SOURCE_ROOT; };
-		0492ADDE1F6B83A7005FE7CE /* util_string.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util_string.h; path = ../chuck/src/core/util_string.h; sourceTree = SOURCE_ROOT; };
+		0492ADDE1F6B83A7005FE7CE /* util_string.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = util_string.h; path = ../chuck/src/core/util_string.h; sourceTree = SOURCE_ROOT; };
 		0492ADDF1F6B83A7005FE7CE /* util_thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util_thread.cpp; path = ../chuck/src/core/util_thread.cpp; sourceTree = SOURCE_ROOT; };
 		0492ADE01F6B83A7005FE7CE /* util_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util_thread.h; path = ../chuck/src/core/util_thread.h; sourceTree = SOURCE_ROOT; };
 		0492ADE11F6B83A7005FE7CE /* util_xforms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = util_xforms.c; path = ../chuck/src/core/util_xforms.c; sourceTree = SOURCE_ROOT; };
@@ -691,7 +691,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Plugins;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-I../chuck/core",
@@ -736,7 +736,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = /Plugins;
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OTHER_CFLAGS = (
 					"-I../chuck/core",
 					"-I../chuck/core/lo",
