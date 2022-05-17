@@ -154,7 +154,7 @@ public class ChunityTestCallbacks : MonoBehaviour
         yield return new WaitForSeconds( 0.1f );
         myChuck.SetString( "myString", "yo" );
         yield return new WaitForSeconds( 0.1f );
-        myChuck.GetString( "myString", StringID, -1010 );
+        myChuck.GetString( "myString", StringID, (CK_INT) (-1010) );
         yield return new WaitForSeconds( 0.1f );
     }
 
