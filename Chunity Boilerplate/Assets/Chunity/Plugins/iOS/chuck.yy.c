@@ -777,6 +777,14 @@ long htol( c_str str )
 
 #define INITIAL 0
 
+#ifndef YY_NO_UNISTD_H
+/* Special case for "unistd.h", since it is non-ANSI. We include it way
+ * down here because we want the user's section 1 to have been scanned first.
+ * The user has a chance to override it with an option.
+ */
+#include <unistd.h>
+#endif
+
 #ifndef YY_EXTRA_TYPE
 #define YY_EXTRA_TYPE void *
 #endif
@@ -985,7 +993,7 @@ YY_DECL
 #line 175 "chuck.lex"
 
 
-#line 988 "chuck.yy.c"
+#line 996 "chuck.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1572,7 +1580,7 @@ YY_RULE_SETUP
 #line 290 "chuck.lex"
 ECHO;
 	YY_BREAK
-#line 1575 "chuck.yy.c"
+#line 1583 "chuck.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
