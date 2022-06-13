@@ -10,9 +10,9 @@ Windows
 Beta Release:
 iOS
 Linux
+Android
 
 Alpha Pre-release (not all functions fully work):
-Android
 WebGL
 Chugins on macOS and Windows
 
