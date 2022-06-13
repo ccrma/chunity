@@ -6,7 +6,8 @@ at http://chuck.stanford.edu/chunity/.
 ///////////////////////////////////////////////////////////////////////////
 To use Chunity, you will need to move these folders into the top level
 of your Assets folder:
-- Streaming Assets
+- Streaming Assets (you will also need to rename the folder to just
+  "StreamingAssets" without quotes)
 
 The reason for this is that Unity mandates that there is only one of each
 of these kinds of special folders, and that they must reside at the top
