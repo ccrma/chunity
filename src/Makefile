@@ -34,6 +34,7 @@ chuck/src/core/ugen_osc.cpp \
 chuck/src/core/ugen_filter.cpp \
 chuck/src/core/ugen_stk.cpp \
 chuck/src/core/ugen_xxx.cpp \
+chuck/src/core/ulib_ai.cpp \
 chuck/src/core/ulib_machine.cpp \
 chuck/src/core/ulib_math.cpp \
 chuck/src/core/ulib_std.cpp \

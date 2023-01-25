@@ -83,6 +83,7 @@
 		04F9FB26264DBD9F008B7F74 /* chuck_globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F9FB25264DBD9F008B7F74 /* chuck_globals.cpp */; };
 		2BC2A8D5144C433D00D5EF79 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BC2A8D4144C433D00D5EF79 /* OpenGL.framework */; };
 		3BC406E41AFB7CDF00E92CB9 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC406E31AFB7CDF00E92CB9 /* CoreMIDI.framework */; };
+		869C165C2980CAA100C838C6 /* ulib_ai.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 869C165B2980CA9600C838C6 /* ulib_ai.cpp */; };
 		8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -265,6 +266,8 @@
 		2BC2A8D4144C433D00D5EF79 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		3BC406E31AFB7CDF00E92CB9 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
 		3D199B6D1858F3E60063EC53 /* PluginList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PluginList.h; path = ../PluginList.h; sourceTree = "<group>"; };
+		869C165A2980CA9600C838C6 /* ulib_ai.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ulib_ai.h; path = ../src/core/ulib_ai.h; sourceTree = "<group>"; };
+		869C165B2980CA9600C838C6 /* ulib_ai.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ulib_ai.cpp; path = ../src/core/ulib_ai.cpp; sourceTree = "<group>"; };
 		8D576316048677EA00EA77CD /* AudioPluginChuck.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioPluginChuck.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D576317048677EA00EA77CD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -368,6 +371,8 @@
 				0492ADBE1F6B83A7005FE7CE /* ugen_stk.h */,
 				0492ADBF1F6B83A7005FE7CE /* ugen_xxx.cpp */,
 				0492ADC01F6B83A7005FE7CE /* ugen_xxx.h */,
+				869C165B2980CA9600C838C6 /* ulib_ai.cpp */,
+				869C165A2980CA9600C838C6 /* ulib_ai.h */,
 				0492ADC11F6B83A7005FE7CE /* ulib_machine.cpp */,
 				0492ADC21F6B83A7005FE7CE /* ulib_machine.h */,
 				0492ADC31F6B83A7005FE7CE /* ulib_math.cpp */,
@@ -615,6 +620,7 @@
 				0492AE2D1F6B83A8005FE7CE /* util_xforms.c in Sources */,
 				0492ADF71F6B83A7005FE7CE /* chuck_type.cpp in Sources */,
 				0492AE061F6B83A7005FE7CE /* midiio_rtmidi.cpp in Sources */,
+				869C165C2980CAA100C838C6 /* ulib_ai.cpp in Sources */,
 				0492AE201F6B83A8005FE7CE /* ulib_regex.cpp in Sources */,
 				0492ADEA1F6B83A7005FE7CE /* chuck_errmsg.cpp in Sources */,
 				0492AE191F6B83A8005FE7CE /* ugen_filter.cpp in Sources */,
