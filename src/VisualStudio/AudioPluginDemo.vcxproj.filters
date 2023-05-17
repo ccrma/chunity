@@ -233,6 +233,9 @@
     <ClCompile Include="..\chuck\src\core\ulib_ai.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="..\chuck\src\core\ulib_doc.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PluginList.h" />
@@ -478,6 +481,9 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="..\chuck\src\core\ulib_ai.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chuck\src\core\ulib_doc.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>

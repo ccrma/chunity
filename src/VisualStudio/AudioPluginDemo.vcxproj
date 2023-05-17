@@ -372,6 +372,7 @@ copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClCompile Include="..\chuck\src\core\ugen_stk.cpp" />
     <ClCompile Include="..\chuck\src\core\ugen_xxx.cpp" />
     <ClCompile Include="..\chuck\src\core\ulib_ai.cpp" />
+    <ClCompile Include="..\chuck\src\core\ulib_doc.cpp" />
     <ClCompile Include="..\chuck\src\core\ulib_machine.cpp" />
     <ClCompile Include="..\chuck\src\core\ulib_math.cpp" />
     <ClCompile Include="..\chuck\src\core\ulib_opsc.cpp">
@@ -460,6 +461,7 @@ copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClInclude Include="..\chuck\src\core\ugen_stk.h" />
     <ClInclude Include="..\chuck\src\core\ugen_xxx.h" />
     <ClInclude Include="..\chuck\src\core\ulib_ai.h" />
+    <ClInclude Include="..\chuck\src\core\ulib_doc.h" />
     <ClInclude Include="..\chuck\src\core\ulib_machine.h" />
     <ClInclude Include="..\chuck\src\core\ulib_math.h" />
     <ClInclude Include="..\chuck\src\core\ulib_opsc.h" />
