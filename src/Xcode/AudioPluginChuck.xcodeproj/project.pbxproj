@@ -83,6 +83,7 @@
 		04F9FB26264DBD9F008B7F74 /* chuck_globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04F9FB25264DBD9F008B7F74 /* chuck_globals.cpp */; };
 		2BC2A8D5144C433D00D5EF79 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BC2A8D4144C433D00D5EF79 /* OpenGL.framework */; };
 		3BC406E41AFB7CDF00E92CB9 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC406E31AFB7CDF00E92CB9 /* CoreMIDI.framework */; };
+		860A36112A14748C00A9113D /* ulib_doc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 860A360F2A14746F00A9113D /* ulib_doc.cpp */; };
 		869C165C2980CAA100C838C6 /* ulib_ai.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 869C165B2980CA9600C838C6 /* ulib_ai.cpp */; };
 		8D576314048677EA00EA77CD /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AA1909FFE8422F4C02AAC07 /* CoreFoundation.framework */; };
 /* End PBXBuildFile section */
@@ -266,6 +267,8 @@
 		2BC2A8D4144C433D00D5EF79 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		3BC406E31AFB7CDF00E92CB9 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
 		3D199B6D1858F3E60063EC53 /* PluginList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PluginList.h; path = ../PluginList.h; sourceTree = "<group>"; };
+		860A360F2A14746F00A9113D /* ulib_doc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ulib_doc.cpp; path = ../src/core/ulib_doc.cpp; sourceTree = "<group>"; };
+		860A36102A14746F00A9113D /* ulib_doc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ulib_doc.h; path = ../src/core/ulib_doc.h; sourceTree = "<group>"; };
 		869C165A2980CA9600C838C6 /* ulib_ai.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ulib_ai.h; path = ../src/core/ulib_ai.h; sourceTree = "<group>"; };
 		869C165B2980CA9600C838C6 /* ulib_ai.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ulib_ai.cpp; path = ../src/core/ulib_ai.cpp; sourceTree = "<group>"; };
 		8D576316048677EA00EA77CD /* AudioPluginChuck.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioPluginChuck.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -373,6 +376,8 @@
 				0492ADC01F6B83A7005FE7CE /* ugen_xxx.h */,
 				869C165B2980CA9600C838C6 /* ulib_ai.cpp */,
 				869C165A2980CA9600C838C6 /* ulib_ai.h */,
+				860A360F2A14746F00A9113D /* ulib_doc.cpp */,
+				860A36102A14746F00A9113D /* ulib_doc.h */,
 				0492ADC11F6B83A7005FE7CE /* ulib_machine.cpp */,
 				0492ADC21F6B83A7005FE7CE /* ulib_machine.h */,
 				0492ADC31F6B83A7005FE7CE /* ulib_math.cpp */,
@@ -645,6 +650,7 @@
 				0492ADE61F6B83A7005FE7CE /* chuck_absyn.cpp in Sources */,
 				040209B7200AB1F100AA7411 /* chuck_carrier.cpp in Sources */,
 				0492AE1B1F6B83A8005FE7CE /* ugen_stk.cpp in Sources */,
+				860A36112A14748C00A9113D /* ulib_doc.cpp in Sources */,
 				0492ADF21F6B83A7005FE7CE /* chuck_scan.cpp in Sources */,
 				04813AAF1EF992CA00112924 /* hrtftable.cpp in Sources */,
 				0492AE1E1F6B83A8005FE7CE /* ulib_math.cpp in Sources */,
