@@ -8,36 +8,6 @@
     <ClCompile Include="..\chuck\src\core\lo\address.c">
       <Filter>core\lo</Filter>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\xmalloc.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\tre-ast.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\tre-compile.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\tre-filter.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\tre-match-approx.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\tre-match-backtrack.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\tre-match-parallel.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\tre-mem.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\tre-parse.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\tre-stack.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
     <ClCompile Include="..\chuck\src\core\lo\send.c">
       <Filter>core\lo</Filter>
     </ClCompile>
@@ -46,15 +16,6 @@
     </ClCompile>
     <ClCompile Include="..\chuck\src\core\lo\timetag.c">
       <Filter>core\lo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\regcomp.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\regerror.c">
-      <Filter>core\regex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\chuck\src\core\regex\regexec.c">
-      <Filter>core\regex</Filter>
     </ClCompile>
     <ClCompile Include="..\chuck\src\core\lo\method.c">
       <Filter>core\lo</Filter>
@@ -176,9 +137,6 @@
     <ClCompile Include="..\chuck\src\core\ulib_opsc.cpp">
       <Filter>core</Filter>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\core\ulib_regex.cpp">
-      <Filter>core</Filter>
-    </ClCompile>
     <ClCompile Include="..\chuck\src\core\ulib_std.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -191,7 +149,7 @@
     <ClCompile Include="..\chuck\src\core\util_hid.cpp">
       <Filter>core</Filter>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\core\util_math.c">
+    <ClCompile Include="..\chuck\src\core\util_math.cpp">
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="..\chuck\src\core\util_network.c">
@@ -239,42 +197,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PluginList.h" />
-    <ClInclude Include="..\chuck\src\core\regex\xmalloc.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre-stack.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre-ast.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre-compile.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre-config.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre-filter.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre-internal.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre-match-utils.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre-mem.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\tre-parse.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\regex.h">
-      <Filter>core\regex</Filter>
-    </ClInclude>
     <ClInclude Include="..\chuck\src\core\lo\lo.h">
       <Filter>core\lo</Filter>
     </ClInclude>
@@ -307,9 +229,6 @@
     </ClInclude>
     <ClInclude Include="..\chuck\src\core\lo\config.h">
       <Filter>core\lo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\chuck\src\core\regex\config.h">
-      <Filter>core\regex</Filter>
     </ClInclude>
     <ClInclude Include="..\AudioPluginInterface.h">
       <Filter>unity</Filter>
@@ -434,9 +353,6 @@
     <ClInclude Include="..\chuck\src\core\ulib_opsc.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="..\chuck\src\core\ulib_regex.h">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="..\chuck\src\core\ulib_std.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -493,9 +409,6 @@
     </Filter>
     <Filter Include="core\lo">
       <UniqueIdentifier>{26d1453e-2469-4181-bec0-2f1f0e460b89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="core\regex">
-      <UniqueIdentifier>{c853afe7-5bfc-4104-acd6-59cfd228268e}</UniqueIdentifier>
     </Filter>
     <Filter Include="unity">
       <UniqueIdentifier>{15308e21-0149-4117-8df9-8865b0cc1409}</UniqueIdentifier>
