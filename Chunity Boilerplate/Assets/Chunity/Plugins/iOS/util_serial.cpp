@@ -29,10 +29,8 @@
 // author: Spencer Salazar (spencer@ccrma.stanford.edu)
 // date: Summer 2012
 //-----------------------------------------------------------------------------
-#include "chuck_def.h"
 #include "util_serial.h"
 #include "chuck_errmsg.h"
-using namespace std;
 
 #if defined(__MACOSX_CORE__) && !defined(__CHIP_MODE__)
 
@@ -41,15 +39,17 @@ using namespace std;
 #include <IOKit/serial/IOSerialKeys.h>
 #include <IOKit/IOBSD.h>
 
+using namespace std;
+
 vector<string> SerialIOManager::availableSerialDevices()
 {
     vector<string> devices;
-    
+
     io_iterator_t serialIterator = 0; // NULL;
     kern_return_t kernResult;
     mach_port_t masterPort;
     CFMutableDictionaryRef classesToMatch = NULL;
-    
+
     io_object_t serialObject;
     static char resultStr[256];
     CFStringRef calloutCFKeyName = CFStringCreateWithCString(kCFAllocatorDefault, kIOCalloutDeviceKey, kCFStringEncodingUTF8);
@@ -74,7 +74,7 @@ vector<string> SerialIOManager::availableSerialDevices()
         EM_log(CK_LOG_WARNING, "[SerialIOManager] IOServiceGetMatchingServices returned %d\n", kernResult);
         goto error;
     }
-        
+
     while((serialObject = IOIteratorNext(serialIterator)))
     {
         CFTypeRef nameCFstring;
@@ -87,8 +87,8 @@ vector<string> SerialIOManager::availableSerialDevices()
             CFRelease(nameCFstring);
             devices.push_back(string(resultStr));
         }
-        
-        // TODO: use tty name also? 
+
+        // TODO: use tty name also?
         // see: http://stuffthingsandjunk.blogspot.com/2009/03/devcu-vs-devtty-osx-serial-ports.html
 //        nameCFstring = IORegistryEntryCreateCFProperty(serialObject,
 //                                                       dialinCFKeyName,
@@ -100,17 +100,17 @@ vector<string> SerialIOManager::availableSerialDevices()
 //            devices.push_back(string(resultStr));
 //        }
     }
-    
+
     goto cleanup;
-    
+
 error:
     devices.clear();
-    
+
 cleanup:
     if(classesToMatch) { CFRelease(classesToMatch); classesToMatch = NULL; }
     if(calloutCFKeyName) { CFRelease(calloutCFKeyName); calloutCFKeyName = NULL; }
     if(dialinCFKeyName) { CFRelease(dialinCFKeyName); dialinCFKeyName = NULL; }
-    
+
     return devices;
 }
 
@@ -121,14 +121,22 @@ cleanup:
 #include <dirent.h>
 #include <unistd.h>
 
+using namespace std;
 
 vector<string> SerialIOManager::availableSerialDevices()
 {
     vector<string> devices;
-    const int buf_size = PATH_MAX;
+
+    // two sizes | 1.5.0.1 (ge) updated, as pointed out by linux compilation warning
+    const int link_buf_size = 4096+256;
+    const int path_buf_size = 4096;
+    // was PATH_MAX, which apparently isn't
+    // https://stackoverflow.com/questions/9449241/where-is-path-max-defined-in-linux
+    // https://insanecoding.blogspot.com/2007/11/pathmax-simply-isnt.html
+    // https://news.ycombinator.com/item?id=14194681
     const char * serial_dir = "/dev/serial/by-id";
-    char link_buf[buf_size];
-    char path_buf[buf_size];
+    char link_buf[link_buf_size];
+    char path_buf[path_buf_size];
 
     DIR * dir = opendir(serial_dir);
 
@@ -145,8 +153,8 @@ vector<string> SerialIOManager::availableSerialDevices()
         if(strcmp(dir_info->d_name, ".") == 0 ||
            strcmp(dir_info->d_name, "..") == 0)
             continue;
-        snprintf(link_buf, buf_size, "%s/%s", serial_dir, dir_info->d_name);
-        int link_size = readlink(link_buf, path_buf, buf_size-1);
+        snprintf(link_buf, link_buf_size, "%s/%s", serial_dir, dir_info->d_name);
+        int link_size = readlink(link_buf, path_buf, path_buf_size-1);
         if(link_size <= 0)
         {
             EM_log(CK_LOG_INFO, "(SerialIOManager): readlink failed on '%s'", link_buf);
@@ -159,7 +167,7 @@ vector<string> SerialIOManager::availableSerialDevices()
         if(path_buf[0] != '/')
         {
             // normalize path
-            snprintf(link_buf, buf_size, "%s/%s", serial_dir, path_buf);
+            snprintf(link_buf, link_buf_size, "%s/%s", serial_dir, path_buf);
 
             if(!realpath(link_buf, path_buf))
                 goto error;
@@ -169,17 +177,19 @@ vector<string> SerialIOManager::availableSerialDevices()
     }
 
     goto cleanup;
-    
+
 error:
     devices.clear();
-    
+
 cleanup:
     return devices;
 }
 
-#elif defined(__WINDOWS_DS__)
+#elif defined(__PLATFORM_WIN32__)
 
 #include <windows.h>
+
+using namespace std;
 
 vector<string> SerialIOManager::availableSerialDevices()
 {
@@ -188,7 +198,7 @@ vector<string> SerialIOManager::availableSerialDevices()
     HKEY hSERIALCOMM;
     DWORD dwMaxValueNameLen, dwMaxValueLen;
     char *name, *value;
-    
+
     DWORD dwIndex = 0;
     DWORD dwType;
     DWORD dwValueNameSize;
@@ -206,7 +216,7 @@ vector<string> SerialIOManager::availableSerialDevices()
         EM_error3("SerialIOManager: unable to query registry key info");
         goto error;
     }
-    
+
     name = new char[dwMaxValueNameLen+1];
     value = new char[dwMaxValueLen+1];
 
@@ -224,7 +234,7 @@ vector<string> SerialIOManager::availableSerialDevices()
         dwValueNameSize = dwMaxValueNameLen+1;
         dwDataSize = dwMaxValueLen+1;
     }
-    
+
     return devices;
 
 error:
@@ -238,10 +248,9 @@ error:
 vector<string> SerialIOManager::availableSerialDevices()
 {
     vector<string> devices;
-    
+
     return devices;
 }
 
 
 #endif /* __MACOSX_CORE__ */
-

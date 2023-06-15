@@ -89,14 +89,16 @@ chuck/src/core/ugen_stk.cpp
 chuck/src/core/ugen_stk.h
 chuck/src/core/ugen_xxx.cpp
 chuck/src/core/ugen_xxx.h
+chuck/src/core/ulib_ai.cpp
+chuck/src/core/ulib_ai.h
+chuck/src/core/ulib_doc.cpp
+chuck/src/core/ulib_doc.h
 chuck/src/core/ulib_machine.cpp
 chuck/src/core/ulib_machine.h
 chuck/src/core/ulib_math.cpp
 chuck/src/core/ulib_math.h
 chuck/src/core/ulib_opsc.cpp
 chuck/src/core/ulib_opsc.h
-chuck/src/core/ulib_regex.cpp
-chuck/src/core/ulib_regex.h
 chuck/src/core/ulib_std.cpp
 chuck/src/core/ulib_std.h
 chuck/src/core/util_buffers.cpp
@@ -105,7 +107,7 @@ chuck/src/core/util_console.cpp
 chuck/src/core/util_console.h
 chuck/src/core/util_hid.cpp
 chuck/src/core/util_hid.h
-chuck/src/core/util_math.c
+chuck/src/core/util_math.cpp
 chuck/src/core/util_math.h
 chuck/src/core/util_network.c
 chuck/src/core/util_network.h

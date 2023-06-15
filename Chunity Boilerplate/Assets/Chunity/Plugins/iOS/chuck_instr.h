@@ -44,6 +44,9 @@ struct Chuck_VM_Shred;
 struct Chuck_Type;
 struct Chuck_Func;
 
+// 1.4.2.0 (ge) | added for switching from snprintf()
+#define CK_PRINT_BUF_LENGTH 256
+
 
 
 
@@ -55,19 +58,25 @@ struct Chuck_Instr
 {
 public:
     Chuck_Instr();
-    virtual ~Chuck_Instr() { }
+    virtual ~Chuck_Instr() { SAFE_DELETE(m_codestr); }
 
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred ) = 0;
 
 public:
     virtual const char * name() const;
-    virtual const char * params() const 
+    virtual const char * params() const
     { return ""; }
 
 public:
+    // store line position for error messages
     void set_linepos( t_CKUINT linepos );
     t_CKUINT m_linepos;
+
+    // set codestr associated with this instruction
+    void set_codestr( const std::string & str );
+    // (used in instruction dump) | 1.5.0.0 (ge) added
+    std::string * m_codestr;
 };
 
 
@@ -80,11 +89,12 @@ public:
 struct Chuck_Instr_Branch_Op : public Chuck_Instr
 {
 public:
+    Chuck_Instr_Branch_Op() : m_jmp(0) { }
     inline void set( t_CKUINT jmp ) { m_jmp = jmp; }
 
 public:
     virtual const char * params() const
-    { static char buffer[256]; sprintf( buffer, "%ld", (long)m_jmp ); return buffer; }
+    { static char buffer[CK_PRINT_BUF_LENGTH]; snprintf( buffer, CK_PRINT_BUF_LENGTH, "%ld", (long)m_jmp ); return buffer; }
 
 protected:
     t_CKUINT m_jmp;
@@ -100,12 +110,13 @@ protected:
 struct Chuck_Instr_Unary_Op : public Chuck_Instr
 {
 public:
+    Chuck_Instr_Unary_Op() : m_val(0) { }
     inline void set( t_CKUINT val ) { m_val = val; }
     inline t_CKUINT get() { return m_val; }
 
 public:
     virtual const char * params() const
-    { static char buffer[256]; sprintf( buffer, "%ld", (long)m_val ); return buffer; }
+    { static char buffer[CK_PRINT_BUF_LENGTH]; snprintf( buffer, CK_PRINT_BUF_LENGTH, "%ld", (long)m_val ); return buffer; }
 
 protected:
     t_CKUINT m_val;
@@ -121,12 +132,13 @@ protected:
 struct Chuck_Instr_Unary_Op2 : public Chuck_Instr
 {
 public:
+    Chuck_Instr_Unary_Op2() : m_val(0) { }
     inline void set( t_CKFLOAT val ) { m_val = val; }
     inline t_CKFLOAT get() { return m_val; }
 
 public:
     virtual const char * params() const
-    { static char buffer[256]; sprintf( buffer, "%.6f", m_val ); return buffer; }
+    { static char buffer[CK_PRINT_BUF_LENGTH]; snprintf( buffer, CK_PRINT_BUF_LENGTH, "%.6f", m_val ); return buffer; }
 
 protected:
     t_CKFLOAT m_val;
@@ -2015,6 +2027,23 @@ protected:
 
 
 //-----------------------------------------------------------------------------
+// name: struct Chuck_Instr_Reg_Push_Zero
+// desc: push immediate value 0 to reg stack with specific width
+//-----------------------------------------------------------------------------
+struct Chuck_Instr_Reg_Push_Zero : public Chuck_Instr_Unary_Op
+{
+public:
+    Chuck_Instr_Reg_Push_Zero( t_CKUINT sizeInBytes )
+    { this->set( sizeInBytes ); }
+
+public:
+    virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
+};
+
+
+
+
+//-----------------------------------------------------------------------------
 // name: struct Chuck_Instr_Reg_Dup_Last
 // desc: duplicate last value on reg stack
 //-----------------------------------------------------------------------------
@@ -2133,8 +2162,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "src=%ld, base=%ld", (long)m_val, (long)base );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "src=%ld, base=%ld", (long)m_val, (long)base );
       return buffer; }
 
 protected:
@@ -2158,8 +2187,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "src=%ld, base=%ld", (long)m_val, (long)base );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "src=%ld, base=%ld", (long)m_val, (long)base );
       return buffer; }
 
 protected:
@@ -2183,8 +2212,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "src=%ld, base=%ld", (long)m_val, (long)base );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "src=%ld, base=%ld", (long)m_val, (long)base );
       return buffer; }
 
 protected:
@@ -2204,14 +2233,14 @@ struct Chuck_Instr_Reg_Push_Mem_Vec3 : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_Reg_Push_Mem_Vec3( t_CKUINT src, t_CKBOOL use_base = FALSE )
     { this->set( src ); base = use_base; }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-        sprintf( buffer, "src=%ld, base=%ld", (long)m_val, (long)base );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+        snprintf( buffer, CK_PRINT_BUF_LENGTH, "src=%ld, base=%ld", (long)m_val, (long)base );
         return buffer; }
-    
+
 protected:
     // use global stack base
     t_CKBOOL base;
@@ -2229,14 +2258,14 @@ struct Chuck_Instr_Reg_Push_Mem_Vec4 : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_Reg_Push_Mem_Vec4( t_CKUINT src, t_CKBOOL use_base = FALSE )
     { this->set( src ); base = use_base; }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-        sprintf( buffer, "src=%ld, base=%ld", (long)m_val, (long)base );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+        snprintf( buffer, CK_PRINT_BUF_LENGTH, "src=%ld, base=%ld", (long)m_val, (long)base );
         return buffer; }
-    
+
 protected:
     // use global stack base
     t_CKBOOL base;
@@ -2258,8 +2287,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "name='%s'", m_name.c_str() );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "name='%s'", m_name.c_str() );
       return buffer; }
 
 public:
@@ -2283,8 +2312,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "src=%ld, base=%ld", (long)m_val, (long)base );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "src=%ld, base=%ld", (long)m_val, (long)base );
       return buffer; }
 
 protected:
@@ -2308,8 +2337,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "name='%s'", m_name.c_str() );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "name='%s'", m_name.c_str() );
       return buffer; }
 
 protected:
@@ -2364,12 +2393,12 @@ struct Chuck_Instr_Mem_Set_Imm : public Chuck_Instr
 public:
     Chuck_Instr_Mem_Set_Imm( t_CKUINT offset, t_CKUINT val )
     { m_offset = offset; m_val = val; }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "offset=%ld, value=%ld", (long)m_offset, (long)m_val );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "offset=%ld, value=%ld", (long)m_offset, (long)m_val );
       return buffer; }
 
 protected:
@@ -2389,12 +2418,12 @@ struct Chuck_Instr_Mem_Set_Imm2 : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_Mem_Set_Imm2( t_CKUINT offset, t_CKFLOAT val )
     { m_offset = offset; m_val = val; }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "offset=%ld, value=%f", (long)m_offset, m_val );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "offset=%ld, value=%f", (long)m_offset, m_val );
       return buffer; }
 
 protected:
@@ -2414,7 +2443,7 @@ struct Chuck_Instr_Mem_Push_Imm : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_Mem_Push_Imm( t_CKUINT src )
     { this->set( src ); }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
@@ -2430,7 +2459,7 @@ struct Chuck_Instr_Mem_Push_Imm2 : public Chuck_Instr_Unary_Op2
 public:
     Chuck_Instr_Mem_Push_Imm2( t_CKFLOAT src )
     { this->set( src ); }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
@@ -2513,10 +2542,10 @@ public:
     // (added 1.3.0.0 -- is_object)
     Chuck_Instr_Alloc_Word( t_CKUINT offset, t_CKBOOL is_object )
     { this->set( offset ); m_is_object = is_object; }
-    
+
     // was this object reference? (added 1.3.0.0)
     t_CKBOOL m_is_object;
-    
+
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
 
@@ -2532,7 +2561,7 @@ struct Chuck_Instr_Alloc_Word2 : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_Alloc_Word2( t_CKUINT offset )
     { this->set( offset ); }
-    
+
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
 
@@ -2564,7 +2593,7 @@ struct Chuck_Instr_Alloc_Vec3 : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_Alloc_Vec3( t_CKUINT offset )
     { this->set( offset ); }
-    
+
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
 
@@ -2580,7 +2609,7 @@ struct Chuck_Instr_Alloc_Vec4 : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_Alloc_Vec4( t_CKUINT offset )
     { this->set( offset ); }
-    
+
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
 
@@ -2644,7 +2673,7 @@ struct Chuck_Instr_Alloc_Member_Vec3 : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_Alloc_Member_Vec3( t_CKUINT offset  )
     { this->set( offset ); }
-    
+
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
 
@@ -2660,7 +2689,7 @@ struct Chuck_Instr_Alloc_Member_Vec4 : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_Alloc_Member_Vec4( t_CKUINT offset  )
     { this->set( offset ); }
-    
+
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
 
@@ -2676,24 +2705,26 @@ struct Chuck_Instr_Alloc_Word_Global : public Chuck_Instr_Unary_Op
 public:
     // (added 1.3.0.0 -- is_object)
     Chuck_Instr_Alloc_Word_Global()
-    { this->set( 0 ); m_stack_offset = 0; m_chuck_type = NULL;
-      m_should_execute_ctors = FALSE; m_is_array = FALSE; }
-    
+        : m_type(te_globalTypeNone), m_is_array(FALSE),
+        m_should_execute_ctors(FALSE),
+        m_stack_offset(0), m_chuck_type(NULL)
+    { this->set( 0 ); }
+
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "name='%s'", m_name.c_str() );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "name='%s'", m_name.c_str() );
       return buffer; }
-    
+
     // global name and type
     std::string m_name;
     te_GlobalType m_type;
     t_CKBOOL m_is_array;
-    
+
     // for objects
     t_CKBOOL m_should_execute_ctors;
     t_CKUINT m_stack_offset;
     Chuck_Type * m_chuck_type;
-    
+
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
 
@@ -2946,7 +2977,7 @@ struct Chuck_Instr_AddRef_Object2 : public Chuck_Instr_Unary_Op
 public:
     Chuck_Instr_AddRef_Object2( t_CKUINT offset )
     { this->set( offset ); }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
 };
@@ -2957,6 +2988,7 @@ public:
 //-----------------------------------------------------------------------------
 // name: struct Chuck_Instr_Reg_AddRef_Object3
 // desc: added 1.3.0.0 -- does the ref add in-place
+//       operates on top of the register stack
 //-----------------------------------------------------------------------------
 struct Chuck_Instr_Reg_AddRef_Object3 : public Chuck_Instr
 {
@@ -2969,7 +3001,7 @@ public:
 
 //-----------------------------------------------------------------------------
 // name: struct Chuck_Instr_Release_Object
-// desc: ...
+// desc: release object on stack by its offset
 //-----------------------------------------------------------------------------
 struct Chuck_Instr_Release_Object : public Chuck_Instr
 {
@@ -2989,6 +3021,38 @@ struct Chuck_Instr_Release_Object2 : public Chuck_Instr_Unary_Op
 {
 public:
     Chuck_Instr_Release_Object2( t_CKUINT offset )
+    { this->set( offset ); }
+
+public:
+    virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
+};
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: struct Chuck_Instr_Release_Object3_Pop_Word
+// desc: release object reference + pop from reg stack | 1.5.0.0 (ge) added
+//       the variant assumes object pointer directly on stack (not offset)
+//-----------------------------------------------------------------------------
+struct Chuck_Instr_Release_Object3_Pop_Word : public Chuck_Instr
+{
+public:
+    virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
+};
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: struct Chuck_Instr_Release_Object4
+// desc: release object reference from reg stack (no pop) | 1.5.0.0 (ge) added
+//       the variant assumes object pointer directly on stack (not offset)
+//-----------------------------------------------------------------------------
+struct Chuck_Instr_Release_Object4 : public Chuck_Instr_Unary_Op
+{
+public:
+    Chuck_Instr_Release_Object4( t_CKUINT offset )
     { this->set( offset ); }
 
 public:
@@ -3031,11 +3095,14 @@ public:
 struct Chuck_Instr_Func_Call_Member : public Chuck_Instr_Unary_Op
 {
 public:
-    Chuck_Instr_Func_Call_Member( t_CKUINT ret_size )
-    { this->set( ret_size ); }
+    Chuck_Instr_Func_Call_Member( t_CKUINT ret_size, Chuck_Func * func_ref )
+    { this->set( ret_size ); m_func_ref = func_ref; }
 
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
+
+public:
+    Chuck_Func * m_func_ref; // 1.5.0.0 (ge) | added for arg list cleanup
 };
 
 
@@ -3048,11 +3115,14 @@ public:
 struct Chuck_Instr_Func_Call_Static : public Chuck_Instr_Unary_Op
 {
 public:
-    Chuck_Instr_Func_Call_Static( t_CKUINT ret_size )
-    { this->set( ret_size ); }
+    Chuck_Instr_Func_Call_Static( t_CKUINT ret_size, Chuck_Func * func_ref )
+    { this->set( ret_size ); m_func_ref = func_ref; }
 
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
+
+public:
+    Chuck_Func * m_func_ref; // 1.5.0.0 (ge) | added for arg list cleanup
 };
 
 
@@ -3145,6 +3215,7 @@ protected:
     Chuck_Type * m_type_ref;
     t_CKINT m_length;
     t_CKBOOL m_is_obj;
+    t_CKBOOL m_is_float;
     char * m_param_str;
 };
 
@@ -3158,8 +3229,9 @@ protected:
 struct Chuck_Instr_Array_Alloc : public Chuck_Instr
 {
 public: // REFACTOR-2017: added env
-    Chuck_Instr_Array_Alloc( Chuck_Env * env, t_CKUINT depth, Chuck_Type * the_type,
-        t_CKUINT offset, t_CKBOOL ref );
+    Chuck_Instr_Array_Alloc( Chuck_Env * env, t_CKUINT depth,
+        Chuck_Type * contentType, t_CKUINT offset, t_CKBOOL ref,
+        Chuck_Type * arrayType );
     virtual ~Chuck_Instr_Array_Alloc();
 
 public:
@@ -3168,7 +3240,8 @@ public:
 
 protected:
     t_CKUINT m_depth;
-    Chuck_Type * m_type_ref;
+    Chuck_Type * m_type_ref_content;
+    Chuck_Type * m_type_ref_array; // 1.5.0.0 (ge) added
     t_CKBOOL m_is_obj;
     char * m_param_str;
     t_CKUINT m_stack_offset;
@@ -3185,15 +3258,15 @@ protected:
 struct Chuck_Instr_Array_Access : public Chuck_Instr
 {
 public:
-    Chuck_Instr_Array_Access( t_CKUINT kind, t_CKUINT emit_addr, 
+    Chuck_Instr_Array_Access( t_CKUINT kind, t_CKUINT emit_addr,
         t_CKUINT istr = FALSE )
     { m_kind = kind; m_emit_addr = emit_addr; m_istr = istr; }
 
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "kind=%ld, emit_addr=%p istr=%ld", 
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "kind=%ld, emit_addr=%p istr=%ld",
           (long)m_kind, (void *)m_emit_addr, (long)m_istr );
       return buffer; }
 
@@ -3219,8 +3292,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "kind=%ld, emit_addr=%p", (long)m_kind, (void *)m_emit_addr );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "kind=%ld, emit_addr=%p", (long)m_kind, (void *)m_emit_addr );
       return buffer; }
 
 protected:
@@ -3246,15 +3319,15 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "depth=%ld, kind=%ld, emit_addr=%p", (long)m_depth, (long)m_kind, (void *)m_emit_addr );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "depth=%ld, kind=%ld, emit_addr=%p", (long)m_depth, (long)m_kind, (void *)m_emit_addr );
       return buffer; }
 
 protected:
     t_CKUINT m_depth;
     t_CKUINT m_kind;
     t_CKUINT m_emit_addr;
-    
+
     // 1.3.1.0 list of types of indices
     std::vector<t_CKBOOL> m_indexIsAssociative;
 };
@@ -3275,8 +3348,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "offset=%ld, kind=%ld, emit_addr=%p", (long)m_offset, (long)m_kind, (void *)m_emit_addr );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "offset=%ld, kind=%ld, emit_addr=%p", (long)m_offset, (long)m_kind, (void *)m_emit_addr );
       return buffer; }
 
 protected:
@@ -3301,8 +3374,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "offset=%ld", (long)m_offset );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "offset=%ld", (long)m_offset );
       return buffer; }
 
 protected:
@@ -3321,14 +3394,14 @@ struct Chuck_Instr_Dot_Primitive_Func : public Chuck_Instr
 public:
     Chuck_Instr_Dot_Primitive_Func( t_CKUINT native_func )
     { m_native_func = native_func; }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-        sprintf( buffer, "native_func=%p", (void *)m_native_func );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+        snprintf( buffer, CK_PRINT_BUF_LENGTH, "native_func=%p", (void *)m_native_func );
         return buffer; }
-    
+
 protected:
     t_CKUINT m_native_func;
 };
@@ -3349,8 +3422,9 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "offset=%ld, size=%ld, kind=%ld, emit_addr=%p", (long)m_offset, (long)m_size, (long)m_kind, (void *)m_emit_addr );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "offset=%ld, size=%ld, kind=%ld, emit_addr=%p",
+                (long)m_offset, (long)m_size, (long)m_kind, (void *)m_emit_addr );
       return buffer; }
 
 protected:
@@ -3376,8 +3450,9 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "addr=%p, kind=%ld, emit_addr=%p", (void *)m_addr, (long)m_kind, (void *)m_emit_addr );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "addr=%p, kind=%ld, emit_addr=%p",
+                (void *)m_addr, (long)m_kind, (void *)m_emit_addr );
       return buffer; }
 
 protected:
@@ -3402,8 +3477,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "func=%p", (void *)m_func );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "func=%p", (void *)m_func );
       return buffer; }
 
 protected:
@@ -3426,8 +3501,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "is_mem=%ld, emit_addr=%p", (long)m_is_mem, (void *)m_emit_addr );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "is_mem=%ld, emit_addr=%p", (long)m_is_mem, (void *)m_emit_addr );
       return buffer; }
 
 protected:
@@ -3451,8 +3526,8 @@ public:
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-      sprintf( buffer, "is_mem=%ld, emit_addr=%p", (long)m_is_mem, (void *)m_emit_addr );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+      snprintf( buffer, CK_PRINT_BUF_LENGTH, "is_mem=%ld, emit_addr=%p", (long)m_is_mem, (void *)m_emit_addr );
       return buffer; }
 
 protected:
@@ -3472,14 +3547,14 @@ struct Chuck_Instr_Dot_Cmp_Third : public Chuck_Instr
 public:
     Chuck_Instr_Dot_Cmp_Third( t_CKUINT is_mem, t_CKUINT emit_addr )
     { m_is_mem = is_mem; m_emit_addr = emit_addr; }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-        sprintf( buffer, "is_mem=%ld, emit_addr=%p", (long)m_is_mem, (void *)m_emit_addr );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+        snprintf( buffer, CK_PRINT_BUF_LENGTH, "is_mem=%ld, emit_addr=%p", (long)m_is_mem, (void *)m_emit_addr );
         return buffer; }
-    
+
 protected:
     t_CKUINT m_is_mem;
     t_CKUINT m_emit_addr;
@@ -3497,14 +3572,14 @@ struct Chuck_Instr_Dot_Cmp_Fourth : public Chuck_Instr
 public:
     Chuck_Instr_Dot_Cmp_Fourth( t_CKUINT is_mem, t_CKUINT emit_addr )
     { m_is_mem = is_mem; m_emit_addr = emit_addr; }
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
     virtual const char * params() const
-    { static char buffer[256];
-        sprintf( buffer, "is_mem=%ld, emit_addr=%p", (long)m_is_mem, (void *)m_emit_addr );
+    { static char buffer[CK_PRINT_BUF_LENGTH];
+        snprintf( buffer, CK_PRINT_BUF_LENGTH, "is_mem=%ld, emit_addr=%p", (long)m_is_mem, (void *)m_emit_addr );
         return buffer; }
-    
+
 protected:
     t_CKUINT m_is_mem;
     t_CKUINT m_emit_addr;
@@ -3586,10 +3661,10 @@ struct Chuck_Instr_UGen_Link : public Chuck_Instr
 {
 public:
     Chuck_Instr_UGen_Link( t_CKBOOL isUpChuck = FALSE );
-    
+
 public:
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
-    
+
 protected:
     t_CKBOOL m_isUpChuck;
 };
@@ -3609,7 +3684,7 @@ public:
     { }
 
     virtual void execute( Chuck_VM * vm, Chuck_VM_Shred * shred );
-    
+
 protected:
     t_CKBOOL m_srcIsArray, m_dstIsArray;
 };
