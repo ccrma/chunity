@@ -35,13 +35,14 @@ chuck/src/core/ugen_filter.cpp \
 chuck/src/core/ugen_stk.cpp \
 chuck/src/core/ugen_xxx.cpp \
 chuck/src/core/ulib_ai.cpp \
+chuck/src/core/ulib_doc.cpp \
 chuck/src/core/ulib_machine.cpp \
 chuck/src/core/ulib_math.cpp \
 chuck/src/core/ulib_std.cpp \
 chuck/src/core/ulib_opsc.cpp \
-chuck/src/core/ulib_regex.cpp \
 chuck/src/core/util_buffers.cpp \
 chuck/src/core/util_console.cpp \
+chuck/src/core/util_math.cpp \
 chuck/src/core/util_string.cpp \
 chuck/src/core/util_thread.cpp \
 chuck/src/core/util_opsc.cpp \
@@ -51,8 +52,7 @@ chuck/src/core/uana_xform.cpp \
 chuck/src/core/uana_extract.cpp
 
 # chuck.yy.?? chuck.tab.??
-CSRCS=chuck/src/core/util_math.c \
-chuck/src/core/util_network.c \
+CSRCS=chuck/src/core/util_network.c \
 chuck/src/core/util_raw.c \
 chuck/src/core/util_xforms.c \
 chuck/src/core/chuck.tab.c \
@@ -72,18 +72,22 @@ chuck/src/core/lo/server_thread.c \
 chuck/src/core/lo/timetag.c
 
 
-
 OBJS=$(SRCS:.cpp=.o)
 COBJS=$(CSRCS:.c=.o)
 SF_COBJS=$(SF_CSRCS:.c=.o)
 LO_COBJS=$(LO_CSRCS:.c=.o)
 OUTPUT=libAudioPluginChuck.so
 
-CXXFLAGS=-I. -Ichuck/src/core -Ichuck/src/core/lo -D__PLATFORM_LINUX__ -O2 -fPIC -fno-strict-aliasing -D__CK_SNDFILE_NATIVE__ -DHAVE_CONFIG_H
-
+# compiler flags
+CXXFLAGS=-I. -Ichuck/src/core -Ichuck/src/core/lo -O2 -fPIC -fno-strict-aliasing -DHAVE_CONFIG_H
+# specify platform
+CXXFLAGS+=-D__PLATFORM_LINUX__
+# specify whether to use native libsndfile or pre-made util_sndfile.o
+CXXFLAGS+=-D__CK_SNDFILE_NATIVE__
 
 LDFLAGS=-shared -rdynamic -fPIC 
 LDFLAGS2=-lstdc++ -ldl -lm -lpthread -lsndfile -lasound
+
 LEX=flex
 YACC=bison
 CXX=gcc
@@ -108,4 +112,3 @@ $(OUTPUT): chuck/src/core/chuck.tab.c chuck/src/core/chuck.tab.h chuck/src/core/
 
 .c.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
