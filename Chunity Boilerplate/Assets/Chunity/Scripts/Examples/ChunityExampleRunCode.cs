@@ -25,12 +25,12 @@ public class ChunityExampleRunCode : MonoBehaviour
 
 			// play a chuck script
 			myChuck.RunCode( @"
+				<<< ""chuck version:"", Machine.version() >>>;
 				SndBuf buffy => dac;
 				// TODO: broken on iOS?
 				//""special:dope"" => buffy.read;
 				me.dir() + ""impact.wav"" => buffy.read;
-				buffy.length() => now;		
-	
+				buffy.length() => now;
 			" );
 		}
 

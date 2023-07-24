@@ -1,3 +1,10 @@
+//-----------------------------------------------------------------------------
+//  name: Plugin_ChucK.h
+//  desc: ChucK in Unity (Chunity) plugin; creates AudioPluginChucK
+//
+//  author: Jack Atherton
+//    date: created 4/19/17
+//-----------------------------------------------------------------------------
 #pragma once
 
 #ifndef __ANDROID__
@@ -102,6 +109,6 @@ namespace ChucK_For_Unity {
     
     UNITY_INTERFACE_EXPORT bool setLogLevel( unsigned int level );
     
-};
+}; // namespace ChucK_For_Unity
 
-};
+}; // extern "C"
