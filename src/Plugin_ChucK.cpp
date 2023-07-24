@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------------
 #include "Plugin_ChucK.h"
 #include "chuck_globals.h"
+#include "util_platforms.h" // for ck_usleep
 
 #include <iostream>
 #include <map>
@@ -901,12 +902,11 @@ namespace ChucK_For_Unity
             }
 
             // wait a bit
-            usleep( 30000 );
+            ck_usleep( 30000 );
             #endif
 
             // cleanup this chuck early
             delete chuck;
-
         }
 
         return true;
@@ -947,7 +947,7 @@ namespace ChucK_For_Unity
         }
 
         // wait for callbacks to finish their current run
-        usleep( 30000 );
+        ck_usleep( 30000 );
         #endif
 
         // next, delete chucks

@@ -182,9 +182,6 @@
     <ClCompile Include="..\chuck\src\core\chuck_carrier.cpp">
       <Filter>core</Filter>
     </ClCompile>
-    <ClCompile Include="..\chuck\src\core\chuck_win32.c">
-      <Filter>core</Filter>
-    </ClCompile>
     <ClCompile Include="..\chuck\src\core\chuck_globals.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -192,6 +189,12 @@
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="..\chuck\src\core\ulib_doc.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chuck\src\core\chuck_yacc.c">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\chuck\src\core\util_platforms.cpp">
       <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -305,9 +308,6 @@
     <ClInclude Include="..\chuck\src\core\chuck_vm.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="..\chuck\src\core\chuck_win32.h">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="..\chuck\src\core\dirent_win32.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -400,6 +400,12 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="..\chuck\src\core\ulib_doc.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chuck\src\core\chuck_yacc.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\chuck\src\core\util_platforms.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>

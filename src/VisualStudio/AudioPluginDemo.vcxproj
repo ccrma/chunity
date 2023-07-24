@@ -227,7 +227,7 @@ copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClCompile Include="..\chuck\src\core\chuck_ugen.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_utils.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_vm.cpp" />
-    <ClCompile Include="..\chuck\src\core\chuck_win32.c" />
+    <ClCompile Include="..\chuck\src\core\chuck_yacc.c" />
     <ClCompile Include="..\chuck\src\core\hidio_sdl.cpp" />
     <ClCompile Include="..\chuck\src\core\lo\address.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HAVE_CONFIG_H;__WINDOWS_MODERN__;__PLATFORM_WIN32__;__WINDOWS_DS__;WIN32;NDEBUG;_CONSOLE;_WINDOWS;_USRDLL;AudioPluginDemo_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -305,6 +305,7 @@ copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClCompile Include="..\chuck\src\core\util_math.cpp" />
     <ClCompile Include="..\chuck\src\core\util_network.c" />
     <ClCompile Include="..\chuck\src\core\util_opsc.cpp" />
+    <ClCompile Include="..\chuck\src\core\util_platforms.cpp" />
     <ClCompile Include="..\chuck\src\core\util_raw.c" />
     <ClCompile Include="..\chuck\src\core\util_serial.cpp" />
     <ClCompile Include="..\chuck\src\core\util_sndfile.c" />
@@ -344,7 +345,7 @@ copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClInclude Include="..\chuck\src\core\chuck_ugen.h" />
     <ClInclude Include="..\chuck\src\core\chuck_utils.h" />
     <ClInclude Include="..\chuck\src\core\chuck_vm.h" />
-    <ClInclude Include="..\chuck\src\core\chuck_win32.h" />
+    <ClInclude Include="..\chuck\src\core\chuck_yacc.h" />
     <ClInclude Include="..\chuck\src\core\dirent_win32.h" />
     <ClInclude Include="..\chuck\src\core\hidio_sdl.h" />
     <ClInclude Include="..\chuck\src\core\lo\config.h" />
@@ -378,6 +379,7 @@ copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClInclude Include="..\chuck\src\core\util_math.h" />
     <ClInclude Include="..\chuck\src\core\util_network.h" />
     <ClInclude Include="..\chuck\src\core\util_opsc.h" />
+    <ClInclude Include="..\chuck\src\core\util_platforms.h" />
     <ClInclude Include="..\chuck\src\core\util_raw.h" />
     <ClInclude Include="..\chuck\src\core\util_serial.h" />
     <ClInclude Include="..\chuck\src\core\util_sndfile.h" />
