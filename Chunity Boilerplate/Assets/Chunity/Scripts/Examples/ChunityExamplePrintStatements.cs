@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,19 +13,27 @@ public class ChunityExamplePrintStatements : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        // evaluate code
         GetComponent<ChuckSubInstance>().RunCode( @"
-			SinOsc foo => dac;
-			<<< ""Hello, I am a print statement and my script has connected foo to dac! "" >>>;
-			chout <= ""Hello, I am another kind of print statement. "" <= "" with TWO PARTS! "" <= IO.newline();
+            SinOsc foo => dac;
+            // chuck print out
+            <<< ""Hello, I am a print statement and my script has connected foo to dac! "" >>>;
+            // cherr write to stderr and flushes IO every time
+            cherr <= ""Hello, I am another kind of print statement. "" <= "" with TWO PARTS! "" <= IO.newline();
 
-			while( true ) 
-			{
-				Math.random2f( 300, 1000 ) => foo.freq;
-				cherr <= ""foo.freq is "" <= foo.freq() <= IO.newline();
-				1000::ms => now;
-			}
-		" );
+            // time loop
+            while( true )
+            {
+                // randomize frequency
+                Math.random2f( 300, 1000 ) => foo.freq;
+                // chout writes to stdout; buffers output; flushes with IO.newline();
+                chout <= ""foo.freq is "" <= foo.freq() <= IO.newline();
+                // advance time
+                1000::ms => now;
+            }
+        " );
 
+        // shouldn't get here unless RunCode() encountered errors
         Debug.Log( "About to run some code that has a syntax error: " );
         GetComponent<ChuckSubInstance>().RunCode( " I am code with a syntax error " );
     }
