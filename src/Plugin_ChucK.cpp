@@ -848,7 +848,7 @@ namespace ChucK_For_Unity
             msg->type = CK_MSG_CLEARVM;
 
             // null reply so that VM will delete for us when it's done
-            msg->reply_queue = NULL;
+            msg->reply_queue = FALSE;
 
             // tell the VM to clear
             chuck->vm()->globals_manager()->execute_chuck_msg_with_globals( msg );
