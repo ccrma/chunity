@@ -36,11 +36,12 @@ LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/ugen_filter.cpp \
 ../../chuck/src/core/ugen_stk.cpp \
 ../../chuck/src/core/ugen_xxx.cpp \
+../../chuck/src/core/ulib_ai.cpp \
+../../chuck/src/core/ulib_doc.cpp \
 ../../chuck/src/core/ulib_machine.cpp \
 ../../chuck/src/core/ulib_math.cpp \
 ../../chuck/src/core/ulib_std.cpp \
 ../../chuck/src/core/ulib_opsc.cpp \
-../../chuck/src/core/ulib_regex.cpp \
 ../../chuck/src/core/util_buffers.cpp \
 ../../chuck/src/core/util_console.cpp \
 ../../chuck/src/core/util_platforms.cpp \
@@ -51,11 +52,11 @@ LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/util_hid.cpp \
 ../../chuck/src/core/uana_xform.cpp \
 ../../chuck/src/core/uana_extract.cpp \
-../../chuck/src/core/util_math.c \
+../../chuck/src/core/util_math.cpp \
 ../../chuck/src/core/util_network.c \
 ../../chuck/src/core/util_raw.c \
 ../../chuck/src/core/util_xforms.c \
-../../chuck/src/core/chuck_win32.c \
+../../chuck/src/core/chuck_yacc.c \
 ../../chuck/src/core/util_sndfile.c \
 ../../chuck/src/core/lo/address.c \
 ../../chuck/src/core/lo/blob.c \
