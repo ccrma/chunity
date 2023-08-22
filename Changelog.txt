@@ -1,6 +1,24 @@
-2.0.0
+--------------------
+Chunity VERSIONS log
+--------------------
 
-Updated to the latest version of ChucK, 1.4.1.1. Included new features for callback functions that additionally pass back the name of the global variable or a custom user-provided ID.
+2.1.1 (August 2023)
+=====
+Updated to ChucK language version 1.5.1.1 (chai).
+(fixed) a long-time crashing-on-main-instance cleanup bug
+
+
+2.1.0 (May 2023)
+=====
+Updated to ChucK language version 1.5.0.0 (chai)
+(added) support for ArraySyncers between ChucK and Unity
+
+
+2.0.0 (June 2022)
+=====
+Updated to the latest version of ChucK, 1.4.1.1. Included new features
+for callback functions that additionally pass back the name of the global
+variable or a custom user-provided ID.
 
 Platform support:
 Release:
@@ -18,7 +36,9 @@ Chugins on macOS and Windows
 
 
 1.0.2
-
+===
 Beta support for Linux. Tested only briefly on Ubuntu 18.04.
 
-Addition of ChuckMainInstance > bool useMicrophone. Uncheck to disable loading of the microphone (for example, if you are on a system that has no microphones or you don't have access to the microphone).
+Addition of ChuckMainInstance > bool useMicrophone. Uncheck to disable
+loading of the microphone (for example, if you are on a system that has
+no microphones or you don't have access to the microphone).
