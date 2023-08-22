@@ -33,8 +33,7 @@
 #include "chuck_globals.h"
 #include "chuck_vm.h"
 #include "chuck_instr.h"
-
-
+using namespace std;
 
 
 
@@ -430,6 +429,24 @@ struct Chuck_Execute_Chuck_Msg_Request
 
 
 //-----------------------------------------------------------------------------
+// name: struct Chuck_Get_Global_All_Request
+// desc: container for messages to get all global variables
+//-----------------------------------------------------------------------------
+struct Chuck_Get_Global_All_Request
+{
+    // callback
+    void (* cb)( const std::vector<Chuck_Globals_TypeValue> & list, void * data );
+    // data
+    void * data;
+
+    // constructor
+    Chuck_Get_Global_All_Request() : cb(NULL), data(NULL) { }
+};
+
+
+
+
+//-----------------------------------------------------------------------------
 // name: struct Chuck_Global_Int_Container
 // desc: container for global ints
 //-----------------------------------------------------------------------------
@@ -512,13 +529,16 @@ struct Chuck_Global_UGen_Container
 struct Chuck_Global_Array_Container
 {
     Chuck_Object * array;
+    Chuck_Type * type;
     te_GlobalType array_type;
     t_CKBOOL ctor_needs_to_be_called;
 
-    Chuck_Global_Array_Container( te_GlobalType arr_type )
+    // constructor
+    Chuck_Global_Array_Container( Chuck_Type * t, te_GlobalType arr_type )
     {
         array = NULL;
         ctor_needs_to_be_called = FALSE;
+        type = t;
         array_type = arr_type;
     }
 };
@@ -997,7 +1017,7 @@ t_CKBOOL Chuck_Globals_Manager::init_global_string( const std::string & name )
         m_global_strings[name] = new Chuck_Global_String_Container;
         // init
         m_global_strings[name]->val = (Chuck_String *)
-        instantiate_and_initialize_object( m_vm->env()->t_string, m_vm );
+        instantiate_and_initialize_object( m_vm->env()->ckt_string, m_vm );
 
         // add reference to prevent deletion
         m_global_strings[name]->val->add_ref();
@@ -1280,7 +1300,7 @@ t_CKBOOL Chuck_Globals_Manager::init_global_event( const std::string & name,
         m_global_events[name]->type = type;
     }
     // already exists. check if there's a type mismatch.
-    else if( type->name != m_global_events[name]->type->name )
+    else if( type->base_name != m_global_events[name]->type->base_name )
     {
         return FALSE;
     }
@@ -1362,7 +1382,7 @@ t_CKBOOL Chuck_Globals_Manager::init_global_ugen( const std::string & name,
         m_global_ugens[name]->type = type;
     }
     // already exists. check if there's a type mismatch.
-    else if( type->name != m_global_ugens[name]->type->name )
+    else if( type->base_name != m_global_ugens[name]->type->base_name )
     {
         return FALSE;
     }
@@ -2098,6 +2118,30 @@ t_CKBOOL Chuck_Globals_Manager::getGlobalAssociativeFloatArrayValue(
 
 
 //-----------------------------------------------------------------------------
+// name: getAllGlobalVariables()
+// desc: get a global float by name
+//-----------------------------------------------------------------------------
+t_CKBOOL Chuck_Globals_Manager::getAllGlobalVariables(
+    void (*callback)( const std::vector<Chuck_Globals_TypeValue> & list, void * data ),
+    void * data )
+{
+    Chuck_Get_Global_All_Request * get_all_message = new Chuck_Get_Global_All_Request;
+    get_all_message->cb = callback;
+    get_all_message->data = data;
+
+    Chuck_Global_Request r;
+    r.type = get_global_all_request;
+    r.getAllRequest = get_all_message;
+
+    m_global_request_queue.put( r );
+
+    return TRUE;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
 // name: execute_chuck_msg_with_globals()
 // desc: execute a Chuck_Msg in the globals callback
 //-----------------------------------------------------------------------------
@@ -2129,7 +2173,7 @@ t_CKBOOL Chuck_Globals_Manager::init_global_array( const std::string & name, Chu
     if( m_global_arrays.count( name ) == 0 )
     {
         // make container
-        m_global_arrays[name] = new Chuck_Global_Array_Container( arr_type );
+        m_global_arrays[name] = new Chuck_Global_Array_Container( type, arr_type );
         // do not init
         m_global_arrays[name]->array = NULL;
         // global variable type
@@ -2277,7 +2321,7 @@ t_CKBOOL Chuck_Globals_Manager::init_global_object( const std::string & name,
         m_global_objects[name]->type = type;
     }
     // already exists. check if there's a type mismatch.
-    else if( type->name != m_global_objects[name]->type->name )
+    else if( type->base_name != m_global_objects[name]->type->base_name )
     {
         return FALSE;
     }
@@ -2333,6 +2377,98 @@ Chuck_Object * Chuck_Globals_Manager::get_global_object( const std::string & nam
 Chuck_Object ** Chuck_Globals_Manager::get_ptr_to_global_object( const std::string & name )
 {
     return &( m_global_objects[name]->val );
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: get_all_global_variables() | 1.5.1.0 (ge)
+// desc: get list of all global variables as a two-string pair of (type, name)
+//-----------------------------------------------------------------------------
+void Chuck_Globals_Manager::get_all_global_variables( std::vector<Chuck_Globals_TypeValue> & list )
+{
+    // clear the list
+    list.clear();
+
+    // int globals
+    map<string, Chuck_Global_Int_Container *>::iterator it_int;
+    // iterate
+    for( it_int = m_global_ints.begin(); it_int != m_global_ints.end(); it_int++ )
+    {
+        // append entry
+        list.push_back( Chuck_Globals_TypeValue( "int", it_int->first ) );
+    }
+
+    // float globals
+    map<string, Chuck_Global_Float_Container *>::iterator it_float;
+    // iterate
+    for( it_float = m_global_floats.begin(); it_float != m_global_floats.end(); it_float++ )
+    {
+        // append entry
+        list.push_back( Chuck_Globals_TypeValue( "float", it_float->first ) );
+    }
+
+    // string globals
+    map<string, Chuck_Global_String_Container *>::iterator it_string;
+    // iterate
+    for( it_string = m_global_strings.begin(); it_string != m_global_strings.end(); it_string++ )
+    {
+        // append entry
+        list.push_back( Chuck_Globals_TypeValue( "string", it_string->first ) );
+    }
+
+    // event globals
+    map<string, Chuck_Global_Event_Container *>::iterator it_event;
+    // iterate
+    for( it_event = m_global_events.begin(); it_event != m_global_events.end(); it_event++ )
+    {
+        // container
+        Chuck_Global_Event_Container * c = it_event->second;
+        // check
+        string type = c->type ? c->type->name() : "Event";
+        // append entry
+        list.push_back( Chuck_Globals_TypeValue( type, it_event->first ) );
+    }
+
+    // ugen globals
+    map<string, Chuck_Global_UGen_Container *>::iterator it_ugen;
+    // iterate
+    for( it_ugen = m_global_ugens.begin(); it_ugen != m_global_ugens.end(); it_ugen++ )
+    {
+        // container
+        Chuck_Global_UGen_Container * c = it_ugen->second;
+        // check
+        string type = c->type ? c->type->name() : "UGen";
+        // append entry
+        list.push_back( Chuck_Globals_TypeValue( type, it_ugen->first ) );
+    }
+
+    // array globals
+    map<string, Chuck_Global_Array_Container *>::iterator it_array;
+    // iterate
+    for( it_array = m_global_arrays.begin(); it_array != m_global_arrays.end(); it_array++ )
+    {
+        // container
+        Chuck_Global_Array_Container * c = it_array->second;
+        // check
+        string type = c->type ? c->type->name() : "@array";
+        // append entry
+        list.push_back( Chuck_Globals_TypeValue( type, it_array->first ) );
+    }
+
+    // object globals
+    map<string, Chuck_Global_Object_Container *>::iterator it_object;
+    // iterate
+    for( it_object = m_global_objects.begin(); it_object != m_global_objects.end(); it_object++ )
+    {
+        // container
+        Chuck_Global_Object_Container * c = it_object->second;
+        // check
+        string type = c->type ? c->type->name() : "Object";
+        // append entry
+        list.push_back( Chuck_Globals_TypeValue( type, it_object->first ) );
+    }
 }
 
 
@@ -2449,7 +2585,7 @@ void Chuck_Globals_Manager::cleanup_global_variables()
     for( std::map< std::string, Chuck_Global_String_Container * >::iterator it=
         m_global_strings.begin(); it!=m_global_strings.end(); it++ )
     {
-        SAFE_RELEASE( it->second->val );
+        CK_SAFE_RELEASE( it->second->val );
         delete (it->second);
     }
     m_global_strings.clear();
@@ -2458,7 +2594,7 @@ void Chuck_Globals_Manager::cleanup_global_variables()
     for( std::map< std::string, Chuck_Global_Event_Container * >::iterator it=
         m_global_events.begin(); it!=m_global_events.end(); it++ )
     {
-        SAFE_RELEASE( it->second->val );
+        CK_SAFE_RELEASE( it->second->val );
         delete (it->second);
     }
     m_global_events.clear();
@@ -2467,7 +2603,7 @@ void Chuck_Globals_Manager::cleanup_global_variables()
     for( std::map< std::string, Chuck_Global_UGen_Container * >::iterator it=
         m_global_ugens.begin(); it!=m_global_ugens.end(); it++ )
     {
-        SAFE_RELEASE( it->second->val );
+        CK_SAFE_RELEASE( it->second->val );
         delete (it->second);
     }
     m_global_ugens.clear();
@@ -2479,7 +2615,7 @@ void Chuck_Globals_Manager::cleanup_global_variables()
         // release. array initialization adds a reference,
         // but the release instruction is prevented from being
         // used on all global objects (including arrays)
-        SAFE_RELEASE( it->second->array );
+        CK_SAFE_RELEASE( it->second->array );
         delete (it->second);
     }
     m_global_arrays.clear();
@@ -2488,7 +2624,7 @@ void Chuck_Globals_Manager::cleanup_global_variables()
     for( std::map< std::string, Chuck_Global_Object_Container * >::iterator it=
         m_global_objects.begin(); it!=m_global_objects.end(); it++ )
     {
-        SAFE_RELEASE( it->second->val );
+        CK_SAFE_RELEASE( it->second->val );
         delete (it->second);
     }
     m_global_objects.clear();
@@ -2525,7 +2661,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                         m_vm->process_msg( message.executeChuckMsgRequest->msg );
                     }
                     // clean up request storage
-                    SAFE_DELETE( message.executeChuckMsgRequest );
+                    CK_SAFE_DELETE( message.executeChuckMsgRequest );
                     break;
 
                 case spork_shred_request:
@@ -2539,7 +2675,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     // set int
                     m_global_ints[message.setIntRequest->name]->val = message.setIntRequest->val;
                     // clean up request storage
-                    SAFE_DELETE( message.setIntRequest );
+                    CK_SAFE_DELETE( message.setIntRequest );
                     break;
 
                 case get_global_int_request:
@@ -2563,7 +2699,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                         }
                     }
                     // clean up request storage
-                    SAFE_DELETE( message.getIntRequest );
+                    CK_SAFE_DELETE( message.getIntRequest );
                     break;
 
                 case set_global_float_request:
@@ -2572,7 +2708,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     // set float
                     m_global_floats[message.setFloatRequest->name]->val = message.setFloatRequest->val;
                     // clean up request storage
-                    SAFE_DELETE( message.setFloatRequest );
+                    CK_SAFE_DELETE( message.setFloatRequest );
                     break;
 
                 case get_global_float_request:
@@ -2596,7 +2732,22 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                         }
                     }
                     // clean up request storage
-                    SAFE_DELETE( message.getFloatRequest );
+                    CK_SAFE_DELETE( message.getFloatRequest );
+                    break;
+
+                case get_global_all_request:
+                    // ensure one cb is not null (union)
+                    if( message.getAllRequest->cb != NULL )
+                    {
+                        // the vector
+                        std::vector<Chuck_Globals_TypeValue> list;
+                        // get all
+                        get_all_global_variables( list );
+                        // call back
+                        message.getAllRequest->cb( list, message.getAllRequest->data );
+                    }
+                    // clean up request storage
+                    CK_SAFE_DELETE( message.getAllRequest );
                     break;
 
                 case set_global_string_request:
@@ -2605,7 +2756,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     // set string
                     m_global_strings[message.setStringRequest->name]->val->set( message.setStringRequest->val );
                     // clean up request storage
-                    SAFE_DELETE( message.setStringRequest );
+                    CK_SAFE_DELETE( message.setStringRequest );
                     break;
 
                 case get_global_string_request:
@@ -2629,7 +2780,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                         }
                     }
                     // clean up request storage
-                    SAFE_DELETE( message.getStringRequest );
+                    CK_SAFE_DELETE( message.getStringRequest );
                     break;
 
                 case signal_global_event_request:
@@ -2667,7 +2818,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.signalEventRequest );
+                        CK_SAFE_DELETE( message.signalEventRequest );
                     }
                     break;
 
@@ -2738,7 +2889,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.listenForEventRequest );
+                        CK_SAFE_DELETE( message.listenForEventRequest );
                     }
                     break;
 
@@ -2783,7 +2934,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.setIntArrayRequest );
+                        CK_SAFE_DELETE( message.setIntArrayRequest );
                     }
                     break;
 
@@ -2844,7 +2995,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.getIntArrayRequest );
+                        CK_SAFE_DELETE( message.getIntArrayRequest );
                     }
                     break;
 
@@ -2886,7 +3037,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.setIntArrayValueRequest );
+                        CK_SAFE_DELETE( message.setIntArrayValueRequest );
                     }
                     break;
 
@@ -2939,7 +3090,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.getIntArrayValueRequest );
+                        CK_SAFE_DELETE( message.getIntArrayValueRequest );
                     }
                     break;
 
@@ -2978,7 +3129,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.setAssociativeIntArrayValueRequest );
+                        CK_SAFE_DELETE( message.setAssociativeIntArrayValueRequest );
                     }
                     break;
 
@@ -3031,7 +3182,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.getAssociativeIntArrayValueRequest );
+                        CK_SAFE_DELETE( message.getAssociativeIntArrayValueRequest );
                     }
                     break;
 
@@ -3076,7 +3227,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.setFloatArrayRequest );
+                        CK_SAFE_DELETE( message.setFloatArrayRequest );
                     }
                     break;
 
@@ -3136,7 +3287,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.getFloatArrayRequest );
+                        CK_SAFE_DELETE( message.getFloatArrayRequest );
                     }
                     break;
 
@@ -3178,7 +3329,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.setFloatArrayValueRequest );
+                        CK_SAFE_DELETE( message.setFloatArrayValueRequest );
                     }
                     break;
 
@@ -3230,7 +3381,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.getFloatArrayValueRequest );
+                        CK_SAFE_DELETE( message.getFloatArrayValueRequest );
                     }
                     break;
 
@@ -3269,7 +3420,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.setAssociativeFloatArrayValueRequest );
+                        CK_SAFE_DELETE( message.setAssociativeFloatArrayValueRequest );
                     }
                     break;
 
@@ -3321,7 +3472,7 @@ void Chuck_Globals_Manager::handle_global_queue_messages()
                     }
                     else
                     {
-                        SAFE_DELETE( message.getAssociativeFloatArrayValueRequest );
+                        CK_SAFE_DELETE( message.getAssociativeFloatArrayValueRequest );
                     }
                     break;
             }

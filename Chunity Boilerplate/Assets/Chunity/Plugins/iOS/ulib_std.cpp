@@ -31,11 +31,14 @@
 //-----------------------------------------------------------------------------
 #include "ulib_std.h"
 #include "util_buffers.h"
+#include "util_math.h"
+#include "util_string.h"
+#include "util_platforms.h"
+
 #ifndef __DISABLE_PROMPTER__
 #include "util_console.h"
 #endif
-#include "util_math.h"
-#include "util_string.h"
+
 #ifndef __DISABLE_THREADS__
 #include "util_thread.h"
 #endif
@@ -49,7 +52,7 @@
 #include <time.h>
 #include <math.h>
 
-#ifdef __PLATFORM_WIN32__
+#ifdef __PLATFORM_WINDOWS__
   #ifndef __CHUNREAL_ENGINE__
     #include <windows.h>
   #else
@@ -68,7 +71,7 @@ int setenv( const char *n, const char *v, int i )
 }
 #else
   #include <unistd.h>
-#endif // #ifdef __PLATFORM_WIN32__
+#endif // #ifdef __PLATFORM_WINDOWS__
 
 // for ConsoleInput and StringTokenizer
 #include <sstream>
@@ -256,8 +259,13 @@ DLL_QUERY libstd_query( Chuck_DL_Query * QUERY )
 
     // add getenv
     QUERY->add_sfun( QUERY, getenv_impl, "string", "getenv" ); //! fetch environment variable
-    QUERY->add_arg( QUERY, "string", "value" );
+    QUERY->add_arg( QUERY, "string", "key" );
     QUERY->doc_func( QUERY, "get the value of an environment variable (e.g., PATH)." );
+
+    QUERY->add_sfun( QUERY, getenv2_impl, "string", "getenv" );//! fetch environment variable with default
+    QUERY->add_arg( QUERY, "string", "key" );
+    QUERY->add_arg( QUERY, "string", "default" );
+    QUERY->doc_func( QUERY, "get the value of an environment variable, returning the provided default if unset." );
 
     // add setenv
     QUERY->add_sfun( QUERY, setenv_impl, "int", "setenv" ); //! set environment variable
@@ -328,6 +336,22 @@ DLL_QUERY libstd_query( Chuck_DL_Query * QUERY )
     QUERY->add_arg( QUERY, "float", "dstmin" );
     QUERY->add_arg( QUERY, "float", "dstmax" );
     QUERY->doc_func( QUERY, "Scale a float from source range to destination range." );
+
+    // add range functions | 1.5.1.1 (nshaheed)
+    QUERY->add_sfun(QUERY, range1_impl, "int[]", "range"); //! fetch environment variable
+    QUERY->add_arg(QUERY, "int", "stop");
+    QUERY->doc_func(QUERY, "Return array containing the range [0,stop).");
+
+    QUERY->add_sfun(QUERY, range2_impl, "int[]", "range"); //! fetch environment variable
+    QUERY->add_arg(QUERY, "int", "start");
+    QUERY->add_arg(QUERY, "int", "stop");
+    QUERY->doc_func(QUERY, "Return array containing the range [start,stop).");
+
+    QUERY->add_sfun(QUERY, range3_impl, "int[]", "range"); //! fetch environment variable
+    QUERY->add_arg(QUERY, "int", "start");
+    QUERY->add_arg(QUERY, "int", "stop");
+    QUERY->add_arg(QUERY, "int", "step");
+    QUERY->doc_func(QUERY, "Return array containing values from start up to (but not including) stop, hopping by step.");
 
     // finish class
     QUERY->end_class( QUERY );
@@ -576,7 +600,7 @@ DLL_QUERY libstd_query( Chuck_DL_Query * QUERY )
     type_engine_import_class_end( env );
 
 
-#if defined(__PLATFORM_WIN32__)
+#if defined(__PLATFORM_WINDOWS__)
     // begin class (Cereal)
     if( !type_engine_import_class_begin( env, "Cereal", "Object",
                                          env->global(), Cereal_ctor ) )
@@ -654,15 +678,16 @@ CK_DLL_SFUN( rand_impl )
 // randf
 CK_DLL_SFUN( randf_impl )
 {
-    // 1.5.0.1 (ge) use ck_random() and CK_RANDOM_MAX
-    RETURN->v_float = ( 2.0 * ck_random() / (t_CKFLOAT)CK_RANDOM_MAX - 1.0 );
+    // 1.5.0.4 (ge) use ck_random_f()
+    RETURN->v_float = ( 2.0 * ck_random_f() - 1.0 );
 }
 
 // randf
 CK_DLL_SFUN( rand2f_impl )
 {
     t_CKFLOAT min = GET_CK_FLOAT(ARGS), max = *((t_CKFLOAT *)ARGS + 1);
-    RETURN->v_float = min + (max-min)*(::ck_random()/(t_CKFLOAT)CK_RANDOM_MAX);
+    // 1.5.0.4 (ge) use ck_random_f()
+    RETURN->v_float = min + (max-min)*::ck_random_f();
 }
 
 // randi
@@ -769,7 +794,7 @@ CK_DLL_SFUN( itoa_impl )
 {
     t_CKINT i = GET_CK_INT(ARGS);
     // TODO: memory leak, please fix.  Thanks.
-    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     a->set( itoa( i ) );
     RETURN->v_string = a;
 }
@@ -779,7 +804,7 @@ CK_DLL_SFUN( ftoa_impl )
 {
     t_CKFLOAT f = GET_NEXT_FLOAT(ARGS);
     t_CKINT p = GET_NEXT_INT(ARGS);
-    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     a->set( ftoa( f, (t_CKUINT)p ) );
     RETURN->v_string = a;
 }
@@ -792,14 +817,55 @@ CK_DLL_SFUN( ftoi_impl )
 }
 
 // getenv
-// static Chuck_String g_str; // PROBLEM: not thread friendly
 CK_DLL_SFUN( getenv_impl )
 {
-    const char * v = GET_CK_STRING(ARGS)->str().c_str();
+    // get chuck string key
+    Chuck_String * ckstr_key = GET_NEXT_STRING(ARGS);
+    // check for null
+    if( !ckstr_key )
+    {
+        // instantiate
+        Chuck_String * empty = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
+        // return value
+        RETURN->v_string = empty;
+        // return out of this function
+        return;
+    }
+
+    const char * v = ckstr_key->str().c_str();
     const char * s = getenv( v );
-    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     a->set( s ? s : "" );
     RETURN->v_string = a;
+}
+
+// getenv with default value fallback | 1.5.0.8 (@ynohtna) added
+CK_DLL_SFUN( getenv2_impl )
+{
+    // get chuck string key and default
+    Chuck_String * ckstr_key = GET_NEXT_STRING(ARGS);
+    Chuck_String * ckstr_default = GET_NEXT_STRING(ARGS);
+    // check for null
+    if( !ckstr_key )
+    {
+        // return default
+        RETURN->v_string = ckstr_default;
+        // return out of this function
+        return;
+    }
+
+    // get key as c str
+    const char * k = ckstr_key->str().c_str();
+    // get env value
+    const char * v = getenv( k );
+    if( v ) {
+        Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
+        a->set( v ? v : "" );
+        RETURN->v_string = a;
+    } else {
+        Chuck_String * d = ckstr_default;
+        RETURN->v_string = d;
+    }
 }
 
 // setenv
@@ -810,47 +876,46 @@ CK_DLL_SFUN( setenv_impl )
     RETURN->v_int = setenv( v1, v2, 1 );
 }
 
-
 // mtof
 CK_DLL_SFUN( mtof_impl )
 {
     t_CKFLOAT v = GET_CK_FLOAT(ARGS);
-    RETURN->v_float = mtof(v);
+    RETURN->v_float = ck_mtof(v);
 }
 
 // ftom
 CK_DLL_SFUN( ftom_impl )
 {
     t_CKFLOAT v = GET_CK_FLOAT(ARGS);
-    RETURN->v_float = ftom(v);
+    RETURN->v_float = ck_ftom(v);
 }
 
 // powtodb
 CK_DLL_SFUN( powtodb_impl )
 {
     t_CKFLOAT v = GET_CK_FLOAT(ARGS);
-    RETURN->v_float = powtodb(v);
+    RETURN->v_float = ck_powtodb(v);
 }
 
 // rmstodb
 CK_DLL_SFUN( rmstodb_impl )
 {
     t_CKFLOAT v = GET_CK_FLOAT(ARGS);
-    RETURN->v_float = rmstodb(v);
+    RETURN->v_float = ck_rmstodb(v);
 }
 
 // dbtopow
 CK_DLL_SFUN( dbtopow_impl )
 {
     t_CKFLOAT v = GET_CK_FLOAT(ARGS);
-    RETURN->v_float = dbtopow(v);
+    RETURN->v_float = ck_dbtopow(v);
 }
 
 // dbtorms
 CK_DLL_SFUN( dbtorms_impl )
 {
     t_CKFLOAT v = GET_CK_FLOAT(ARGS);
-    RETURN->v_float = dbtorms(v);
+    RETURN->v_float = ck_dbtorms(v);
 }
 
 CK_DLL_SFUN( dbtolin_impl )
@@ -872,7 +937,7 @@ CK_DLL_SFUN( clamp_impl )
     t_CKINT max = GET_NEXT_INT(ARGS);
 
     if(v < min) RETURN->v_int = min;
-    else if( v > max) RETURN->v_int = max;
+    else if(v > max) RETURN->v_int = max;
     else RETURN->v_int = v;
 }
 
@@ -898,6 +963,64 @@ CK_DLL_SFUN( scalef_impl )
     RETURN->v_float = dstmin + (dstmax-dstmin) * ((v-srcmin)/(srcmax-srcmin));
 }
 
+// common internal function for range() | 1.5.1.1 (nshaheed)
+static Chuck_Array4 * ck_range( t_CKINT start, t_CKINT stop, t_CKINT step, Chuck_VM_Shred * SHRED )
+{
+    // size
+    t_CKINT size = 0;
+    // calculate size based on comparing start and stop
+    if( start < stop && step > 0 ) size = (stop-start)/step + ((stop-start)%step ? 1 : 0);
+    else if( start > stop && step < 0 ) size = (start-stop)/(-step) + ((start-stop)%(-step) ? 1 : 0);
+
+    // allocate array object
+    Chuck_Array4 * range = new Chuck_Array4(FALSE, size);
+    // initialize with trappings of Object
+    initialize_object(range, SHRED->vm_ref->env()->ckt_array);
+
+    // the value
+    t_CKINT value = start;
+    // populate the array
+    for (t_CKINT i = 0; i < size; i++) {
+        range->set(i, value);
+        value += step;
+    }
+
+    // return the array reference
+    return range;
+}
+
+// basic range function - make array with values from [0,stop)
+CK_DLL_SFUN(range1_impl)
+{
+    t_CKINT start = 0;
+    t_CKINT stop = GET_NEXT_INT(ARGS);
+    t_CKINT step = stop > start ? 1 : -1;
+    RETURN->v_object = ck_range( start, stop, step, SHRED );
+}
+
+// start/stop range function - make array with values from [start,stop)
+CK_DLL_SFUN(range2_impl)
+{
+    t_CKINT start = GET_NEXT_INT(ARGS);
+    t_CKINT stop = GET_NEXT_INT(ARGS);
+    t_CKINT step = stop > start ? 1 : -1;
+    RETURN->v_object = ck_range( start, stop, step, SHRED );
+}
+
+// start/stop/step range function - make array with values from [start,stop) with step stride
+CK_DLL_SFUN(range3_impl)
+{
+    t_CKINT start = GET_NEXT_INT(ARGS);
+    t_CKINT stop = GET_NEXT_INT(ARGS);
+    t_CKINT step = GET_NEXT_INT(ARGS);
+
+    // check and flip signs to match with stop-start
+    if( (start < stop && step < 0) ||
+        (start > stop && step > 0 ) ) step = -step;
+
+    RETURN->v_object = ck_range( start, stop, step, SHRED );
+}
+
 
 
 
@@ -910,7 +1033,7 @@ XThread * KBHitManager::the_thread;
 #define BUFFER_SIZE 1024
 
 
-#if !defined(__PLATFORM_WIN32__) || defined(__WINDOWS_PTHREAD__)
+#if !defined(__PLATFORM_WINDOWS__) || defined(__WINDOWS_PTHREAD__)
 static void * kb_loop( void * )
 #else
 static unsigned int __stdcall kb_loop( void * )
@@ -936,7 +1059,7 @@ static unsigned int __stdcall kb_loop( void * )
         }
 
         // wait
-        usleep( 5000 );
+        ck_usleep( 5000 );
     }
 
     return 0;
@@ -954,7 +1077,7 @@ t_CKBOOL KBHitManager::init()
     if( !the_buf->initialize( BUFFER_SIZE, sizeof(t_CKINT) ) )
     {
         EM_log( CK_LOG_SEVERE, "KBHitManager: couldn't allocate central KB buffer..." );
-        SAFE_DELETE( the_buf );
+        CK_SAFE_DELETE( the_buf );
         return FALSE;
     }
 
@@ -974,7 +1097,7 @@ t_CKBOOL KBHitManager::init()
 void KBHitManager::shutdown()
 {
     EM_log( CK_LOG_INFO, "shutting down KBHitManager..." );
-    SAFE_DELETE( the_buf );
+    CK_SAFE_DELETE( the_buf );
     kb_endwin();
 
     the_onoff = 0;
@@ -1220,7 +1343,7 @@ void le_cleanup()
     if( g_le_thread )
     {
         // cancel thread
-#if !defined(__PLATFORM_WIN32__) || defined(__WINDOWS_PTHREAD__)
+#if !defined(__PLATFORM_WINDOWS__) || defined(__WINDOWS_PTHREAD__)
         pthread_cancel( g_le_thread );
 #else
         CloseHandle( g_le_thread );
@@ -1244,7 +1367,7 @@ void * le_cb( void * p )
     {
         // wait
         while( g_le_wait )
-            usleep( 10000 );
+            ck_usleep( 10000 );
 
         // REFACTOR-2017: TODO Ge:
         // I removed the check here for if there are no more vms running
@@ -1284,7 +1407,7 @@ LineEvent::LineEvent( Chuck_Event * SELF )
     // launch the cb
     if( !g_le_launched )
     {
-#if !defined(__PLATFORM_WIN32__) || defined(__WINDOWS_PTHREAD__)
+#if !defined(__PLATFORM_WINDOWS__) || defined(__WINDOWS_PTHREAD__)
         pthread_create( &g_le_thread, NULL, le_cb, NULL );
 #else
         g_le_thread = CreateThread( NULL, 0, (LPTHREAD_START_ROUTINE)le_cb, NULL, 0, 0 );
@@ -1390,7 +1513,7 @@ CK_DLL_MFUN( Skot_getLine )
 {
     LineEvent * le = (LineEvent *)OBJ_MEMBER_INT(SELF, Skot_offset_data);
     // TODO: memory leak
-    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     a->set( le->getLine() );
     RETURN->v_string = a;
 }
@@ -1433,7 +1556,7 @@ StrTok::StrTok()
 
 StrTok::~StrTok()
 {
-    SAFE_DELETE( m_ss );
+    CK_SAFE_DELETE( m_ss );
 }
 
 void StrTok::set( const string & line )
@@ -1441,7 +1564,7 @@ void StrTok::set( const string & line )
     string s;
 
     // delete
-    SAFE_DELETE( m_ss );
+    CK_SAFE_DELETE( m_ss );
     // alloc
     m_ss = new istringstream( line );
     // read
@@ -1513,7 +1636,7 @@ CK_DLL_MFUN( StrTok_more )
 CK_DLL_MFUN( StrTok_next )
 {
     StrTok * tokens = (StrTok *)OBJ_MEMBER_INT(SELF, StrTok_offset_data);
-    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     a->set( tokens->next() );
     RETURN->v_string = a;
 }
@@ -1531,7 +1654,7 @@ CK_DLL_MFUN( StrTok_get )
 {
     StrTok * tokens = (StrTok *)OBJ_MEMBER_INT(SELF, StrTok_offset_data);
     t_CKINT index = GET_NEXT_INT(ARGS);
-    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     string s = tokens->get( index );
     a->set( s );
     RETURN->v_string = a;
@@ -1826,7 +1949,7 @@ CK_DLL_MFUN( VCR_name )
 }
 
 
-#ifdef __PLATFORM_WIN32__
+#ifdef __PLATFORM_WINDOWS__
 
 
 // jeff's cereal

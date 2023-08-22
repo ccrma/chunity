@@ -35,6 +35,7 @@
 #include "chuck_vm.h"
 #include "chuck_ugen.h"
 #include "chuck_dl.h"
+#include "chuck_io.h"
 #include "chuck_errmsg.h"
 #include "chuck_globals.h" // added 1.4.1.0
 #include "util_math.h"
@@ -57,7 +58,21 @@ Chuck_Instr::Chuck_Instr()
     // set linepos to 0 so we can tell later whether it has been set properly
     m_linepos = 0;
     // default codestr
-    m_codestr = NULL;
+    m_codestr_pre = NULL;
+    m_codestr_post = NULL;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: ~Chuck_Instr()
+// desc: destructor
+//-----------------------------------------------------------------------------
+Chuck_Instr::~Chuck_Instr()
+{
+    CK_SAFE_DELETE( m_codestr_pre );
+    CK_SAFE_DELETE( m_codestr_post );
 }
 
 
@@ -82,16 +97,32 @@ const char * Chuck_Instr::name() const
 
 
 //-----------------------------------------------------------------------------
-// name: set_codestr()
-// desc: set codestr associated with this instruction
+// name: prepend_codestr()
+// desc: prepend codestr associated with this instruction
 //       only certain instructions (e.g., start of stmts) have this
 //-----------------------------------------------------------------------------
-void Chuck_Instr::set_codestr( const string & str )
+void Chuck_Instr::prepend_codestr( const string & str )
 {
-    // cleanup
-    SAFE_DELETE( m_codestr );
-    // allocate
-    m_codestr = new string( str );
+    // alloc if needed
+    if( !m_codestr_pre ) m_codestr_pre = new vector<string>();
+    // prepend to pre
+    m_codestr_pre->insert( m_codestr_pre->begin(), str );
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: append_codestr()
+// desc: append codestr associated with this instruction
+//       only certain instructions (e.g., start of stmts) have this
+//-----------------------------------------------------------------------------
+void Chuck_Instr::append_codestr( const string & str )
+{
+    // alloc if needed
+    if( !m_codestr_post ) m_codestr_post = new vector<string>();
+    // append to post
+    m_codestr_post->push_back( str );
 }
 
 
@@ -1659,7 +1690,7 @@ void Chuck_Instr_Add_string::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
     if( !rhs || !lhs ) goto null_pointer;
 
     // make new string
-    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->t_string, shred );
+    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->ckt_string, shred );
 
     // concat
     // result->str = lhs->str + rhs->str;
@@ -1753,7 +1784,7 @@ void Chuck_Instr_Add_string_int::execute( Chuck_VM * vm, Chuck_VM_Shred * shred 
     if( !lhs ) goto null_pointer;
 
     // make new string
-    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->t_string, shred );
+    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->ckt_string, shred );
 
     // concat
     // result->str = lhs->str + ::itoa(rhs);
@@ -1802,7 +1833,7 @@ void Chuck_Instr_Add_string_float::execute( Chuck_VM * vm, Chuck_VM_Shred * shre
     if( !lhs ) goto null_pointer;
 
     // make new string
-    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->t_string, shred );
+    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->ckt_string, shred );
 
     // concat
     // result->str = lhs->str + ::ftoa(rhs, 4);
@@ -1851,7 +1882,7 @@ void Chuck_Instr_Add_int_string::execute( Chuck_VM * vm, Chuck_VM_Shred * shred 
     if( !rhs ) goto null_pointer;
 
     // make new string
-    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->t_string, shred );
+    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->ckt_string, shred );
 
     // concat
     // result->str = ::itoa(lhs) + rhs->str;
@@ -1900,7 +1931,7 @@ void Chuck_Instr_Add_float_string::execute( Chuck_VM * vm, Chuck_VM_Shred * shre
     if( !rhs ) goto null_pointer;
 
     // make new string
-    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->t_string, shred );
+    result = (Chuck_String *)instantiate_and_initialize_object( vm->env()->ckt_string, shred );
 
     // concat
     // result->str = ::ftoa(lhs, 4) + rhs->str;
@@ -2199,7 +2230,7 @@ void Chuck_Instr_Reg_Push_Maybe::execute( Chuck_VM * vm, Chuck_VM_Shred * shred 
     t_CKINT *& reg_sp = (t_CKINT *&)shred->reg->sp;
 
     // push val into reg stack
-    t_CKFLOAT num = ck_random()/(t_CKFLOAT)CK_RANDOM_MAX;
+    t_CKFLOAT num = ck_random_f();
     push_( reg_sp, num > .5 );
 }
 
@@ -2370,7 +2401,7 @@ void Chuck_Instr_Reg_Push_Global::execute( Chuck_VM * vm, Chuck_VM_Shred * shred
             {
                 // we have a problem
                 CK_FPRINTF_STDERR(
-                    "[chuck](VM): UninitializedUGenException: on line[%lu] in shred[id=%lu:%s]\n[chuck](VM): ... (hint: need to declare global UGen earlier in file)\n",
+                    "[chuck](VM): UninitializedUGenException: on line[%lu] in shred[id=%lu:%s]\n[chuck](VM): ...(hint: need to declare global UGen earlier in file)\n",
                     m_linepos, shred->xid, shred->name.c_str());
                 goto error;
             }
@@ -2388,7 +2419,7 @@ void Chuck_Instr_Reg_Push_Global::execute( Chuck_VM * vm, Chuck_VM_Shred * shred
             {
                 // we have a problem
                 CK_FPRINTF_STDERR(
-                                  "[chuck](VM): UninitializedObjectException: on line[%lu] in shred[id=%lu:%s]\n[chuck](VM): ... (hint: need to declare global Object earlier in file)\n",
+                                  "[chuck](VM): UninitializedObjectException: on line[%lu] in shred[id=%lu:%s]\n[chuck](VM): ...(hint: need to declare global Object earlier in file)\n",
                                   m_linepos, shred->xid, shred->name.c_str());
                 goto error;
             }
@@ -3887,7 +3918,7 @@ t_CKBOOL initialize_object( Chuck_Object * object, Chuck_Type * type )
     // set the type reference
     object->type_ref = type;
     // reference count
-    SAFE_ADD_REF(object->type_ref);
+    CK_SAFE_ADD_REF(object->type_ref);
     // get the size
     object->data_size = type->obj_size;
     // allocate memory
@@ -3920,7 +3951,7 @@ t_CKBOOL initialize_object( Chuck_Object * object, Chuck_Type * type )
         {
             // allocate ugen for each | REFACTOR-2017: added ugen->vm
             Chuck_Object * obj = instantiate_and_initialize_object(
-                ugen->vm->env()->t_ugen, ugen->shred, ugen->vm );
+                ugen->vm->env()->ckt_ugen, ugen->shred, ugen->vm );
             // cast to ugen
             ugen->m_multi_chan[i] = (Chuck_UGen *)obj;
             // additional reference count
@@ -3944,7 +3975,7 @@ out_of_memory:
         type->c_name() );
 
     // delete
-    if( object ) SAFE_DELETE( object->vtable );
+    if( object ) CK_SAFE_DELETE( object->vtable );
 
     // return FALSE
     return FALSE;
@@ -4001,18 +4032,18 @@ Chuck_Object * instantiate_and_initialize_object( Chuck_Type * type, Chuck_VM_Sh
         if( type->allocator )
             object = type->allocator( vm, shred, Chuck_DL_Api::Api::instance() );
         // #ifndef __DISABLE_FILEIO__
-        else if( isa( type, vm->env()->t_fileio ) ) object = new Chuck_IO_File( vm );
+        else if( isa( type, vm->env()->ckt_fileio ) ) object = new Chuck_IO_File( vm );
         // #endif
-        else if( isa( type, vm->env()->t_event ) ) object = new Chuck_Event;
-        else if( isa( type, vm->env()->t_string ) ) object = new Chuck_String;
+        else if( isa( type, vm->env()->ckt_event ) ) object = new Chuck_Event;
+        else if( isa( type, vm->env()->ckt_string ) ) object = new Chuck_String;
         // TODO: is this ok?
-        else if( isa( type, vm->env()->t_shred ) )
+        else if( isa( type, vm->env()->ckt_shred ) )
         {
             object = new Chuck_VM_Shred;
             ((Chuck_VM_Shred * )object)->vm_ref = vm; // REFACTOR-2017
         }
         // 1.5.0.0 (ge) added -- here my feeble brain starts leaking out of my eyeballs
-        else if( isa( type, vm->env()->t_class ) ) object = new Chuck_Type( vm->env(), te_class, type->name, type, type->size );
+        else if( isa( type, vm->env()->ckt_class ) ) object = new Chuck_Type( vm->env(), te_class, type->base_name, type, type->size );
         // TODO: is this ok?
         else object = new Chuck_Object;
     }
@@ -4061,7 +4092,7 @@ out_of_memory:
 error:
 
     // delete
-    SAFE_DELETE( object );
+    CK_SAFE_DELETE( object );
 
     // return NULL
     return NULL;
@@ -4207,7 +4238,7 @@ void Chuck_Instr_Pre_Ctor_Array_Post::execute( Chuck_VM * vm, Chuck_VM_Shred * s
 
     // clean up the array
     t_CKUINT * arr = (t_CKUINT *)*reg_sp;
-    SAFE_DELETE_ARRAY( arr );
+    CK_SAFE_DELETE_ARRAY( arr );
 }
 
 
@@ -4331,15 +4362,17 @@ void Chuck_Instr_Assign_Object::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
     done = *obj;
     // copy popped value into memory
     *obj = (Chuck_VM_Object *)(*(reg_sp));
+
+    // hmm if need to debug
+    // CK_FPRINTF_STDERR( "obj: 0x%08x 0x%08x\n", *obj, done );
+
     // add reference
     if( *obj ) (*obj)->add_ref();
     // release
     if( done ) done->release();
 
-//    CK_FPRINTF_STDERR( "obj: 0x%08x\n", *obj );
-
-    // copy
-    // memcpy( (void *)*(reg_sp+1), *obj, sizeof(t_CKUINT) );
+    // FYI this instruction expects a variable address in obj
+    // but ends up pushing *obj (the value pointed to by obj)
     // push the reference value to reg stack
     push_( reg_sp, (t_CKUINT)*obj );
 }
@@ -4379,12 +4412,12 @@ void Chuck_Instr_Assign_String::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         // if left is not null, yes
         if( lhs != NULL )
         {
-            (*rhs_ptr) = (Chuck_String *)instantiate_and_initialize_object( vm->env()->t_string, shred );
+            (*rhs_ptr) = (Chuck_String *)instantiate_and_initialize_object( vm->env()->ckt_string, shred );
             // add ref
             (*rhs_ptr)->add_ref();
             (*rhs_ptr)->set( lhs->str() );
         }
-        //EM_error2( 0, "internal error: somehow the type checker has allowed NULL strings" );
+        //EM_error2( 0, "(internal error) somehow the type checker has allowed NULL strings" );
         //EM_error2( 0, "we are sorry for the inconvenience but..." );
         //EM_error2( 0, "we have to crash now.  Thanks." );
         //assert( FALSE );
@@ -4822,7 +4855,7 @@ void Chuck_Instr_Func_Call_Member::execute( Chuck_VM * vm, Chuck_VM_Shred * shre
         push_( reg_sp, retval.v_uint );
 
         // 1.5.0.0 (ge) | added -- ensure ref count
-        if( m_func_ref && isobj(vm->env(), m_func_ref->def->ret_type) )
+        if( m_func_ref && isobj(vm->env(), m_func_ref->def()->ret_type) )
         {
             // get return value as object reference
             Chuck_VM_Object * obj = (Chuck_VM_Object *) retval.v_uint;
@@ -4871,7 +4904,7 @@ void Chuck_Instr_Func_Call_Member::execute( Chuck_VM * vm, Chuck_VM_Shred * shre
         //       return value is one of these args being released;
         //          e.g., functions that pass through args;
         //          e.g., string Sndbuf.read(string)
-        func_release_args( vm, m_func_ref->def->arg_list, (t_CKBYTE *)(mem_sp+1) );
+        func_release_args( vm, m_func_ref->def()->arg_list, (t_CKBYTE *)(mem_sp+1) );
     }
 
     // pop the stack pointer
@@ -4955,7 +4988,7 @@ void Chuck_Instr_Func_Call_Static::execute( Chuck_VM * vm, Chuck_VM_Shred * shre
         push_( reg_sp, retval.v_uint );
 
         // 1.5.0.0 (ge) | added -- ensure ref count
-        if( m_func_ref && isobj(vm->env(), m_func_ref->def->ret_type) )
+        if( m_func_ref && isobj(vm->env(), m_func_ref->def()->ret_type) )
         {
             // get return value as object reference
             Chuck_VM_Object * obj = (Chuck_VM_Object *) retval.v_uint;
@@ -5004,7 +5037,7 @@ void Chuck_Instr_Func_Call_Static::execute( Chuck_VM * vm, Chuck_VM_Shred * shre
         //       return value is one of these args being released;
         //          e.g., functions that pass through args;
         //          e.g., string Sndbuf.read(string)
-        func_release_args( vm, m_func_ref->def->arg_list, (t_CKBYTE *)(mem_sp+1) );
+        func_release_args( vm, m_func_ref->def()->arg_list, (t_CKBYTE *)(mem_sp+1) );
     }
 
     // pop the stack pointer
@@ -5222,10 +5255,10 @@ done:
 
 
 //-----------------------------------------------------------------------------
-// name: Chuck_Instr_Array_Init()
-// desc: ...
+// name: Chuck_Instr_Array_Init_Literal()
+// desc: initialize array literal, e.g., [1,2,3]
 //-----------------------------------------------------------------------------
-Chuck_Instr_Array_Init::Chuck_Instr_Array_Init( Chuck_Env * env, Chuck_Type * t, t_CKINT length )
+Chuck_Instr_Array_Init_Literal::Chuck_Instr_Array_Init_Literal( Chuck_Env * env, Chuck_Type * t, t_CKINT length )
 {
     // set
     m_length = length;
@@ -5239,7 +5272,7 @@ Chuck_Instr_Array_Init::Chuck_Instr_Array_Init( Chuck_Env * env, Chuck_Type * t,
     m_is_obj = isobj( env, m_type_ref );
     // float | 1.4.2.0 (ge) added to differentiate between int and float arrays
     // -- in situations where they are the same size
-    m_is_float = isa( t, env->t_float );
+    m_is_float = isa( t, env->ckt_float );
 
     // copy type name
     const char * str = m_type_ref->c_name();
@@ -5263,16 +5296,15 @@ Chuck_Instr_Array_Init::Chuck_Instr_Array_Init( Chuck_Env * env, Chuck_Type * t,
 
 
 //-----------------------------------------------------------------------------
-// name: ~Chuck_Instr_Array_Init()
+// name: ~Chuck_Instr_Array_Init_Literal()
 // desc: ...
 //-----------------------------------------------------------------------------
-Chuck_Instr_Array_Init::~Chuck_Instr_Array_Init()
+Chuck_Instr_Array_Init_Literal::~Chuck_Instr_Array_Init_Literal()
 {
     // delete
-    delete [] m_param_str;
-    m_param_str = NULL;
+    CK_SAFE_DELETE_ARRAY( m_param_str );
     // release
-    SAFE_RELEASE( m_type_ref );
+    CK_SAFE_RELEASE( m_type_ref );
 }
 
 
@@ -5282,7 +5314,7 @@ Chuck_Instr_Array_Init::~Chuck_Instr_Array_Init()
 // name: execute()
 // desc: ...
 //-----------------------------------------------------------------------------
-void Chuck_Instr_Array_Init::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
+void Chuck_Instr_Array_Init_Literal::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
 {
     // reg stack pointer
     t_CKUINT *& reg_sp = (t_CKUINT *&)shred->reg->sp;
@@ -5300,10 +5332,7 @@ void Chuck_Instr_Array_Init::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         if( !array ) goto out_of_memory;
         // initialize object
         // TODO: should it be this??? initialize_object( array, m_type_ref );
-        initialize_object( array, vm->env()->t_array );
-        // set array type
-        array->m_array_type = m_type_ref;
-        m_type_ref->add_ref();
+        initialize_object( array, vm->env()->ckt_array );
         // set size
         array->set_size( m_length );
         // fill array
@@ -5323,10 +5352,7 @@ void Chuck_Instr_Array_Init::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         // fill array
         t_CKFLOAT * sp = (t_CKFLOAT *)reg_sp;
         // intialize object
-        initialize_object( array, vm->env()->t_array );
-        // set array type
-        array->m_array_type = m_type_ref;
-        m_type_ref->add_ref();
+        initialize_object( array, vm->env()->ckt_array );
         // set size
         array->set_size( m_length );
         // fill array
@@ -5346,10 +5372,9 @@ void Chuck_Instr_Array_Init::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         // fill array
         t_CKCOMPLEX * sp = (t_CKCOMPLEX *)reg_sp;
         // intialize object
-        initialize_object( array, vm->env()->t_array );
-        // set array type
-        array->m_array_type = m_type_ref;
-        m_type_ref->add_ref();
+        initialize_object( array, vm->env()->ckt_array );
+        // differentiate between complex and polar | 1.5.1.0 (ge) added, used for sorting Array16s
+        if( isa(m_type_ref, vm->env()->ckt_polar) ) array->m_isPolarType = TRUE;
         // set size
         array->set_size( m_length );
         // fill array
@@ -5369,10 +5394,7 @@ void Chuck_Instr_Array_Init::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         // fill array
         t_CKVEC3 * sp = (t_CKVEC3 *)reg_sp;
         // intialize object
-        initialize_object( array, vm->env()->t_array );
-        // set array type
-        array->m_array_type = m_type_ref;
-        m_type_ref->add_ref();
+        initialize_object( array, vm->env()->ckt_array );
         // set size
         array->set_size( m_length );
         // fill array
@@ -5392,10 +5414,7 @@ void Chuck_Instr_Array_Init::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         // fill array
         t_CKVEC4 * sp = (t_CKVEC4 *)reg_sp;
         // intialize object
-        initialize_object( array, vm->env()->t_array );
-        // set array type
-        array->m_array_type = m_type_ref;
-        m_type_ref->add_ref();
+        initialize_object( array, vm->env()->ckt_array );
         // set size
         array->set_size( m_length );
         // fill array
@@ -5445,10 +5464,10 @@ Chuck_Instr_Array_Alloc::Chuck_Instr_Array_Alloc( Chuck_Env * env, t_CKUINT dept
     // copy array content type, e.g., int
     m_type_ref_content = contentType;
     // remember
-    SAFE_ADD_REF( m_type_ref_content );
+    CK_SAFE_ADD_REF( m_type_ref_content );
     // remember the type of the array itself, e.g., int[][]
     m_type_ref_array = arrayType;
-    SAFE_ADD_REF( m_type_ref_array );
+    CK_SAFE_ADD_REF( m_type_ref_array );
 
     // parameter string
     m_param_str = new char[64];
@@ -5480,10 +5499,10 @@ Chuck_Instr_Array_Alloc::Chuck_Instr_Array_Alloc( Chuck_Env * env, t_CKUINT dept
 Chuck_Instr_Array_Alloc::~Chuck_Instr_Array_Alloc()
 {
     // delete | 1.5.0.0 (ge) convert to macro
-    SAFE_DELETE_ARRAY( m_param_str );
+    CK_SAFE_DELETE_ARRAY( m_param_str );
     // release | 1.5.0.0 (ge) added
-    SAFE_RELEASE(m_type_ref_content);
-    SAFE_RELEASE(m_type_ref_array);
+    CK_SAFE_RELEASE(m_type_ref_content);
+    CK_SAFE_RELEASE(m_type_ref_array);
 }
 
 
@@ -5532,7 +5551,7 @@ Chuck_Object * do_alloc_array( Chuck_VM * vm, // REFACTOR-2017: added
             // initialize object | 1.5.0.0 (ge) use array type instead of base t_array
             // for the object->type_ref to contain more specific information
             initialize_object( baseX, type );
-            // initialize_object( baseX, vm->env()->t_array );
+            // initialize_object( baseX, vm->env()->ckt_array );
             return baseX;
         }
         else if( kind == kindof_FLOAT ) // ISSUE: 64-bit (fixed 1.3.1.0)
@@ -5543,7 +5562,7 @@ Chuck_Object * do_alloc_array( Chuck_VM * vm, // REFACTOR-2017: added
             // initialize object | 1.5.0.0 (ge) use array type instead of base t_array
             // for the object->type_ref to contain more specific information
             initialize_object( baseX, type );
-            // initialize_object( baseX, vm->env()->t_array );
+            // initialize_object( baseX, vm->env()->ckt_array );
             return baseX;
         }
         else if( kind == kindof_COMPLEX ) // ISSUE: 64-bit (fixed 1.3.1.0)
@@ -5551,10 +5570,15 @@ Chuck_Object * do_alloc_array( Chuck_VM * vm, // REFACTOR-2017: added
             Chuck_Array16 * baseX = new Chuck_Array16( *capacity );
             if( !baseX ) goto out_of_memory;
 
+            // check array type
+            Chuck_Type * array_type = type->array_type;
+            // differentiate between complex and polar | 1.5.1.0 (ge) added, used for sorting Array16s
+            if( array_type && isa(array_type, vm->env()->ckt_polar) ) baseX->m_isPolarType = TRUE;
+
             // initialize object | 1.5.0.0 (ge) use array type instead of base t_array
             // for the object->type_ref to contain more specific information
             initialize_object( baseX, type );
-            // initialize_object( baseX, vm->env()->t_array );
+            // initialize_object( baseX, vm->env()->ckt_array );
             return baseX;
         }
         else if( kind == kindof_VEC3 ) // 1.3.5.3
@@ -5565,7 +5589,7 @@ Chuck_Object * do_alloc_array( Chuck_VM * vm, // REFACTOR-2017: added
             // initialize object | 1.5.0.0 (ge) use array type instead of base t_array
             // for the object->type_ref to contain more specific information
             initialize_object( baseX, type );
-            // initialize_object( baseX, vm->env()->t_array );
+            // initialize_object( baseX, vm->env()->ckt_array );
             return baseX;
         }
         else if( kind == kindof_VEC4 ) // 1.3.5.3
@@ -5576,7 +5600,7 @@ Chuck_Object * do_alloc_array( Chuck_VM * vm, // REFACTOR-2017: added
             // initialize object | 1.5.0.0 (ge) use array type instead of base t_array
             // for the object->type_ref to contain more specific information
             initialize_object( baseX, type );
-            // initialize_object( baseX, vm->env()->t_array );
+            // initialize_object( baseX, vm->env()->ckt_array );
             return baseX;
         }
 
@@ -5589,11 +5613,18 @@ Chuck_Object * do_alloc_array( Chuck_VM * vm, // REFACTOR-2017: added
     if( !theBase) goto out_of_memory;
 
     // construct type for next array level | 1.5.0.0 (ge) added
-    typeNext = type->copy( vm->env() );
+    // TODO: look up in common array type pool before allocating
+    // pass in NULL (context) as typeNext is meant to be temporary and
+    // shouldn't be associated with context; also by this point,
+    // vm->env()->context is likely the global context, and the
+    // originating context (e.g., ck file) is already cleaned up | 1.5.1.1
+    typeNext = type->copy( vm->env(), NULL );
     // check
     if( typeNext->array_depth == 0 ) goto internal_error_array_depth;
     // minus the depth
     typeNext->array_depth--;
+    // add ref | 1.5.1.1
+    CK_SAFE_ADD_REF( typeNext );
 
     // allocate the next level
     for( i = 0; i < *capacity; i++ )
@@ -5606,16 +5637,19 @@ Chuck_Object * do_alloc_array( Chuck_VM * vm, // REFACTOR-2017: added
         theBase->set( i, (t_CKUINT)next );
     }
 
+    // release | 1.5.1.1
+    CK_SAFE_RELEASE( typeNext );
+
     // initialize object | 1.5.0.0 (ge) use array type instead of base t_array
     // for the object->type_ref to contain more specific information
     initialize_object( theBase, type );
-    // initialize_object( theBase, vm->env()->t_array );
+    // initialize_object( theBase, vm->env()->ckt_array );
     return theBase;
 
 internal_error_array_depth:
     // we have a big problem
     CK_FPRINTF_STDERR(
-        "[chuck](VM): internal error: multi-dimensional array depth mismatch while allocating arrays...\n" );
+        "[chuck](VM): (internal error) multi-dimensional array depth mismatch while allocating arrays...\n" );
     goto error;
 
 out_of_memory:
@@ -5632,7 +5666,7 @@ negative_array_size:
 
 error:
     // base shouldn't have been ref counted
-    SAFE_DELETE( theBase );
+    CK_SAFE_DELETE( theBase );
     return NULL;
 }
 
@@ -5697,7 +5731,7 @@ void Chuck_Instr_Array_Alloc::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         // check to see if we need to allocate
         // if( num_obj > shred->obj_array_size )
         // {
-        //     SAFE_DELETE( shred->obj_array );
+        //     CK_SAFE_DELETE( shred->obj_array );
         //     shred->obj_array_size = 0;
         //     shred->obj_array = new t_CKUINT[num_obj];
         //     if( !shred->obj_array ) goto out_of_memory;
@@ -7153,6 +7187,7 @@ void Chuck_Instr_UGen_Link::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
     pop_( sp, 2 );
     // check for null
     if( !*(sp+1) || !(*sp) ) goto null_pointer;
+
     // go for it
     (*(sp + 1))->add( *sp, m_isUpChuck );
     // push the second
@@ -7453,6 +7488,121 @@ void Chuck_Instr_Pop_Loop_Counter::execute( Chuck_VM * vm, Chuck_VM_Shred * shre
 
 
 
+//-----------------------------------------------------------------------------
+// name: struct Chuck_Instr_ForEach_Inc_And_Branch
+// desc: for( VAR : ARRAY ) increment VAR, test against ARRAY size; branch
+//
+// pre-condition: expects three items on reg stack (see below)
+// post-condition: leaves no values on reg stack
+//-----------------------------------------------------------------------------
+void Chuck_Instr_ForEach_Inc_And_Branch::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
+{
+    t_CKUINT *& reg_sp = (t_CKUINT *&)shred->reg->sp;
+
+    // --------
+    // output of VAR alloc (e.g., int or float or other) -- but always an UINT
+    // ARRAY to iterate over
+    // implicit loop counter
+    // --------
+    // ^ assume three things on the reg stack
+
+    // compute stack offset
+    // t_CKUINT offset = (m_dataSize + sz_INT + sz_INT) / sz_INT;
+    t_CKUINT offset = (sz_INT + sz_INT + sz_INT) / sz_INT;
+
+    // pop
+    pop_( reg_sp, offset );
+    // set
+    t_CKUINT *& sp = reg_sp;
+
+    // get var address
+    t_CKUINT * pVar = (t_CKUINT *)(*sp);
+    // get array pointer
+    Chuck_Array * array = (Chuck_Array *)(*(sp+1));
+    // loop counter pointer
+    t_CKINT ** pCounter = (t_CKINT **)(sp+2);
+    // counter
+    t_CKINT * counter = *(pCounter);
+
+    // branch if either NULL array, or counter reached array size
+    if( !array || val_(counter) >= array->size() )
+    {
+        shred->next_pc = m_jmp;
+    }
+    else
+    {
+        // set pVar to current element
+        switch( m_dataKind )
+        {
+            case kindof_INT:
+            {
+                // cast to specific array type
+                Chuck_Array4 * arr = (Chuck_Array4 *)array;
+                // is object RELEASE
+                if( arr->contains_objects() && *pVar)
+                {
+                    // release ref, since for-each loops don't auto-release every iteration
+                    // (only at the end or if return encountered)
+                    ((Chuck_VM_Object *)(*pVar))->release();
+                }
+                // get element
+                arr->get( *counter, pVar );
+                // is object ADD_REF
+                if( arr->contains_objects() && *pVar)
+                {
+                    // add ref, as this will be cleaned up at end of scope, hopefully
+                    ((Chuck_VM_Object *)(*pVar))->add_ref(); 
+                }
+                break;
+            }
+            case kindof_FLOAT:
+            {
+                // cast to specific array type
+                Chuck_Array8 * arr = (Chuck_Array8 *) array;
+                // get element
+                arr->get( *counter, (t_CKFLOAT *)pVar );
+                break;
+            }
+            case kindof_COMPLEX:
+            {
+                // cast to specific array type
+                Chuck_Array16 * arr = (Chuck_Array16 *) array;
+                // get element
+                arr->get( *counter, (t_CKCOMPLEX *)pVar );
+                break;
+            }
+            case kindof_VEC3:
+            {
+                // cast to specific array type
+                Chuck_Array24 * arr = (Chuck_Array24 *) array;
+                // get element
+                arr->get( *counter, (t_CKVEC3 *)pVar );
+                break;
+            }
+            case kindof_VEC4:
+            {
+                // cast to specific array type
+                Chuck_Array32 * arr = (Chuck_Array32 *) array;
+                // get element
+                arr->get( *counter, (t_CKVEC4 *)pVar );
+                break;
+            }
+            default:
+            {
+                // shouldn't get here
+                assert( FALSE );
+                break;
+            }
+        }
+
+        // increment counter
+        (*(*pCounter))++;
+    }
+}
+
+
+
+
 #pragma mark === IO ===
 
 
@@ -7594,7 +7744,7 @@ done:
 
 //-----------------------------------------------------------------------------
 // name: execute()
-// desc: ...
+// desc: insert int value into output stream
 //-----------------------------------------------------------------------------
 void Chuck_Instr_IO_out_int::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
 {
@@ -7636,7 +7786,7 @@ done:
 
 //-----------------------------------------------------------------------------
 // name: execute()
-// desc: ...
+// desc: insert float value into output stream
 //-----------------------------------------------------------------------------
 void Chuck_Instr_IO_out_float::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
 {
@@ -7677,8 +7827,176 @@ done:
 
 
 //-----------------------------------------------------------------------------
+// name: execute() | 1.5.1.0
+// desc: insert complex value into output stream
+//-----------------------------------------------------------------------------
+void Chuck_Instr_IO_out_complex::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
+{
+    t_CKINT *& sp = (t_CKINT *&)shred->reg->sp;
+
+    // pop the value
+    pop_( sp, 1 + (sz_COMPLEX / sz_INT) ); // ISSUE: 64-bit (fixed 1.3.1.0)
+
+    // ISSUE: 64-bit
+    // the IO
+    Chuck_IO **& ppIO = (Chuck_IO **&)sp;
+
+    // check it
+    if( *(ppIO) == NULL ) goto null_pointer;
+
+    // write the value
+    (*ppIO)->write( *((t_CKCOMPLEX *)(sp+1)) );
+
+    // push the IO
+    push_( sp, (t_CKINT)(*(ppIO)) );
+
+    return;
+
+null_pointer:
+    // we have a problem
+    CK_FPRINTF_STDERR(
+        "[chuck](VM): NullPointerException: (IO output complex) on line[%lu] in shred[id=%lu:%s]\n",
+        m_linepos, shred->xid, shred->name.c_str() );
+    goto done;
+
+done:
+    // do something!
+    shred->is_running = FALSE;
+    shred->is_done = TRUE;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: execute() | 1.5.1.0
+// desc: insert complex value into output stream
+//-----------------------------------------------------------------------------
+void Chuck_Instr_IO_out_polar::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
+{
+    t_CKINT *& sp = (t_CKINT *&)shred->reg->sp;
+
+    // pop the value
+    pop_( sp, 1 + (sz_POLAR / sz_INT) ); // ISSUE: 64-bit (fixed 1.3.1.0)
+
+    // ISSUE: 64-bit
+    // the IO
+    Chuck_IO **& ppIO = (Chuck_IO **&)sp;
+
+    // check it
+    if( *(ppIO) == NULL ) goto null_pointer;
+
+    // write the value
+    (*ppIO)->write( *((t_CKPOLAR *)(sp+1)) );
+
+    // push the IO
+    push_( sp, (t_CKINT)(*(ppIO)) );
+
+    return;
+
+null_pointer:
+    // we have a problem
+    CK_FPRINTF_STDERR(
+        "[chuck](VM): NullPointerException: (IO output polar) on line[%lu] in shred[id=%lu:%s]\n",
+        m_linepos, shred->xid, shred->name.c_str() );
+    goto done;
+
+done:
+    // do something!
+    shred->is_running = FALSE;
+    shred->is_done = TRUE;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: execute() | 1.5.1.0
+// desc: insert vec3 value into output stream
+//-----------------------------------------------------------------------------
+void Chuck_Instr_IO_out_vec3::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
+{
+    t_CKINT *& sp = (t_CKINT *&)shred->reg->sp;
+
+    // pop the value
+    pop_( sp, 1 + (sz_VEC3 / sz_INT) ); // ISSUE: 64-bit (fixed 1.3.1.0)
+
+    // ISSUE: 64-bit
+    // the IO
+    Chuck_IO **& ppIO = (Chuck_IO **&)sp;
+
+    // check it
+    if( *(ppIO) == NULL ) goto null_pointer;
+
+    // write the value
+    (*ppIO)->write( *((t_CKVEC3 *)(sp+1)) );
+
+    // push the IO
+    push_( sp, (t_CKINT)(*(ppIO)) );
+
+    return;
+
+null_pointer:
+    // we have a problem
+    CK_FPRINTF_STDERR(
+        "[chuck](VM): NullPointerException: (IO output vec3) on line[%lu] in shred[id=%lu:%s]\n",
+        m_linepos, shred->xid, shred->name.c_str() );
+    goto done;
+
+done:
+    // do something!
+    shred->is_running = FALSE;
+    shred->is_done = TRUE;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: execute() | 1.5.1.0
+// desc: insert vec4 value into output stream
+//-----------------------------------------------------------------------------
+void Chuck_Instr_IO_out_vec4::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
+{
+    t_CKINT *& sp = (t_CKINT *&)shred->reg->sp;
+
+    // pop the value
+    pop_( sp, 1 + (sz_VEC4 / sz_INT) ); // ISSUE: 64-bit (fixed 1.3.1.0)
+
+    // ISSUE: 64-bit
+    // the IO
+    Chuck_IO **& ppIO = (Chuck_IO **&)sp;
+
+    // check it
+    if( *(ppIO) == NULL ) goto null_pointer;
+
+    // write the value
+    (*ppIO)->write( *((t_CKVEC4 *)(sp+1)) );
+
+    // push the IO
+    push_( sp, (t_CKINT)(*(ppIO)) );
+
+    return;
+
+null_pointer:
+    // we have a problem
+    CK_FPRINTF_STDERR(
+        "[chuck](VM): NullPointerException: (IO output vec4) on line[%lu] in shred[id=%lu:%s]\n",
+        m_linepos, shred->xid, shred->name.c_str() );
+    goto done;
+
+done:
+    // do something!
+    shred->is_running = FALSE;
+    shred->is_done = TRUE;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
 // name: execute()
-// desc: ...
+// desc: insert string into output stream
 //-----------------------------------------------------------------------------
 void Chuck_Instr_IO_out_string::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
 {
@@ -7739,10 +8057,10 @@ void Chuck_Instr_Hack::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
     {
         t_CKINT * sp = (t_CKINT *)shred->reg->sp;
         Chuck_Object * obj = ((Chuck_Object *)*(sp-1));
-        if( !isa( m_type_ref, vm->env()->t_string ) || *(sp-1) == 0 )
+        if( !isa( m_type_ref, vm->env()->ckt_string ) || *(sp-1) == 0 )
         {
             // print it
-            if( isa( m_type_ref, vm->env()->t_object ) )
+            if( isa( m_type_ref, vm->env()->ckt_object ) )
             {
                 if( obj == NULL )
                 {
@@ -7779,7 +8097,7 @@ void Chuck_Instr_Hack::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         {
             t_CKFLOAT * sp = (t_CKFLOAT *)shred->reg->sp;
             // print it
-            CK_FPRINTF_STDERR( "%%(%.4f,%.4f*pi) :(%s)\n", *(sp-2), *(sp-1)/ONE_PI, m_type_ref->c_name() );
+            CK_FPRINTF_STDERR( "%%(%.4f,%.4f*pi) :(%s)\n", *(sp-2), *(sp-1)/CK_ONE_PI, m_type_ref->c_name() );
         }
         else
         {
@@ -7876,9 +8194,9 @@ void Chuck_Instr_Gack::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         if( type->size == sz_INT && iskindofint(vm->env(), type) ) // ISSUE: 64-bit (fixed 1.3.1.0)
         {
             t_CKINT * sp = (t_CKINT *)the_sp;
-            if( !isa( type, vm->env()->t_string ) || *(sp) == 0 )
+            if( !isa( type, vm->env()->ckt_string ) || *(sp) == 0 )
             {
-                if( isa( type, vm->env()->t_object ) )
+                if( isa( type, vm->env()->ckt_object ) )
                 {
                     Chuck_Object * obj = ((Chuck_Object *)(*sp));
                     // print it
@@ -7917,7 +8235,7 @@ void Chuck_Instr_Gack::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
                 CK_FPRINTF_STDERR( "#(%.4f,%.4f) ", *(sp), *(sp+1) );
             else if( type->xid == te_polar )
                 // print it
-                CK_FPRINTF_STDERR( "%%(%.4f,%.4f*pi) ", *(sp), *(sp+1)/ONE_PI );
+                CK_FPRINTF_STDERR( "%%(%.4f,%.4f*pi) ", *(sp), *(sp+1)/CK_ONE_PI );
 
             the_sp += sz_COMPLEX; // ISSUE: 64-bit (fixed 1.3.1.0)
         }
@@ -7941,7 +8259,7 @@ void Chuck_Instr_Gack::execute( Chuck_VM * vm, Chuck_VM_Shred * shred )
         }
         else if( type->size == 0 )
         {
-            CK_FPRINTF_STDERR( "... " );
+            CK_FPRINTF_STDERR( "..." );
         }
         else
             assert( FALSE );

@@ -46,6 +46,7 @@
 #include "chuck_io.h"
 #include "chuck_oo.h"
 #include "util_math.h"
+#include "util_platforms.h"
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -3260,6 +3261,10 @@ by Perry R. Cook and Gary P. Scavone, 1995 - 2002.";
         HnkyTonk_ctor, HnkyTonk_dtor,
         HnkyTonk_tick, HnkyTonk_pmsg, doc.c_str() ) ) return FALSE;
 
+    // add examples
+    if( !type_engine_import_add_ex( env, "stk/honkeytonk-algo1.ck" ) ) goto error;
+    if( !type_engine_import_add_ex( env, "stk/honkeytonk-algo3.ck" ) ) goto error;
+
     // end the class import
     type_engine_import_class_end( env );
 
@@ -5767,7 +5772,7 @@ void BandedWG :: setFrequency(MY_FLOAT frequency)
     //  CK_STDCERR << CK_STDENDL;
 
     // set the bandpass filter resonances
-    radius = 1.0 - ONE_PI * 32 / Stk::sampleRate(); //freakency * modes[i] / Stk::sampleRate()/32;
+    radius = 1.0 - CK_ONE_PI * 32 / Stk::sampleRate(); //freakency * modes[i] / Stk::sampleRate()/32;
     if ( radius < 0.0 ) radius = 0.0;
     bandpass[i].setResonance(freakency * modes[i], radius, true);
 
@@ -5791,7 +5796,7 @@ void BandedWG :: setStrikePosition(MY_FLOAT position)
   // 1.4.1.0 (prc)
   strikePosition = position; /***** REPAIRATHON2021 HACK *****/
   for (int i=0; i<MAX_BANDED_MODES; i++) { /***** REPAIRATHON2021 HACKS *****/
-    outGains[i] = fabs(sin((i+1)*ONE_PI*strikePosition)); /***** REPAIRATHON2021 HACKS *****/
+    outGains[i] = fabs(sin((i+1)*CK_ONE_PI*strikePosition)); /***** REPAIRATHON2021 HACKS *****/
     if (strikePosition == 0.0) outGains[i] = 1.0; // AVOID (Override) EDGE CASES
     if (strikePosition == 1.0) outGains[i] = 1.0; // WHERE GAINS WOULD COME OUT ZERO
   }
@@ -6141,7 +6146,7 @@ void BiQuad :: setA2(MY_FLOAT a2)
 void BiQuad :: setResonance(MY_FLOAT frequency, MY_FLOAT radius, bool normalize)
 {
   a[2] = radius * radius;
-  a[1] = -2.0 * radius * cos(TWO_PI * frequency / Stk::sampleRate());
+  a[1] = -2.0 * radius * cos(CK_TWO_PI * frequency / Stk::sampleRate());
 
   if ( normalize ) {
     // Use zeros at +- 1 and normalize the filter peak gain.
@@ -6155,7 +6160,7 @@ void BiQuad :: setNotch(MY_FLOAT frequency, MY_FLOAT radius)
 {
   // This method does not attempt to normalize the filter gain.
   b[2] = radius * radius;
-  b[1] = (MY_FLOAT) -2.0 * radius * cos(TWO_PI * (double) frequency / Stk::sampleRate());
+  b[1] = (MY_FLOAT) -2.0 * radius * cos(CK_TWO_PI * (double) frequency / Stk::sampleRate());
 }
 
 void BiQuad :: setEqualGainZeroes()
@@ -6257,7 +6262,7 @@ void Blit :: setFrequency( MY_FLOAT frequency )
 #endif
 
   p_ = Stk::sampleRate() / frequency;
-  rate_ = ONE_PI / p_;
+  rate_ = CK_ONE_PI / p_;
   this->updateHarmonics();
 }
 
@@ -6307,7 +6312,7 @@ MY_FLOAT Blit :: tick( void )
   }
 
   phase_ += rate_;
-  if ( phase_ >= ONE_PI ) phase_ -= ONE_PI;
+  if ( phase_ >= CK_ONE_PI ) phase_ -= CK_ONE_PI;
 
   return output;
 }
@@ -6361,7 +6366,7 @@ void BlitSaw :: setFrequency( MY_FLOAT frequency )
 
   p_ = Stk::sampleRate() / frequency;
   C2_ = 1 / p_;
-  rate_ = ONE_PI * C2_;
+  rate_ = CK_ONE_PI * C2_;
   this->updateHarmonics();
 }
 
@@ -6431,7 +6436,7 @@ MY_FLOAT BlitSaw :: tick( void )
   state_ = output * 0.995;
 
   phase_ += rate_;
-  if ( phase_ >= ONE_PI ) phase_ -= ONE_PI;
+  if ( phase_ >= CK_ONE_PI ) phase_ -= CK_ONE_PI;
 
   return output;
 }
@@ -6495,7 +6500,7 @@ void BlitSquare :: setFrequency( MY_FLOAT frequency )
   // waveform at half the blit frequency. Thus, we need to scale the
   // frequency value here by 0.5. (GPS, 2006).
   p_ = 0.5 * Stk::sampleRate() / frequency;
-  rate_ = ONE_PI / p_;
+  rate_ = CK_ONE_PI / p_;
   this->updateHarmonics();
 }
 
@@ -6541,7 +6546,7 @@ MY_FLOAT BlitSquare :: tick( void )
   MY_FLOAT denominator = sin( phase_ );
   if ( fabs( denominator )  < std::numeric_limits<MY_FLOAT>::epsilon() ) {
     // Inexact comparison safely distinguishes betwen *close to zero*, and *close to PI*.
-    if ( phase_ < 0.1f || phase_ > TWO_PI - 0.1f )
+    if ( phase_ < 0.1f || phase_ > CK_TWO_PI - 0.1f )
       m_boutput = a_;
     else
       m_boutput = -a_;
@@ -6558,7 +6563,7 @@ MY_FLOAT BlitSquare :: tick( void )
   dcbState_ = m_boutput;
 
   phase_ += rate_;
-  if ( phase_ >= TWO_PI ) phase_ -= TWO_PI;
+  if ( phase_ >= CK_TWO_PI ) phase_ -= CK_TWO_PI;
 
   return m_output;
 }
@@ -6815,8 +6820,8 @@ BlowHole :: BlowHole(MY_FLOAT lowestFrequency)
   double r_rh = 0.0015;    // register vent radius
   te = 1.4 * r_rh;         // effective length of the open hole
   double xi = 0.0;         // series resistance term
-  double zeta = 347.23 + 2*ONE_PI*pow(r_b,2)*xi/1.1769;
-  double psi = 2*ONE_PI*pow(r_b,2)*te / (ONE_PI*pow(r_rh,2));
+  double zeta = 347.23 + 2*CK_ONE_PI*pow(r_b,2)*xi/1.1769;
+  double psi = 2*CK_ONE_PI*pow(r_b,2)*te / (CK_ONE_PI*pow(r_rh,2));
   rh_coeff = (zeta - 2 * Stk::sampleRate() * psi) / (zeta + 2 * Stk::sampleRate() * psi);
   rh_gain = -347.23 / (zeta + 2 * Stk::sampleRate() * psi);
   vent = new PoleZero;
@@ -7541,17 +7546,17 @@ Chorus :: Chorus(MY_FLOAT baseDelay)
 
 Chorus :: ~Chorus()
 {
-  SAFE_DELETE( delayLine[0] );
-  SAFE_DELETE( delayLine[1] );
-  SAFE_DELETE( mods[0] );
-  SAFE_DELETE( mods[1] );
+  CK_SAFE_DELETE( delayLine[0] );
+  CK_SAFE_DELETE( delayLine[1] );
+  CK_SAFE_DELETE( mods[0] );
+  CK_SAFE_DELETE( mods[1] );
 }
 
 // chuck
 void Chorus :: set(MY_FLOAT baseDelay, MY_FLOAT depth)
 {
-  SAFE_DELETE( delayLine[0] );
-  SAFE_DELETE( delayLine[1] );
+  CK_SAFE_DELETE( delayLine[0] );
+  CK_SAFE_DELETE( delayLine[1] );
 
   delayLine[0] = new DelayL((long) baseDelay, (long) (baseDelay + baseDelay * depth) + 2);
   // delayLine[0] = new DelayL((long) baseDelay, (long) (baseDelay + baseDelay * 1.414 * depth) + 2);
@@ -8327,9 +8332,13 @@ char waveNames[DRUM_NUMWAVES][32] =
 
 Drummer :: Drummer() : Instrmnt()
 {
-  for (int i=0; i<DRUM_POLYPHONY; i++)   {
+  for (int i=0; i<DRUM_POLYPHONY; i++) {
     filters[i] = new OnePole;
     sounding[i] = -1;
+
+    // this will crash if Drummer is used (currently doesn't seem to be)
+    // but better than trashing memory
+    waves[i] = NULL; // 1.5.0.4 (ge) added
   }
 
   // This counts the number of sounding voices.
@@ -9722,6 +9731,9 @@ FormSwep :: FormSwep() : BiQuad()
   deltaRadius = (MY_FLOAT) 0.0;
   sweepState = (MY_FLOAT) 0.0;
   sweepRate = (MY_FLOAT) 0.002;
+  startFrequency = (MY_FLOAT) 0.0; // 1.5.0.4 (ge) added
+  startGain = (MY_FLOAT)0.0; // 1.5.0.4 (ge) added
+  startRadius = (MY_FLOAT)0.0; // 1.5.0.4 (ge) added
   dirty = false;
   this->clear();
 }
@@ -10643,10 +10655,10 @@ bool Mandolin :: setBodyIR( const char * path, bool isRaw )
 Mandolin :: ~Mandolin()
 {
 //    for( int i=0; i<12; i++ )
-//        SAFE_DELETE( soundfile[i] );
+//        CK_SAFE_DELETE( soundfile[i] );
 
     // chuck: all the soundfiles are the same object, only delete one of them
-    SAFE_DELETE(soundfile[0]);
+    CK_SAFE_DELETE(soundfile[0]);
     for( int i=1; i<12; i++ )
         soundfile[i] = NULL;
 }
@@ -11474,7 +11486,7 @@ void ModalBar :: setStrikePosition(MY_FLOAT position)
   }
 
   // Hack only first three modes.
-  MY_FLOAT temp2 = position * ONE_PI;
+  MY_FLOAT temp2 = position * CK_ONE_PI;
   MY_FLOAT temp = sin(temp2);
   this->setModeGain(0, 0.12 * temp);
 
@@ -11613,6 +11625,9 @@ Modulate :: Modulate()
 
   filter = new OnePole( 0.999 );
   filter->setGain( randomGain );
+
+  // initialize | 1.5.0.4 (ge) added
+  lastOutput = 0;
 }
 
 Modulate :: ~Modulate()
@@ -11703,6 +11718,7 @@ Moog :: Moog()
   adsr->setAllTimes((MY_FLOAT) 0.001,(MY_FLOAT) 1.5,(MY_FLOAT) 0.6,(MY_FLOAT) 0.250);
   filterQ = (MY_FLOAT) 0.85;
   filterRate = (MY_FLOAT) 0.0001;
+  filterStartFreq = (MY_FLOAT) 0.0;
   modDepth = (MY_FLOAT) 0.0;
 
   // chuck
@@ -12756,6 +12772,12 @@ PitShift :: PitShift()
   delayLine[1] = new DelayL(delay[1], (long) 1024);
   effectMix = (MY_FLOAT) 0.5;
   rate = 1.0;
+
+  // 1.5.0.4 (ge) added initialization
+  lastOutput = 0;
+  m_vibratoFreq = 0;
+  m_vibratoGain = 0;
+  m_volume = 0;
 }
 
 PitShift :: ~PitShift()
@@ -13205,6 +13227,7 @@ ReedTabl :: ReedTabl()
 {
   offSet = (MY_FLOAT) 0.6;  // Offset is a bias, related to reed rest position.
   slope = (MY_FLOAT) -0.8;  // Slope corresponds loosely to reed stiffness.
+  lastOutput = (MY_FLOAT) 0.0;
 }
 
 ReedTabl :: ~ReedTabl()
@@ -13414,6 +13437,9 @@ void Resonate :: controlChange(int number, MY_FLOAT value)
 
 Reverb :: Reverb()
 {
+    // 1.5.0.4 (ge) add initialization
+    effectMix = 0;
+    lastOutput[0] = lastOutput[1] = 0;
 }
 
 Reverb :: ~Reverb()
@@ -14620,7 +14646,7 @@ int Shakers :: setFreqAndReson(int which, MY_FLOAT theFreq, MY_FLOAT reson) {
     center_freqs[which] = theFreq;
     t_center_freqs[which] = theFreq;
     coeffs[which][1] = reson * reson;
-    coeffs[which][0] = -reson * 2.0 * cos(theFreq * TWO_PI / Stk::sampleRate());
+    coeffs[which][0] = -reson * 2.0 * cos(theFreq * CK_TWO_PI / Stk::sampleRate());
     return 1;
   }
   else return 0;
@@ -15125,7 +15151,7 @@ MY_FLOAT Shakers :: tick()
         for (i=0;i<nFreqs;i++) {
           if (freqalloc[i]) {
             temp_rand = t_center_freqs[i] * (1.0 + (freq_rand[i] * noise_tick()));
-            coeffs[i][0] = -resons[i] * 2.0 * cos(temp_rand * TWO_PI / Stk::sampleRate());
+            coeffs[i][0] = -resons[i] * 2.0 * cos(temp_rand * CK_TWO_PI / Stk::sampleRate());
           }
         }
         }
@@ -15239,7 +15265,7 @@ void Shakers :: controlChange(int number, MY_FLOAT value)
         temp = center_freqs[i] * pow (1.015,value-64);
       t_center_freqs[i] = temp;
 
-      coeffs[i][0] = -resons[i] * 2.0 * cos(temp * TWO_PI / Stk::sampleRate());
+      coeffs[i][0] = -resons[i] * 2.0 * cos(temp * CK_TWO_PI / Stk::sampleRate());
       coeffs[i][1] = resons[i]*resons[i];
     }
   }
@@ -15291,19 +15317,19 @@ MY_FLOAT Shakers :: wuter_tick() {
   if (gains[0] >  0.001) {
     center_freqs[0]  *= WUTR_FREQ_SWEEP;
     coeffs[0][0] = -resons[0] * 2.0 *
-      cos(center_freqs[0] * TWO_PI / Stk::sampleRate());
+      cos(center_freqs[0] * CK_TWO_PI / Stk::sampleRate());
   }
   gains[1] *= resons[1];
   if (gains[1] > 0.001) {
     center_freqs[1] *= WUTR_FREQ_SWEEP;
     coeffs[1][0] = -resons[1] * 2.0 *
-      cos(center_freqs[1] * TWO_PI / Stk::sampleRate());
+      cos(center_freqs[1] * CK_TWO_PI / Stk::sampleRate());
   }
   gains[2] *= resons[2];
   if (gains[2] > 0.001) {
     center_freqs[2] *= WUTR_FREQ_SWEEP;
     coeffs[2][0] = -resons[2] * 2.0 *
-      cos(center_freqs[2] * TWO_PI / Stk::sampleRate());
+      cos(center_freqs[2] * CK_TWO_PI / Stk::sampleRate());
   }
 
   sndLevel *= soundDecay;        // Each (all) event(s)
@@ -15981,7 +16007,7 @@ void StifKarp :: setStretch(MY_FLOAT stretch)
     biQuad[i]->setB0( coefficient );
     biQuad[i]->setB2( 1.0 );
 
-    coefficient = -2.0 * temp * cos(TWO_PI * freq / Stk::sampleRate());
+    coefficient = -2.0 * temp * cos(CK_TWO_PI * freq / Stk::sampleRate());
     biQuad[i]->setA1( coefficient );
     biQuad[i]->setB1( coefficient );
 
@@ -16217,7 +16243,7 @@ void Stk :: swap64(unsigned char *ptr)
   *(ptr+1) = val;
 }
 
-#if (defined(__OS_WINDOWS__) || defined(__PLATFORM_WIN32__))
+#if (defined(__OS_WINDOWS__) || defined(__PLATFORM_WINDOWS__))
   #ifndef __CHUNREAL_ENGINE__
     #include <windows.h> // for win32_tmpfile()
   #else
@@ -16227,20 +16253,13 @@ void Stk :: swap64(unsigned char *ptr)
   #endif // #ifndef __CHUNREAL_ENGINE__
 #else
   #include <unistd.h>
-#endif // #if (defined(__OS_WINDOWS__) || defined(__PLATFORM_WIN32__))
+#endif // #if (defined(__OS_WINDOWS__) || defined(__PLATFORM_WINDOWS__))
 
 void Stk :: sleep(unsigned long milliseconds)
 {
-#if (defined(__OS_WINDOWS__) || defined(__PLATFORM_WIN32__))
-  #ifndef __CHUNREAL_ENGINE__
-    Sleep( (DWORD)milliseconds );
-  #else
-    // 1.5.0.0 (ge) | #chunreal
-    #define usleep(x) FPlatformProcess::Sleep( x/1000.0f <= 0 ? .001 : x/1000.0f );
-  #endif // #ifndef __UNREAL_ENGINE__
-#else
-  usleep( (unsigned int)(milliseconds * 1000.0) ); // 1.4.2.0 (ge) | changed cast to unsigned int to clear a warning
-#endif // #if (defined(__OS_WINDOWS__) || defined(__PLATFORM_WIN32__))
+    // 1.4.2.0 (ge) | changed cast to unsigned int to clear a warning
+    // 1.5.0.5 (ge and eito) call ck_usleep resolved elsewhere
+    ck_usleep( (unsigned int)(milliseconds * 1000.0) );
 }
 
 void Stk :: handleError( const char *message, StkError::TYPE type )
@@ -16621,12 +16640,12 @@ void TwoPole :: setA2(MY_FLOAT a2)
 void TwoPole :: setResonance(MY_FLOAT frequency, MY_FLOAT radius, bool normalize)
 {
   a[2] = radius * radius;
-  a[1] = (MY_FLOAT) -2.0 * radius * cos(TWO_PI * frequency / Stk::sampleRate());
+  a[1] = (MY_FLOAT) -2.0 * radius * cos(CK_TWO_PI * frequency / Stk::sampleRate());
 
   if ( normalize ) {
     // Normalize the filter gain ... not terribly efficient.
-    MY_FLOAT real = 1 - radius + (a[2] - radius) * cos(TWO_PI * 2 * frequency / Stk::sampleRate());
-    MY_FLOAT imag = (a[2] - radius) * sin(TWO_PI * 2 * frequency / Stk::sampleRate());
+    MY_FLOAT real = 1 - radius + (a[2] - radius) * cos(CK_TWO_PI * 2 * frequency / Stk::sampleRate());
+    MY_FLOAT imag = (a[2] - radius) * sin(CK_TWO_PI * 2 * frequency / Stk::sampleRate());
     b[0] = sqrt( pow(real, 2) + pow(imag, 2) );
   }
 }
@@ -16719,7 +16738,7 @@ void TwoZero :: setB2(MY_FLOAT b2)
 void TwoZero :: setNotch(MY_FLOAT frequency, MY_FLOAT radius)
 {
   b[2] = radius * radius;
-  b[1] = (MY_FLOAT) -2.0 * radius * cos(TWO_PI * (double) frequency / Stk::sampleRate());
+  b[1] = (MY_FLOAT) -2.0 * radius * cos(CK_TWO_PI * (double) frequency / Stk::sampleRate());
 
   // Normalize the filter gain.
   if (b[1] > 0.0) // Maximum at z = 0.
@@ -18143,7 +18162,7 @@ void WvIn :: openFile( const char *fileName, bool raw, bool doNormalize, bool ge
         if( strstr(fileName, "special:sinewave") )
         {
             for (unsigned int j=0; j<bufferSize; j++)
-                data[j] = (SHRT_MAX) * sin(2*ONE_PI*j/bufferSize);
+                data[j] = (SHRT_MAX) * sin(2*CK_ONE_PI*j/bufferSize);
         }
         else
         {
@@ -18156,7 +18175,7 @@ void WvIn :: openFile( const char *fileName, bool raw, bool doNormalize, bool ge
             else if( strstr(fileName, "special:britestk") ) {
                 rawsize = britestk_size; rawdata = britestk_data;
             }
-            else if( strstr(fileName, "special:dope") ) {
+            else if( strstr(fileName, "special:doh") || strstr(fileName, "special:dope") ) {
                 rawsize = dope_size; rawdata = dope_data;
             }
             else if( strstr(fileName, "special:eee") ) {
@@ -19201,7 +19220,7 @@ WvOut :: ~WvOut()
 
   // 1.5.0.1 (ge) using macro
   // if (data) delete [] data;
-  SAFE_DELETE_ARRAY( data );
+  CK_SAFE_DELETE_ARRAY( data );
 }
 
 void WvOut :: init()
@@ -19328,7 +19347,7 @@ void WvOut :: openFile( const char *fileName, unsigned int nChannels, WvOut::FIL
 
 bool WvOut :: setRawFile( const char *fileName )
 {
-  char name[128];
+  char name[130];
   strncpy(name, fileName, 128);
   if ( strstr(name, ".raw") == NULL) strcat(name, ".raw");
   fd = fopen(name, "wb");
@@ -19353,7 +19372,7 @@ bool WvOut :: setRawFile( const char *fileName )
 
 bool WvOut :: setWavFile( const char *fileName )
 {
-  char name[128];
+  char name[130];
   strncpy(name, fileName, 128);
   if( strstr(name, ".wav") == NULL ) strcat(name, ".wav");
   fd = fopen( name, "wb" );
@@ -19441,7 +19460,7 @@ if( !little_endian )
 
 bool WvOut :: setSndFile( const char *fileName )
 {
-  char name[128];
+  char name[130];
   strncpy(name, fileName, 128);
   if ( strstr(name, ".snd") == NULL) strcat(name, ".snd");
   fd = fopen(name, "wb");
@@ -19508,7 +19527,7 @@ if( little_endian )
 
 bool WvOut :: setAifFile( const char *fileName )
 {
-  char name[128];
+  char name[130];
   strncpy(name, fileName, 128);
   if ( strstr(name, ".aif") == NULL) strcat(name, ".aif");
   fd = fopen(name, "wb");
@@ -19658,7 +19677,7 @@ if( little_endian )
 
 bool WvOut :: setMatFile( const char *fileName )
 {
-  char name[128];
+  char name[130];
   strncpy(name, fileName, 128);
   if ( strstr(name, ".mat") == NULL) strcat(name, ".mat");
   fd = fopen(name, "w+b");
@@ -19967,6 +19986,11 @@ MidiFileIn :: MidiFileIn( std::string fileName )
     bpm_ = 0;
     // 1.4.1.1 (ge) string buffer for error message
     std::stringstream msg;
+    // 1.5.0.4 (ge) add initialization
+    format_ = 0;
+    division_ = 0;
+    nTracks_ = 0;
+    usingTimeCode_ = false;
 
     // Attempt to open the file.
     file_.open( fileName.c_str(), std::ios::in | std::ios::binary );
@@ -20346,7 +20370,7 @@ ck_domidi ( Instrmnt * inst, unsigned char status, unsigned char data1, unsigned
     unsigned char type = status && 0xf0;
     switch ( type ) {
     case __SK_NoteOn_:
-      inst->noteOn( mtof ( (float)data1 ), ((float)data2) / 128.0 );
+      inst->noteOn( ck_mtof ( (float)data1 ), ((float)data2) / 128.0 );
       break;
     case __SK_NoteOff_:
       inst->noteOff( ((float)data2) / 128.0 );
@@ -20740,6 +20764,9 @@ struct BiQuad_
     t_CKFLOAT zfreq;
     t_CKFLOAT zrad;
     t_CKBOOL norm;
+
+    // constructor
+    BiQuad_() : pfreq(0), prad(0), zfreq(0), zrad(0), norm(FALSE) { }
 };
 
 
@@ -20750,12 +20777,6 @@ struct BiQuad_
 CK_DLL_CTOR( BiQuad_ctor )
 {
     BiQuad_ * d = new BiQuad_;
-    d->pfreq = 0.0;
-    d->prad = 0.0;
-    d->zfreq = 0.0;
-    d->zrad = 0.0;
-    d->norm = FALSE;
-
     OBJ_MEMBER_UINT(SELF, BiQuad_offset_data) = (t_CKUINT)d;
 }
 
@@ -21834,7 +21855,7 @@ struct Brass_
 
    ~Brass_()
    {
-       SAFE_DELETE( imp );
+       CK_SAFE_DELETE( imp );
    }
 }; */
 
@@ -22338,7 +22359,7 @@ CK_DLL_CTOR( Flute_ctor )
 CK_DLL_DTOR( Flute_dtor )
 {
     Flute * f = (Flute *)OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data);
-    SAFE_DELETE(f);
+    CK_SAFE_DELETE(f);
     OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data) = 0;
 }
 
@@ -23023,7 +23044,7 @@ CK_DLL_CTOR( Sitar_ctor )
 CK_DLL_DTOR( Sitar_dtor )
 {
     Sitar * s = (Sitar *)OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data);
-    SAFE_DELETE(s);
+    CK_SAFE_DELETE(s);
     OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data) = 0;
 }
 
@@ -23095,7 +23116,7 @@ CK_DLL_CTOR( Saxofony_ctor )
 CK_DLL_DTOR( Saxofony_dtor )
 {
     Saxofony * d = (Saxofony *)OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data);
-    SAFE_DELETE(d);
+    CK_SAFE_DELETE(d);
     OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data) = 0;
 }
 
@@ -24168,7 +24189,7 @@ CK_DLL_CTOR( ADSR_ctor )
 {
     // TODO: fix this horrid thing
     Envelope * e = (Envelope *)OBJ_MEMBER_UINT(SELF, Envelope_offset_data);
-    SAFE_DELETE(e);
+    CK_SAFE_DELETE(e);
 
     OBJ_MEMBER_UINT(SELF, Envelope_offset_data) = (t_CKUINT)new ADSR;
 }
@@ -26431,7 +26452,7 @@ CK_DLL_CGET( Mandolin_cget_bodyIR )
 {
     Mandolin * m = (Mandolin *)OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data);
     // instantiate | 1.5.0.0 (ge) added to dynamic allocate chuck string
-    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     str->set( m->soundfile[0]->str_filename );
     RETURN->v_string = str;
 }
@@ -26705,7 +26726,7 @@ CK_DLL_CTRL( Moog_ctrl_filterStartFreq )
     t_CKFLOAT f = GET_NEXT_FLOAT(ARGS);
     // m->filterStartFreq( f );
     m->filterStartFreq = f;
-    RETURN->v_float = (t_CKFLOAT)  m->filterStartFreq;
+    RETURN->v_float = (t_CKFLOAT)m->filterStartFreq;
 }
 
 
@@ -26716,7 +26737,7 @@ CK_DLL_CTRL( Moog_ctrl_filterStartFreq )
 CK_DLL_CGET( Moog_cget_filterStartFreq )
 {
     Moog * m = (Moog *)OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data);
-    RETURN->v_float = (t_CKFLOAT)  m->filterStartFreq;
+    RETURN->v_float = (t_CKFLOAT)m->filterStartFreq;
 }
 
 
@@ -27189,7 +27210,7 @@ CK_DLL_CTRL( Shakers_ctrl_freq )
 {
     Shakers * s = (Shakers *)OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data);
     s->freq = GET_NEXT_FLOAT(ARGS);
-    s->controlChange( __SK_ModWheel_, ftom(s->freq) );
+    s->controlChange( __SK_ModWheel_, ck_ftom(s->freq) );
     RETURN->v_float = (t_CKFLOAT)s->freq;
 }
 
@@ -27394,7 +27415,7 @@ CK_DLL_CGET( VoicForm_cget_phoneme )
 {
     VoicForm * v = (VoicForm *)OBJ_MEMBER_UINT(SELF, Instrmnt_offset_data);
     // instantiate | 1.5.0.0 (ge) added to dynamic allocate chuck string
-    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     // set
     str->set( v->str_phoneme );
     RETURN->v_string = str;
@@ -27705,7 +27726,7 @@ CK_DLL_CGET( WvIn_cget_path )
 {
     WvIn * w = (WvIn *)OBJ_MEMBER_UINT(SELF, WvIn_offset_data);
     // instantiate | 1.5.0.0 (ge) added to dynamic allocate chuck string
-    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     str->set( w->str_filename );
     // return value
     RETURN->v_string = str;
@@ -28290,7 +28311,7 @@ CK_DLL_CGET( WvOut_cget_filename )
     WvOut * w = (WvOut *)OBJ_MEMBER_UINT(SELF, WvOut_offset_data);
 
     // instantiate | 1.5.0.0 (ge) added to dynamic allocate chuck string
-    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     str->set( w->str_filename );
 
     RETURN->v_string = str;
@@ -28372,7 +28393,7 @@ CK_DLL_CGET( WvOut_cget_autoPrefix )
 {
     WvOut * w = (WvOut *)OBJ_MEMBER_UINT(SELF, WvOut_offset_data);
     // instantiate | 1.5.0.0 (ge) added to dynamic allocate chuck string
-    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->t_string, SHRED );
+    Chuck_String * str = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
     str->set( w->autoPrefix );
     // return value
     RETURN->v_string = str;
@@ -28581,7 +28602,7 @@ CK_DLL_CTOR( JetTabl_ctor )
 CK_DLL_DTOR( JetTabl_dtor )
 {
     JetTabl * j = (JetTabl *)OBJ_MEMBER_UINT(SELF, JetTabl_offset_data);
-    SAFE_DELETE(j);
+    CK_SAFE_DELETE(j);
     OBJ_MEMBER_UINT(SELF, JetTabl_offset_data) = 0;
 }
 
@@ -28611,7 +28632,7 @@ CK_DLL_CTOR( Mesh2D_ctor ) {
 
 CK_DLL_DTOR( Mesh2D_dtor ) {
     Mesh2D * m = (Mesh2D *)OBJ_MEMBER_UINT(SELF, Mesh2D_offset_data);
-    SAFE_DELETE(m);
+    CK_SAFE_DELETE(m);
     OBJ_MEMBER_UINT(SELF, Mesh2D_offset_data) = 0;
 }
 
@@ -28705,14 +28726,14 @@ CK_DLL_CTOR( MidiFileIn_ctor )
 CK_DLL_DTOR( MidiFileIn_dtor )
 {
     stk::MidiFileIn *f = (stk::MidiFileIn *) OBJ_MEMBER_UINT(SELF, MidiFileIn_offset_data);
-    SAFE_DELETE(f);
+    CK_SAFE_DELETE(f);
     OBJ_MEMBER_UINT(SELF, MidiFileIn_offset_data) = 0;
 }
 
 CK_DLL_MFUN( MidiFileIn_open )
 {
     stk::MidiFileIn *f = (stk::MidiFileIn *) OBJ_MEMBER_UINT(SELF, MidiFileIn_offset_data);
-    SAFE_DELETE(f);
+    CK_SAFE_DELETE(f);
     Chuck_String * str = GET_NEXT_STRING(ARGS);
 
     try
@@ -28732,7 +28753,7 @@ CK_DLL_MFUN( MidiFileIn_open )
 CK_DLL_MFUN( MidiFileIn_close )
 {
     stk::MidiFileIn *f = (stk::MidiFileIn *) OBJ_MEMBER_UINT(SELF, MidiFileIn_offset_data);
-    SAFE_DELETE(f);
+    CK_SAFE_DELETE(f);
     OBJ_MEMBER_UINT(SELF, MidiFileIn_offset_data) = 0;
 }
 
