@@ -34,7 +34,6 @@
 		0492ADF61F6B83A7005FE7CE /* chuck_table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0492AD711F6B83A7005FE7CE /* chuck_table.cpp */; };
 		0492ADF71F6B83A7005FE7CE /* chuck_type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0492AD731F6B83A7005FE7CE /* chuck_type.cpp */; };
 		0492ADF81F6B83A7005FE7CE /* chuck_ugen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0492AD751F6B83A7005FE7CE /* chuck_ugen.cpp */; };
-		0492ADF91F6B83A7005FE7CE /* chuck_utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0492AD771F6B83A7005FE7CE /* chuck_utils.cpp */; };
 		0492ADFA1F6B83A7005FE7CE /* chuck_vm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0492AD791F6B83A7005FE7CE /* chuck_vm.cpp */; };
 		0492ADFB1F6B83A7005FE7CE /* hidio_sdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0492AD7C1F6B83A7005FE7CE /* hidio_sdl.cpp */; };
 		0492ADFC1F6B83A7005FE7CE /* address.c in Sources */ = {isa = PBXBuildFile; fileRef = 0492AD7F1F6B83A7005FE7CE /* address.c */; settings = {COMPILER_FLAGS = "-DHAVE_CONFIG_H -I../chuck/core"; }; };
@@ -138,8 +137,6 @@
 		0492AD741F6B83A7005FE7CE /* chuck_type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chuck_type.h; path = ../chuck/src/core/chuck_type.h; sourceTree = SOURCE_ROOT; };
 		0492AD751F6B83A7005FE7CE /* chuck_ugen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chuck_ugen.cpp; path = ../chuck/src/core/chuck_ugen.cpp; sourceTree = SOURCE_ROOT; };
 		0492AD761F6B83A7005FE7CE /* chuck_ugen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chuck_ugen.h; path = ../chuck/src/core/chuck_ugen.h; sourceTree = SOURCE_ROOT; };
-		0492AD771F6B83A7005FE7CE /* chuck_utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chuck_utils.cpp; path = ../chuck/src/core/chuck_utils.cpp; sourceTree = SOURCE_ROOT; };
-		0492AD781F6B83A7005FE7CE /* chuck_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chuck_utils.h; path = ../chuck/src/core/chuck_utils.h; sourceTree = SOURCE_ROOT; };
 		0492AD791F6B83A7005FE7CE /* chuck_vm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chuck_vm.cpp; path = ../chuck/src/core/chuck_vm.cpp; sourceTree = SOURCE_ROOT; };
 		0492AD7A1F6B83A7005FE7CE /* chuck_vm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chuck_vm.h; path = ../chuck/src/core/chuck_vm.h; sourceTree = SOURCE_ROOT; };
 		0492AD7B1F6B83A7005FE7CE /* dirent_win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dirent_win32.h; path = ../chuck/src/core/dirent_win32.h; sourceTree = SOURCE_ROOT; };
@@ -313,8 +310,6 @@
 				0492AD741F6B83A7005FE7CE /* chuck_type.h */,
 				0492AD751F6B83A7005FE7CE /* chuck_ugen.cpp */,
 				0492AD761F6B83A7005FE7CE /* chuck_ugen.h */,
-				0492AD771F6B83A7005FE7CE /* chuck_utils.cpp */,
-				0492AD781F6B83A7005FE7CE /* chuck_utils.h */,
 				0492AD791F6B83A7005FE7CE /* chuck_vm.cpp */,
 				0492AD7A1F6B83A7005FE7CE /* chuck_vm.h */,
 				0492AD7B1F6B83A7005FE7CE /* dirent_win32.h */,
@@ -589,7 +584,6 @@
 				0492ADFA1F6B83A7005FE7CE /* chuck_vm.cpp in Sources */,
 				0492ADE91F6B83A7005FE7CE /* chuck_emit.cpp in Sources */,
 				0492ADF31F6B83A7005FE7CE /* chuck_shell.cpp in Sources */,
-				0492ADF91F6B83A7005FE7CE /* chuck_utils.cpp in Sources */,
 				0492AE261F6B83A8005FE7CE /* util_network.c in Sources */,
 				0492AE1F1F6B83A8005FE7CE /* ulib_opsc.cpp in Sources */,
 				0492AE241F6B83A8005FE7CE /* util_hid.cpp in Sources */,
