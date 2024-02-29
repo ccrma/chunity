@@ -225,7 +225,6 @@ copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClCompile Include="..\chuck\src\core\chuck_table.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_type.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_ugen.cpp" />
-    <ClCompile Include="..\chuck\src\core\chuck_utils.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_vm.cpp" />
     <ClCompile Include="..\chuck\src\core\chuck_yacc.c" />
     <ClCompile Include="..\chuck\src\core\hidio_sdl.cpp" />
@@ -343,7 +342,6 @@ copy /y "$(TargetPath)" ..\..\Assets\Plugins\x86_64\$(TargetName).dll
     <ClInclude Include="..\chuck\src\core\chuck_table.h" />
     <ClInclude Include="..\chuck\src\core\chuck_type.h" />
     <ClInclude Include="..\chuck\src\core\chuck_ugen.h" />
-    <ClInclude Include="..\chuck\src\core\chuck_utils.h" />
     <ClInclude Include="..\chuck\src\core\chuck_vm.h" />
     <ClInclude Include="..\chuck\src\core\chuck_yacc.h" />
     <ClInclude Include="..\chuck\src\core\dirent_win32.h" />
