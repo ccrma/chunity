@@ -10,7 +10,6 @@ chuck/src/core/chuck_errmsg.cpp \
 chuck/src/core/chuck_frame.cpp \
 chuck/src/core/chuck_symbol.cpp \
 chuck/src/core/chuck_table.cpp \
-chuck/src/core/chuck_utils.cpp \
 chuck/src/core/chuck_vm.cpp \
 chuck/src/core/chuck_instr.cpp \
 chuck/src/core/chuck_scan.cpp \
@@ -105,7 +104,7 @@ chuck/src/core/chuck.yy.c: chuck/src/core/chuck.lex
 
 $(OUTPUT): chuck/src/core/chuck.tab.c chuck/src/core/chuck.tab.h chuck/src/core/chuck.yy.c $(OBJS) $(COBJS) $(SF_COBJS) $(LO_COBJS)
 	$(CXX) $(LDFLAGS) -o $(OUTPUT) $(OBJS) $(COBJS) $(SF_COBJS) $(LO_COBJS) $(LDFLAGS2)
-	cp $(OUTPUT) ../Assets/Plugins/
+	cp $(OUTPUT) "../Chunity Boilerplate/Assets/Chunity/Plugins/Linux/"
 
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
