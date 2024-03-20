@@ -47,6 +47,7 @@ chuck/src/core/util_thread.cpp \
 chuck/src/core/util_opsc.cpp \
 chuck/src/core/util_serial.cpp \
 chuck/src/core/util_hid.cpp \
+chuck/src/core/util_platforms.cpp \
 chuck/src/core/uana_xform.cpp \
 chuck/src/core/uana_extract.cpp
 
