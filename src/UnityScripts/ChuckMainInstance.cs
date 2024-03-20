@@ -274,8 +274,14 @@ public class ChuckMainInstance : MonoBehaviour {
 
 	private void SetupMic()
 	{
+        //Check if there is a microphone device available
+        if (Microphone.devices.Length == 0)
+        {
+            return;
+        }
+        
 		// default device
-		myMicDevice = "";
+        myMicDevice = "";
 		// try to find one that matches identifier
 		if( microphoneIdentifier != "" )
 		{
