@@ -1048,6 +1048,13 @@ public class ChuckMainInstance : MonoBehaviour
 
     private void SetupMic()
     {
+        //Check if there is a microphone device available
+        if (Microphone.devices.Length == 0)
+        {
+            Debug.Log( "No microphone device available" );
+            return;
+        }
+
         // default device
         myMicDevice = "";
         #if UNITY_WEBGL
