@@ -234,8 +234,8 @@
 		860A36102A14746F00A9113D /* ulib_doc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ulib_doc.h; path = ../chuck/src/core/ulib_doc.h; sourceTree = SOURCE_ROOT; };
 		869C165A2980CA9600C838C6 /* ulib_ai.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ulib_ai.h; path = ../chuck/src/core/ulib_ai.h; sourceTree = "<group>"; };
 		869C165B2980CA9600C838C6 /* ulib_ai.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ulib_ai.cpp; path = ../chuck/src/core/ulib_ai.cpp; sourceTree = SOURCE_ROOT; };
-		86FF44FF2A6E271100B9D7D3 /* util_platforms.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util_platforms.cpp; path = ../../../../chuck/src/core/util_platforms.cpp; sourceTree = "<group>"; };
-		86FF45002A6E271100B9D7D3 /* util_platforms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util_platforms.h; path = ../../../../chuck/src/core/util_platforms.h; sourceTree = "<group>"; };
+		86FF44FF2A6E271100B9D7D3 /* util_platforms.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util_platforms.cpp; path = ../chuck/src/core/util_platforms.cpp; sourceTree = SOURCE_ROOT; };
+		86FF45002A6E271100B9D7D3 /* util_platforms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util_platforms.h; path = ../chuck/src/core/util_platforms.h; sourceTree = SOURCE_ROOT; };
 		8D576316048677EA00EA77CD /* AudioPluginChuck.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioPluginChuck.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D576317048677EA00EA77CD /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
