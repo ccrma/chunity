@@ -76,6 +76,8 @@ namespace ChucK_For_Unity {
     UNITY_INTERFACE_EXPORT bool getGlobalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(t_CKINT) );
     UNITY_INTERFACE_EXPORT bool getNamedGlobalAssociativeIntArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(const char *, t_CKINT) );
     UNITY_INTERFACE_EXPORT bool getGlobalAssociativeIntArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char * name, char * key, void (* callback)(t_CKINT, t_CKINT) );
+    UNITY_INTERFACE_EXPORT bool setGlobalIntArray_AT(unsigned int chuckID, const char* name, t_CKINT arrayValues[], unsigned int numValues);  // internal/audio-thread-friendly global array setter
+    UNITY_INTERFACE_EXPORT bool setGlobalIntArrayValue_AT(unsigned int chuckID, const char* name, unsigned int index, t_CKINT value);  // internal/audio-thread-friendly
     // TODO: set entire dict, add to dict in batch; get entire dict
     
     // float array methods
@@ -91,7 +93,8 @@ namespace ChucK_For_Unity {
     UNITY_INTERFACE_EXPORT bool getGlobalAssociativeFloatArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(t_CKFLOAT) );
     UNITY_INTERFACE_EXPORT bool getNamedGlobalAssociativeFloatArrayValue( unsigned int chuckID, const char * name, char * key, void (* callback)(const char *, t_CKFLOAT) );
     UNITY_INTERFACE_EXPORT bool getGlobalAssociativeFloatArrayValueWithID( unsigned int chuckID, t_CKINT callbackID, const char * name, char * key, void (* callback)(t_CKINT, t_CKFLOAT) );
-    
+    UNITY_INTERFACE_EXPORT bool setGlobalFloatArray_AT(unsigned int chuckID, const char* name, t_CKFLOAT arrayValues[], unsigned int numValues);  // internal/audio-thread-friendly global array setter
+    UNITY_INTERFACE_EXPORT bool setGlobalFloatArrayValue_AT(unsigned int chuckID, const char* name, unsigned int index, t_CKFLOAT value);  // internal/audio-thread-friendly
     
     UNITY_INTERFACE_EXPORT bool EMSCRIPTEN_KEEPALIVE initChuckInstance( unsigned int chuckID, unsigned int sampleRate );
     UNITY_INTERFACE_EXPORT bool clearChuckInstance( unsigned int chuckID );
