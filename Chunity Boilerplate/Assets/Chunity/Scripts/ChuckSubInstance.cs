@@ -728,6 +728,30 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: SetIntArray_AT
+    // desc: set the value of global int variableName[] (internal/audio-thread-friendly)
+    // ----------------------------------------------------
+    public bool SetIntArray_AT( string variableName, CK_INT[] values )
+    {
+        return chuckMainInstance.SetIntArray_AT( variableName, values );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: SetIntArrayValue_AT
+    // desc: set the value of global int variableName[index] (internal/audio-thread-friendly)
+    // ----------------------------------------------------
+    public bool SetIntArrayValue_AT( string variableName, uint index, CK_INT value )
+    {
+        return chuckMainInstance.SetIntArrayValue_AT( variableName, index, value );
+    }
+
+
+
+
+    // ----------------------------------------------------
     // name: CreateGetFloatArrayCallback
     // desc: create a callback for getting a float array
     // ----------------------------------------------------
@@ -902,6 +926,30 @@ public class ChuckSubInstance : MonoBehaviour
     public bool GetAssociativeFloatArrayValue( string variableName, string key, Chuck.FloatCallbackWithID callback, CK_INT callbackID )
     {
         return chuckMainInstance.GetAssociativeFloatArrayValue( variableName, key, callback, callbackID );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: SetFloatArray_AT
+    // desc: set the value of global float variableName[] (internal/audio-thread-friendly)
+    // ----------------------------------------------------
+    public bool SetFloatArray_AT( string variableName, CK_FLOAT[] values )
+    {
+        return chuckMainInstance.SetFloatArray_AT( variableName, values );
+    }
+
+
+
+
+    // ----------------------------------------------------
+    // name: SetFloatArrayValue_AT
+    // desc: set the value of global float variableName[index] (internal/audio-thread-friendly)
+    // ----------------------------------------------------
+    public bool SetFloatArrayValue_AT( string variableName, uint index, CK_FLOAT value )
+    {
+        return chuckMainInstance.SetFloatArrayValue_AT( variableName, index, value );
     }
 
 

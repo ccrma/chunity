@@ -1026,6 +1026,16 @@ public class Chuck
         return getGlobalAssociativeIntArrayValueWithID( chuckId, callbackID, variableName, key, callback );
     }
 
+    public bool SetIntArray_AT( System.UInt32 chuckId, string variableName, CK_INT[] values )
+    {
+        return setGlobalIntArray_AT( chuckId, variableName, values, (uint)values.Length );
+    }
+
+    public bool SetIntArrayValue_AT( System.UInt32 chuckId, string variableName, uint index, CK_INT value )
+    {
+        return setGlobalIntArrayValue_AT( chuckId, variableName, index, value );
+    }
+
     public static Chuck.FloatArrayCallback CreateGetFloatArrayCallback( Action<CK_FLOAT[], CK_UINT> callbackFunction )
     {
         return new FloatArrayCallback( callbackFunction );
@@ -1255,6 +1265,16 @@ public class Chuck
     public bool GetAssociativeFloatArrayValue( System.UInt32 chuckId, string variableName, string key, Chuck.FloatCallbackWithID callback, CK_INT callbackID )
     {
         return getGlobalAssociativeFloatArrayValueWithID( chuckId, callbackID, variableName, key, callback );
+    }
+
+    public bool SetFloatArray_AT( System.UInt32 chuckId, string variableName, CK_FLOAT[] values )
+    {
+        return setGlobalFloatArray_AT( chuckId, variableName, values, (uint)values.Length );
+    }
+
+    public bool SetFloatArrayValue_AT( System.UInt32 chuckId, string variableName, uint index, CK_FLOAT value )
+    {
+        return setGlobalFloatArrayValue_AT( chuckId, variableName, index, value );
     }
 
     public enum LogLevel
@@ -1619,6 +1639,12 @@ public class Chuck
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalAssociativeIntArrayValueWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, System.String key, IntCallbackWithID callback );
 
+    [DllImport(PLUGIN_NAME)]
+    private static extern bool setGlobalIntArray_AT( System.UInt32 chuckID, System.String name, CK_INT[] arrayValues, System.UInt32 numValues );
+
+    [DllImport(PLUGIN_NAME)]
+    private static extern bool setGlobalIntArrayValue_AT( System.UInt32 chuckID, System.String name, System.UInt32 index, CK_INT value );
+
     [DllImport( PLUGIN_NAME )]
     private static extern bool setGlobalFloatArray( System.UInt32 chuckID, System.String name, CK_FLOAT[] arrayValues, System.UInt32 numValues );
 
@@ -1654,6 +1680,12 @@ public class Chuck
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool getGlobalAssociativeFloatArrayValueWithID( System.UInt32 chuckID, CK_INT callbackID, System.String name, System.String key, FloatCallbackWithID callback );
+
+    [DllImport(PLUGIN_NAME)]
+    private static extern bool setGlobalFloatArray_AT( System.UInt32 chuckID, System.String name, CK_FLOAT[] arrayValues, System.UInt32 numValues );
+
+    [DllImport(PLUGIN_NAME)]
+    private static extern bool setGlobalFloatArrayValue_AT( System.UInt32 chuckID, System.String name, System.UInt32 index, CK_FLOAT value );
 
     [DllImport( PLUGIN_NAME )]
     private static extern bool setChoutCallback( System.UInt32 chuckID, MyLogCallback callback );
