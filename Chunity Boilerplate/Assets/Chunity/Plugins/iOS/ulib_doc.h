@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------
-  ChucK Concurrent, On-the-fly Audio Programming Language
+  ChucK Strongly-timed Audio Programming Language
     Compiler and Virtual Machine
 
-  Copyright (c) 2004 Ge Wang and Perry R. Cook.  All rights reserved.
+  Copyright (c) 2003 Ge Wang and Perry R. Cook. All rights reserved.
     http://chuck.stanford.edu/
     http://chuck.cs.princeton.edu/
 
@@ -107,6 +107,7 @@ public:
     // class functions
     virtual void begin_static_member_funcs() = 0;
     virtual void end_static_member_funcs() = 0;
+    virtual void begin_ctors() = 0;
     virtual void begin_member_funcs() = 0;
     virtual void end_member_funcs() = 0;
 
@@ -119,6 +120,8 @@ public:
     virtual void end_static_member_func() = 0;
     virtual void begin_member_func(Chuck_Func * func) = 0;
     virtual void end_member_func() = 0;
+    virtual void begin_ctor( Chuck_Func * func ) = 0;
+    virtual void end_ctor() = 0;
 
     // func arguments
     virtual void func_arg( a_Arg_List arg ) = 0;
@@ -151,11 +154,16 @@ public:
     void clearGroups();
     // clear output generator
     void clearOutput();
-    // add a group of types to document
+    // add a group of types to document (Type A)
     t_CKBOOL addGroup( const std::vector<Chuck_Type *> & types,
                        const std::string & name,
                        const std::string & shortName,
-                       const std::string & description );
+                        const std::string & description );
+    // add an external group of types to document (Type B) | 1.5.2.4 (ge) added
+    t_CKBOOL addGroupExt( const std::string & name,
+                          const std::string & URL,
+                          const std::string & description,
+                          const std::string & longDesc );
     // get number of groups
     t_CKINT numGroups() const;
     // set output format: CKDoc.HTML, CKDoc.TEXT, CKDoc.MARKDOWN, CKDoc.JSON

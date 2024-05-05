@@ -601,6 +601,32 @@ namespace ChucK_For_Unity
     }
 
 
+    // internal/audio-thread-friendly global array setter
+    UNITY_INTERFACE_EXPORT bool setGlobalIntArray_AT(unsigned int chuckID,
+        const char* name, t_CKINT arrayValues[], unsigned int numValues)
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+        Chuck_Globals_Manager* gm = chuck_instances[chuckID]->globals();
+        if (gm == NULL) { return false; }
+
+        return gm->set_global_int_array(
+            name, arrayValues, numValues);
+    }
+
+
+    // internal/audio-thread-friendly
+    UNITY_INTERFACE_EXPORT bool setGlobalIntArrayValue_AT(unsigned int chuckID,
+        const char* name, unsigned int index, t_CKINT value)
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+        Chuck_Globals_Manager* gm = chuck_instances[chuckID]->globals();
+        if (gm == NULL) { return false; }
+
+        return gm->set_global_float_array_value(
+            name, index, value);
+    }
+
+
 
     // float array methods
     UNITY_INTERFACE_EXPORT bool setGlobalFloatArray( unsigned int chuckID,
@@ -754,6 +780,32 @@ namespace ChucK_For_Unity
 
         return gm->getGlobalAssociativeFloatArrayValue(
             name, callbackID, key, callback );
+    }
+
+
+    // internal/audio-thread-friendly global array setter
+    UNITY_INTERFACE_EXPORT bool setGlobalFloatArray_AT(unsigned int chuckID,
+        const char* name, t_CKFLOAT arrayValues[], unsigned int numValues)
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+        Chuck_Globals_Manager* gm = chuck_instances[chuckID]->globals();
+        if (gm == NULL) { return false; }
+
+        return gm->set_global_float_array(
+            name, arrayValues, numValues);
+    }
+
+
+
+    UNITY_INTERFACE_EXPORT bool setGlobalFloatArrayValue_AT(unsigned int chuckID,
+        const char* name, unsigned int index, t_CKFLOAT value)
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+        Chuck_Globals_Manager* gm = chuck_instances[chuckID]->globals();
+        if (gm == NULL) { return false; }
+
+        return gm->set_global_float_array_value(
+            name, index, value);
     }
 
 

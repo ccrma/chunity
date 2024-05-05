@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------
-  ChucK Concurrent, On-the-fly Audio Programming Language
+  ChucK Strongly-timed Audio Programming Language
     Compiler and Virtual Machine
 
-  Copyright (c) 2004 Ge Wang and Perry R. Cook.  All rights reserved.
+  Copyright (c) 2003 Ge Wang and Perry R. Cook. All rights reserved.
     http://chuck.stanford.edu/
     http://chuck.cs.princeton.edu/
 
@@ -135,6 +135,11 @@ protected:
     UINT__   m_read_offset;
     UINT__   m_write_offset;
     UINT__   m_max_elem;
+
+#ifndef __DISABLE_THREADS__
+    // added | 1.5.1.5 (ge & andrew) twilight zone
+    XMutex m_mutex;
+#endif
 };
 
 

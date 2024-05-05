@@ -1,25 +1,25 @@
 /*----------------------------------------------------------------------------
- ChucK Concurrent, On-the-fly Audio Programming Language
-   Compiler and Virtual Machine
+  ChucK Strongly-timed Audio Programming Language
+    Compiler and Virtual Machine
 
- Copyright (c) 2003 Ge Wang and Perry R. Cook.  All rights reserved.
-   http://chuck.stanford.edu/
-   http://chuck.cs.princeton.edu/
+  Copyright (c) 2003 Ge Wang and Perry R. Cook. All rights reserved.
+    http://chuck.stanford.edu/
+    http://chuck.cs.princeton.edu/
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- U.S.A.
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+  U.S.A.
  -----------------------------------------------------------------------------*/
 
 //-----------------------------------------------------------------------------
@@ -81,6 +81,7 @@
 #define CHUCK_PARAM_VM_HALT_DEFAULT                "0"
 #define CHUCK_PARAM_OTF_ENABLE_DEFAULT             "0"
 #define CHUCK_PARAM_OTF_PORT_DEFAULT               "8888"
+#define CHUCK_PARAM_OTF_PRINT_WARNINGS_DEFAULT     "0"
 #define CHUCK_PARAM_DUMP_INSTRUCTIONS_DEFAULT      "0"
 #define CHUCK_PARAM_AUTO_DEPEND_DEFAULT            "0"
 #define CHUCK_PARAM_DEPRECATE_LEVEL_DEFAULT        "1"
@@ -197,6 +198,7 @@ void ChucK::initDefaultParams()
     initParam( CHUCK_PARAM_VM_HALT, CHUCK_PARAM_VM_HALT_DEFAULT, ck_param_int );
     initParam( CHUCK_PARAM_OTF_ENABLE, CHUCK_PARAM_OTF_ENABLE_DEFAULT, ck_param_int );
     initParam( CHUCK_PARAM_OTF_PORT, CHUCK_PARAM_OTF_PORT_DEFAULT, ck_param_int );
+    initParam( CHUCK_PARAM_OTF_PRINT_WARNINGS, CHUCK_PARAM_OTF_PRINT_WARNINGS_DEFAULT, ck_param_int );
     initParam( CHUCK_PARAM_DUMP_INSTRUCTIONS, CHUCK_PARAM_DUMP_INSTRUCTIONS_DEFAULT, ck_param_int );
     initParam( CHUCK_PARAM_AUTO_DEPEND, CHUCK_PARAM_AUTO_DEPEND_DEFAULT, ck_param_int );
     initParam( CHUCK_PARAM_DEPRECATE_LEVEL, CHUCK_PARAM_DEPRECATE_LEVEL_DEFAULT, ck_param_int );
@@ -302,7 +304,7 @@ t_CKBOOL ChucK::setParam( const std::string & name, t_CKINT value )
         // enact processing, as needed
         enactParam( key, value );
         // insert into map
-        m_params[key] = itoa(value);
+        m_params[key] = ck_itoa(value);
         return TRUE;
     }
     else
@@ -328,7 +330,7 @@ t_CKBOOL ChucK::setParamFloat( const std::string & name, t_CKFLOAT value )
     if( m_params.count( key ) > 0 && m_param_types[key] == ck_param_float )
     {
         // insert into map
-        m_params[key] = ftoa( value, 32 );
+        m_params[key] = ck_ftoa( value, 32 );
         return TRUE;
     }
     else
@@ -533,6 +535,8 @@ t_CKBOOL ChucK::initVM()
 
     // instantiate VM
     m_carrier->vm = new Chuck_VM();
+    // add reference (this will be released on shutdown)
+    CK_SAFE_ADD_REF( m_carrier->vm );
     // reference back to carrier
     m_carrier->vm->setCarrier( m_carrier );
     // initialize VM
@@ -610,7 +614,7 @@ t_CKBOOL ChucK::initCompiler()
     if( (cstr_cwd = getcwd(NULL, 0)) == NULL )
     {
         // uh...
-        EM_log( CK_LOG_SEVERE, "error: unable to determine current working directory!" );
+        EM_log( CK_LOG_HERALD, "error: unable to determine current working directory!" );
     }
     else
     {
@@ -675,7 +679,6 @@ t_CKBOOL ChucK::initCompiler()
         EM_poplog();
     }
 
-
     return true;
 }
 
@@ -710,29 +713,37 @@ t_CKBOOL ChucK::initChugins()
 
         EM_pushlog();
         // print host version
-        EM_log( CK_LOG_SEVERE, TC::green("host version: %d.%d", true).c_str(), CK_DLL_VERSION_MAJOR, CK_DLL_VERSION_MINOR );
+        EM_log( CK_LOG_HERALD, TC::green("host API version: %d.%d", true).c_str(), CK_DLL_VERSION_MAJOR, CK_DLL_VERSION_MINOR );
         EM_poplog();
 
         //---------------------------------------------------------------------
         // set origin hint | 1.5.0.0 (ge) added
-        m_carrier->compiler->m_originHint = te_originChugin;
+        m_carrier->compiler->m_originHint = ckte_origin_CHUGIN;
         //---------------------------------------------------------------------
         // log
         EM_log( CK_LOG_SYSTEM, "loading chugins..." );
         // push indent level
         // EM_pushlog();
+
+        // chugin extension
+        std::string extension = ".chug";
+#ifdef __EMSCRIPTEN__
+        // webchugins have extension ".chug.wasm" | 1.5.2.0 (terryzfeng) added
+        extension = "chug.wasm";
+#endif
         // load external libs | 1.5.0.4 (ge) enabled recursive search
-        if( !compiler()->load_external_modules( ".chug", dl_search_path, named_dls, TRUE ) )
+        if( !compiler()->load_external_modules( extension.c_str(), dl_search_path, named_dls, TRUE ) )
         {
             // clean up
             goto error;
         }
+
         // pop log
         // EM_poplog();
 
         //---------------------------------------------------------------------
         // set origin hint | 1.5.0.0 (ge) added
-        m_carrier->compiler->m_originHint = te_originImport;
+        m_carrier->compiler->m_originHint = ckte_origin_IMPORT;
         //---------------------------------------------------------------------
         // log
         EM_log( CK_LOG_SYSTEM, "loading chuck extensions..." );
@@ -747,7 +758,7 @@ t_CKBOOL ChucK::initChugins()
             std::string filename = *j;
 
             // log
-            EM_log( CK_LOG_SEVERE, "preloading '%s'...", filename.c_str() );
+            EM_log( CK_LOG_HERALD, "preloading '%s'...", filename.c_str() );
             // push indent
             EM_pushlog();
 
@@ -757,16 +768,20 @@ t_CKBOOL ChucK::initChugins()
             // parse, type-check, and emit
             if( compiler()->go( filename, full_path ) )
             {
-                // TODO: how to compilation handle?
-                //return 1;
-
+                // preserve op overloads | 1.5.1.5
+                compiler()->env()->op_registry.preserve();
                 // get the code
                 code = compiler()->output();
-                // name it - TODO?
-                // code->name = string(argv[i]);
+                // name it | 1.5.2.0 (ge)
+                code->name = std::string("pre-load ck file: ") + filename;
 
                 // spork it
                 shred = vm()->spork( code, NULL, TRUE );
+            }
+            else // did not compile
+            {
+                // undo any op overloads | 1.5.1.5
+                compiler()->env()->op_registry.reset2local();
             }
 
             // pop indent
@@ -791,14 +806,14 @@ t_CKBOOL ChucK::initChugins()
     m_carrier->env->load_user_namespace();
 
     // unset origin hint | 1.5.0.0 (ge) added
-    m_carrier->compiler->m_originHint = te_originUnknown;
+    m_carrier->compiler->m_originHint = ckte_origin_UNKNOWN;
 
     return true;
 
 error: // 1.4.1.0 (ge) added
 
     // unset origin hint | 1.5.0.0 (ge) added
-    m_carrier->compiler->m_originHint = te_originUnknown;
+    m_carrier->compiler->m_originHint = ckte_origin_UNKNOWN;
 
     return false;
 }
@@ -814,16 +829,20 @@ void ChucK::probeChugins()
 {
     // ck files to pre load
     std::list<std::string> ck_libs_to_preload;
+    // host verison
+    std::ostringstream ostr; ostr << CK_DLL_VERSION_MAJOR << "." << CK_DLL_VERSION_MINOR;
 
     // print whether chugins enabled
     EM_log( CK_LOG_SYSTEM, "chugin system: %s", getParamInt( CHUCK_PARAM_CHUGIN_ENABLE ) ? "ON" : "OFF" );
     // print host version
-    EM_log( CK_LOG_SYSTEM, TC::green("host version: %d.%d", true).c_str(), CK_DLL_VERSION_MAJOR, CK_DLL_VERSION_MINOR );
+    EM_log( CK_LOG_SYSTEM, "chugin host API version: %s", TC::green(ostr.str(),true).c_str() );
     // push
     EM_pushlog();
-    // print host version
+    // print version compatibility information
     EM_log( CK_LOG_SYSTEM, "chugin major version must == host major version" );
-    EM_log( CK_LOG_SYSTEM, "chugin minor version must <= host major version" );
+    EM_log( CK_LOG_SYSTEM, "chugin minor version must <= host minor version" );
+    // print chuck language version
+    EM_log( CK_LOG_SYSTEM, "language version: %s", TC::green(CHUCK_VERSION_STRING,true).c_str() );
     // pop
     EM_poplog();
 
@@ -843,8 +862,16 @@ void ChucK::probeChugins()
     EM_log( CK_LOG_SYSTEM, "probing chugins (.chug)..." );
     // push indent level
     // EM_pushlog();
+
+    // chugin extension
+    std::string extension = ".chug";
+#ifdef __EMSCRIPTEN__
+    // webchugins have extension ".chug.wasm" | 1.5.2.0 (terryzfeng) added
+    extension = "chug.wasm";
+#endif
+
     // load external libs
-    if( !Chuck_Compiler::probe_external_modules( ".chug", dl_search_path, named_dls, TRUE, ck_libs_to_preload ) )
+    if( !Chuck_Compiler::probe_external_modules( extension.c_str(), dl_search_path, named_dls, TRUE, ck_libs_to_preload ) )
     {
         // warning
         EM_log( CK_LOG_SYSTEM, "error probing chugins..." );
@@ -887,10 +914,11 @@ t_CKBOOL ChucK::initOTF()
     // server
     if( getParamInt( CHUCK_PARAM_OTF_ENABLE ) != 0 )
     {
+        // get the port
         m_carrier->otf_port = getParamInt( CHUCK_PARAM_OTF_PORT );
         // log
-        EM_log( CK_LOG_SYSTEM, "starting listener on port: %d...",
-               m_carrier->otf_port );
+        EM_log( CK_LOG_SYSTEM, "starting OTF command listener on port: %d...",
+                m_carrier->otf_port );
 
         // start tcp server
         m_carrier->otf_socket = ck_tcp_create( 1 );
@@ -898,17 +926,48 @@ t_CKBOOL ChucK::initOTF()
             !ck_bind( m_carrier->otf_socket, (int)m_carrier->otf_port ) ||
             !ck_listen( m_carrier->otf_socket, 10 ) )
         {
-            EM_error2( 0, "cannot bind to tcp port %li...", m_carrier->otf_port );
+            // get how to handle the warning | 1.5.1.2
+            t_CKINT printInsteadOfLog = getParamInt( CHUCK_PARAM_OTF_PRINT_WARNINGS )
+                                        && getLogLevel() < CK_LOG_SYSTEM;
+            // check
+            if( printInsteadOfLog )
+            {
+                // old school print warning
+                EM_error2( 0, "cannot bind to TCP port %li...", m_carrier->otf_port );
+                // provide more information
+                EM_error2( 0, " |- (cause: another chuck VM may currently have port %li open)", m_carrier->otf_port );
+                EM_error2( 0, " |- (implication: this VM cannot receive OTF commands)" );
+            }
+            else
+            {
+                // push log
+                EM_pushlog();
+
+                // new school log warning, as the warning can be confusing / cause automation issues | 1.5.1.2
+                // FYI see: https://github.com/ccrma/chuck/issues/352 (thanks @barak)
+                EM_log( CK_LOG_SYSTEM, TC::orange("cannot bind to TCP port %li...", true).c_str(), m_carrier->otf_port );
+                // log more information
+                EM_log( CK_LOG_INFO, "possible cause: network device unavailable..." );
+                EM_log( CK_LOG_INFO, "or another program currently has port %li open...", m_carrier->otf_port );
+                EM_pushlog();
+                EM_log( CK_LOG_INFO, "(e.g., another chuck VM)" );
+                EM_poplog();
+                EM_log( CK_LOG_INFO, "implication: this VM cannot receive OTF commands" );
+
+                // pop log
+                EM_poplog();
+            }
+
             ck_close( m_carrier->otf_socket );
             m_carrier->otf_socket = NULL;
         }
         else
         {
 #if !defined(__PLATFORM_WINDOWS__) || defined(__WINDOWS_PTHREAD__)
-            pthread_create( &m_carrier->otf_thread, NULL, otf_cb, m_carrier );
+            pthread_create( &m_carrier->otf_thread, NULL, otf_recv_cb, m_carrier );
 #else
             m_carrier->otf_thread = CreateThread( NULL, 0,
-                                                  (LPTHREAD_START_ROUTINE)otf_cb,
+                                                  (LPTHREAD_START_ROUTINE)otf_recv_cb,
                                                   m_carrier, 0, 0 );
 #endif
         }
@@ -916,7 +975,7 @@ t_CKBOOL ChucK::initOTF()
     else
     {
         // log
-        EM_log( CK_LOG_SYSTEM, "OTF server/listener: OFF" );
+        EM_log( CK_LOG_SYSTEM, "OTF command listener: OFF" );
     }
 #endif
     return true;
@@ -997,10 +1056,14 @@ t_CKBOOL ChucK::shutdown()
     // ensure we have a carrier
     if( m_carrier != NULL )
     {
-        // clean up vm, compiler
-        CK_SAFE_DELETE( m_carrier->vm );
+        // initiate VM shutdown but don't delete VM yet
+        if( m_carrier->vm ) m_carrier->vm->shutdown();
+        // delete compiler, including type system (m_carrier->env)
         CK_SAFE_DELETE( m_carrier->compiler );
-        m_carrier->env = NULL;
+        // verify the env pointer is NULL
+        assert( m_carrier->env == NULL );
+        // release VM (itself an Object)
+        CK_SAFE_RELEASE( m_carrier->vm );
     }
 
     // clear flag
@@ -1059,7 +1122,7 @@ t_CKBOOL ChucK::compileFile( const std::string & path,
 
     //-------------------------------------------------------------------------
     // set origin hint | 1.5.0.0 (ge) added
-    m_carrier->compiler->m_originHint = te_originUserDefined;
+    m_carrier->compiler->m_originHint = ckte_origin_USERDEFINED;
     //-------------------------------------------------------------------------
 
     // log
@@ -1138,7 +1201,7 @@ t_CKBOOL ChucK::compileFile( const std::string & path,
     // pop indent
     EM_poplog();
     // unset origin hint | 1.5.0.0 (ge) added
-    m_carrier->compiler->m_originHint = te_originUnknown;
+    m_carrier->compiler->m_originHint = ckte_origin_UNKNOWN;
 
     return TRUE;
 
@@ -1147,7 +1210,7 @@ error: // 1.5.0.0 (ge) added
     // pop indent
     EM_poplog();
     // unset origin hint | 1.5.0.0 (ge) added
-    m_carrier->compiler->m_originHint = te_originUnknown;
+    m_carrier->compiler->m_originHint = ckte_origin_UNKNOWN;
 
     return FALSE;
 }
@@ -1191,7 +1254,7 @@ t_CKBOOL ChucK::compileCode( const std::string & code,
 
     //-------------------------------------------------------------------------
     // set origin hint | 1.5.0.0 (ge) added
-    m_carrier->compiler->m_originHint = te_originUserDefined;
+    m_carrier->compiler->m_originHint = ckte_origin_USERDEFINED;
     //-------------------------------------------------------------------------
 
     // log
@@ -1252,7 +1315,7 @@ t_CKBOOL ChucK::compileCode( const std::string & code,
     // pop indent
     EM_poplog();
     // unset origin hint | 1.5.0.0 (ge) added
-    m_carrier->compiler->m_originHint = te_originUnknown;
+    m_carrier->compiler->m_originHint = ckte_origin_UNKNOWN;
 
     return TRUE;
 
@@ -1261,7 +1324,7 @@ error: // 1.5.0.0 (ge) added
     // pop indent
     EM_poplog();
     // unset origin hint | 1.5.0.0 (ge) added
-    m_carrier->compiler->m_originHint = te_originUnknown;
+    m_carrier->compiler->m_originHint = ckte_origin_UNKNOWN;
 
     return FALSE;
 }
@@ -1437,7 +1500,7 @@ void ChucK::globalCleanup()
 
     #ifndef __ALTER_HID__
     // shutdown HID
-    HidInManager::cleanup();
+    HidInManager::cleanup( 100 );
     #endif // __ALTER_HID__
 
     #ifndef __DISABLE_SERIAL__

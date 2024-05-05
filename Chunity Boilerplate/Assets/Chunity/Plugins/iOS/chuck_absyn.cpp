@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------
-  ChucK Concurrent, On-the-fly Audio Programming Language
+  ChucK Strongly-timed Audio Programming Language
     Compiler and Virtual Machine
 
-  Copyright (c) 2004 Ge Wang and Perry R. Cook.  All rights reserved.
+  Copyright (c) 2003 Ge Wang and Perry R. Cook. All rights reserved.
     http://chuck.stanford.edu/
     http://chuck.cs.princeton.edu/
 
@@ -30,10 +30,10 @@
 // date: Autumn 2002
 //-----------------------------------------------------------------------------
 #include "chuck_absyn.h"
-#include "chuck_utils.h"
 #include "chuck_errmsg.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string> // 1.5.1.5 for string concat
 
 
 // 1.5.0.5 (ge) option to include in case we need something from flex/bison
@@ -393,13 +393,16 @@ a_Exp new_exp_from_unary( ae_Operator oper, a_Exp exp, uint32_t lineNum, uint32_
 }
 
 a_Exp new_exp_from_unary2( ae_Operator oper, a_Type_Decl type,
-                           a_Array_Sub array, uint32_t lineNum, uint32_t posNum )
+                           int ctor_invoked, a_Exp ctor_args, a_Array_Sub array,
+                           uint32_t lineNum, uint32_t posNum )
 {
     a_Exp a = (a_Exp)checked_malloc( sizeof( struct a_Exp_ ) );
     a->s_type = ae_exp_unary;
     a->s_meta = ae_meta_value;
     a->unary.op = oper;
     a->unary.type = type;
+    a->unary.ctor.invoked = ctor_invoked;
+    a->unary.ctor.args = ctor_args;
     a->unary.array = array;
     a->line = lineNum; a->where = posNum;
     a->unary.line = lineNum; a->unary.where = posNum;
@@ -520,7 +523,7 @@ a_Exp new_exp_from_id( c_str xid, uint32_t lineNum, uint32_t posNum )
     return a;
 }
 
-a_Exp new_exp_from_int( long num, uint32_t lineNum, uint32_t posNum )
+a_Exp new_exp_from_int( t_CKINT num, uint32_t lineNum, uint32_t posNum )
 {
     a_Exp a = (a_Exp)checked_malloc( sizeof( struct a_Exp_ ) );
     a->s_type = ae_exp_primary;
@@ -534,7 +537,7 @@ a_Exp new_exp_from_int( long num, uint32_t lineNum, uint32_t posNum )
     return a;
 }
 
-a_Exp new_exp_from_float( double num, uint32_t lineNum, uint32_t posNum )
+a_Exp new_exp_from_float( t_CKFLOAT num, uint32_t lineNum, uint32_t posNum )
 {
     a_Exp a = (a_Exp)checked_malloc( sizeof( struct a_Exp_ ) );
     a->s_type = ae_exp_primary;
@@ -583,10 +586,10 @@ a_Exp new_exp_from_array_lit( a_Array_Sub exp_list, uint32_t lineNum, uint32_t p
     a->s_meta = ae_meta_value;
     a->primary.s_type = ae_primary_array;
     a->primary.array = exp_list;
+    a->primary.array->self = a; // 1.5.2.0 (ge & nshaheed) added
     a->line = lineNum; a->where = posNum;
     a->primary.line = lineNum; a->primary.where = posNum;
     a->primary.self = a;
-
     return a;
 }
 
@@ -606,24 +609,24 @@ a_Exp new_exp_from_if( a_Exp cond, a_Exp if_exp, a_Exp else_exp, uint32_t lineNu
     return a;
 }
 
-a_Exp new_exp_decl_external( a_Type_Decl type, a_Var_Decl_List var_decl_list, int is_static, uint32_t lineNum, uint32_t posNum )
+a_Exp new_exp_decl_external( a_Type_Decl type, a_Var_Decl_List var_decl_list, int is_static, int is_const, uint32_t lineNum, uint32_t posNum )
 {
-    a_Exp a = new_exp_decl( type, var_decl_list, is_static, lineNum, posNum );
+    a_Exp a = new_exp_decl( type, var_decl_list, is_static, is_const, lineNum, posNum );
     a->decl.is_global = 1;
     EM_error2( posNum, "'external' keyword is deprecated. please use 'global'" );
 
     return a;
 }
 
-a_Exp new_exp_decl_global( a_Type_Decl type, a_Var_Decl_List var_decl_list, int is_static, uint32_t lineNum, uint32_t posNum )
+a_Exp new_exp_decl_global( a_Type_Decl type, a_Var_Decl_List var_decl_list, int is_static, int is_const, uint32_t lineNum, uint32_t posNum )
 {
-    a_Exp a = new_exp_decl( type, var_decl_list, is_static, lineNum, posNum );
+    a_Exp a = new_exp_decl( type, var_decl_list, is_static, is_const, lineNum, posNum );
     a->decl.is_global = 1;
 
     return a;
 }
 
-a_Exp new_exp_decl( a_Type_Decl type, a_Var_Decl_List var_decl_list, int is_static, uint32_t lineNum, uint32_t posNum )
+a_Exp new_exp_decl( a_Type_Decl type, a_Var_Decl_List var_decl_list, int is_static, int is_const, uint32_t lineNum, uint32_t posNum )
 {
     a_Exp a = (a_Exp)checked_malloc( sizeof( struct a_Exp_ ) );
     a->s_type = ae_exp_decl;
@@ -632,6 +635,7 @@ a_Exp new_exp_decl( a_Type_Decl type, a_Var_Decl_List var_decl_list, int is_stat
     a->decl.var_decl_list = var_decl_list;
     a->line = lineNum; a->where = posNum;
     a->decl.is_static = is_static;
+    a->decl.is_const = is_const; // 1.5.1.3
     a->decl.line = lineNum; a->decl.where = posNum;
     a->decl.self = a;
 
@@ -710,10 +714,12 @@ a_Exp new_exp_from_nil( uint32_t lineNum, uint32_t posNum )
     return a;
 }
 
-a_Var_Decl new_var_decl( c_constr xid, a_Array_Sub array, uint32_t lineNum, uint32_t posNum )
+a_Var_Decl new_var_decl( c_constr xid, int ctor_invoked, a_Exp ctor_args, a_Array_Sub array, uint32_t lineNum, uint32_t posNum )
 {
     a_Var_Decl a = (a_Var_Decl)checked_malloc( sizeof( struct a_Var_Decl_ ) );
     a->xid = insert_symbol(xid);
+    a->ctor.invoked = ctor_invoked;
+    a->ctor.args = ctor_args;
     a->array = array;
     a->line = lineNum; a->where = posNum;
 
@@ -788,13 +794,40 @@ a_Func_Def new_func_def( ae_Keyword func_decl, ae_Keyword static_decl,
         sizeof( struct a_Func_Def_ ) );
     a->func_decl = func_decl;
     a->static_decl = static_decl;
-    a->type_decl = type_decl;
+    // substitute if NULL | 1.5.2.0 (ge) for constructors
+    a->type_decl = type_decl ? type_decl : new_type_decl(new_id_list("void",0,0),0,0,0);
     a->name = insert_symbol( name );
     a->arg_list = arg_list;
     a->s_type = ae_func_user;
     a->code = code;
     a->ast_owned = is_from_ast != 0; // 1.5.0.5 (ge) added
     a->line = lineNum; a->where = posNum;
+
+    return a;
+}
+
+// @operator overload | 1.5.1.5
+a_Func_Def new_op_overload( ae_Keyword func_decl, ae_Keyword static_decl,
+                            a_Type_Decl type_decl, ae_Operator oper,
+                            a_Arg_List arg_list, a_Stmt code,
+                            uint32_t is_from_ast, uint32_t overload_post,
+                            uint32_t lineNum, uint32_t posNum, uint32_t operPos )
+{
+    a_Func_Def a = (a_Func_Def)checked_malloc(
+        sizeof( struct a_Func_Def_ ) );
+    a->func_decl = func_decl;
+    a->static_decl = static_decl;
+    a->type_decl = type_decl;
+    // construct op overload function name
+    std::string s( "@operator" ); s += op2str(oper);
+    a->name = insert_symbol( s.c_str() );
+    a->op2overload = oper;
+    a->arg_list = arg_list;
+    a->s_type = ae_func_user;
+    a->code = code;
+    a->ast_owned = is_from_ast != 0; // 1.5.0.5 (ge) added
+    a->overload_post = overload_post; // 1.5.1.5 (ge) added
+    a->line = lineNum; a->where = posNum; a->operWhere = operPos;
 
     return a;
 }
@@ -977,7 +1010,11 @@ a_Vec new_vec( a_Exp e, uint32_t lineNum, uint32_t posNum ) // ge: added 1.3.5.3
 }
 
 
+
+
+// operator strings
 static const char * op_str[] = {
+  "[no_op]",
   "+",
   "-",
   "*",
@@ -1013,26 +1050,76 @@ static const char * op_str[] = {
   "!",
   "@=>",
   "=<",
-  "^=>",
+  "=^",
+  "=v",
+  "=",
+  "$",
+  "@@",
+  "::",
   "spork ~",
   "typeof",
   "sizeof",
   "new",
   "<-",
-  "->"
+  "->",
+  "<--",
+  "-->",
+  ">--",
+  "--<"
 };
-
 //-----------------------------------------------------------------------------
 // name: op2str()
-// desc: chuck operator to string
+// desc: operator enumeration to string
 //-----------------------------------------------------------------------------
 const char * op2str( ae_Operator op )
 {
     t_CKINT index = (t_CKINT)op;
-    if( index < 0 || index >= (t_CKINT)(sizeof( op_str )/sizeof( char * )) )
+    if( index < 0 || index >= ae_op_count )
         return "[non-existent operator]";
 
     return op_str[index];
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: str2op()
+// desc: string to operator enumeration
+//-----------------------------------------------------------------------------
+ae_Operator str2op( const char * str )
+{
+    std::string s(str);
+    for( t_CKUINT i = 1; i < ae_op_count; i++ )
+        if( s == op_str[i] ) return (ae_Operator)i;
+
+    return ae_op_none;
+}
+
+
+
+
+// function pointer kind names | 1.5.2.0
+static const char * fpkind_str[] = {
+    "[unknown]",
+    "ctor",
+    "dtor",
+    "mfun",
+    "sfun",
+    "gfun",
+    "addr"
+};
+//-----------------------------------------------------------------------------
+// name: fpkind2str() | 1.5.2.0
+// desc: convert fp kind by enum to str
+//-----------------------------------------------------------------------------
+const char * fpkind2str( ae_FuncPointerKind kind )
+{
+    t_CKINT index = (t_CKINT)kind;
+    if( index < 0 || index >= ae_fp_count )
+        return "[non-existent func kind]";
+
+    return fpkind_str[index];
 }
 
 

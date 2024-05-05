@@ -9,9 +9,6 @@ chuck/src/core/lo/blob.c
 chuck/src/core/lo/bundle.c
 chuck/src/core/chuck.cpp
 chuck/src/core/chuck.h
-chuck/src/core/chuck.tab.c
-chuck/src/core/chuck.tab.h
-chuck/src/core/chuck.yy.c
 chuck/src/core/chuck_absyn.cpp
 chuck/src/core/chuck_absyn.h
 chuck/src/core/chuck_carrier.cpp
@@ -54,10 +51,10 @@ chuck/src/core/chuck_type.cpp
 chuck/src/core/chuck_type.h
 chuck/src/core/chuck_ugen.cpp
 chuck/src/core/chuck_ugen.h
-chuck/src/core/chuck_utils.cpp
-chuck/src/core/chuck_utils.h
 chuck/src/core/chuck_vm.cpp
 chuck/src/core/chuck_vm.h
+chuck/src/core/chuck_yacc.c
+chuck/src/core/chuck_yacc.h
 chuck/src/core/lo/config.h
 chuck/src/core/hidio_sdl.cpp
 chuck/src/core/hidio_sdl.h
@@ -77,6 +74,7 @@ chuck/src/core/lo/pattern_match.c
 chuck/src/core/lo/send.c
 chuck/src/core/lo/server.c
 chuck/src/core/lo/server_thread.c
+chuck/src/core/lo/timetag.c
 chuck/src/core/uana_extract.cpp
 chuck/src/core/uana_extract.h
 chuck/src/core/uana_xform.cpp
@@ -113,6 +111,8 @@ chuck/src/core/util_network.c
 chuck/src/core/util_network.h
 chuck/src/core/util_opsc.cpp
 chuck/src/core/util_opsc.h
+chuck/src/core/util_platforms.cpp
+chuck/src/core/util_platforms.h
 chuck/src/core/util_raw.c
 chuck/src/core/util_raw.h
 chuck/src/core/util_serial.cpp

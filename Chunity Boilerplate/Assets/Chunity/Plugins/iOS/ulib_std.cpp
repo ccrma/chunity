@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------
-  ChucK Concurrent, On-the-fly Audio Programming Language
+  ChucK Strongly-timed Audio Programming Language
     Compiler and Virtual Machine
 
-  Copyright (c) 2004 Ge Wang and Perry R. Cook.  All rights reserved.
+  Copyright (c) 2003 Ge Wang and Perry R. Cook. All rights reserved.
     http://chuck.stanford.edu/
     http://chuck.cs.princeton.edu/
 
@@ -170,10 +170,6 @@ DLL_QUERY libstd_query( Chuck_DL_Query * QUERY )
     // set name
     QUERY->setname( QUERY, "Std" );
 
-    /*! \example
-    std.rand2f( 100.0, 1000.0 ) => stdout;
-    */
-
     // register deprecate
     type_engine_register_deprecate( env, "std", "Std" );
 
@@ -255,7 +251,7 @@ DLL_QUERY libstd_query( Chuck_DL_Query * QUERY )
     // add ftoi
     QUERY->add_sfun( QUERY, ftoi_impl, "int", "ftoi" ); //! float to int
     QUERY->add_arg( QUERY, "float", "f" );
-    QUERY->doc_func( QUERY, "convert float to integer. " );
+    QUERY->doc_func( QUERY, "convert float to integer." );
 
     // add getenv
     QUERY->add_sfun( QUERY, getenv_impl, "string", "getenv" ); //! fetch environment variable
@@ -745,9 +741,9 @@ CK_DLL_SFUN( system_impl )
     else
     {
         // log
-        EM_log( CK_LOG_SEVERE, "invoking system( CMD )..." );
+        EM_log( CK_LOG_HERALD, "invoking system( CMD )..." );
         EM_pushlog();
-        EM_log( CK_LOG_SEVERE, "CMD: \"%s\"", cmd );
+        EM_log( CK_LOG_HERALD, "CMD: \"%s\"", cmd );
         EM_poplog();
         RETURN->v_int = system( cmd );
     }
@@ -795,7 +791,7 @@ CK_DLL_SFUN( itoa_impl )
     t_CKINT i = GET_CK_INT(ARGS);
     // TODO: memory leak, please fix.  Thanks.
     Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
-    a->set( itoa( i ) );
+    a->set( ck_itoa( i ) );
     RETURN->v_string = a;
 }
 
@@ -805,7 +801,7 @@ CK_DLL_SFUN( ftoa_impl )
     t_CKFLOAT f = GET_NEXT_FLOAT(ARGS);
     t_CKINT p = GET_NEXT_INT(ARGS);
     Chuck_String * a = (Chuck_String *)instantiate_and_initialize_object( SHRED->vm_ref->env()->ckt_string, SHRED );
-    a->set( ftoa( f, (t_CKUINT)p ) );
+    a->set( ck_ftoa( f, (t_CKUINT)p ) );
     RETURN->v_string = a;
 }
 
@@ -964,7 +960,7 @@ CK_DLL_SFUN( scalef_impl )
 }
 
 // common internal function for range() | 1.5.1.1 (nshaheed)
-static Chuck_Array4 * ck_range( t_CKINT start, t_CKINT stop, t_CKINT step, Chuck_VM_Shred * SHRED )
+static Chuck_ArrayInt * ck_range( t_CKINT start, t_CKINT stop, t_CKINT step, Chuck_VM_Shred * SHRED )
 {
     // size
     t_CKINT size = 0;
@@ -973,9 +969,9 @@ static Chuck_Array4 * ck_range( t_CKINT start, t_CKINT stop, t_CKINT step, Chuck
     else if( start > stop && step < 0 ) size = (start-stop)/(-step) + ((start-stop)%(-step) ? 1 : 0);
 
     // allocate array object
-    Chuck_Array4 * range = new Chuck_Array4(FALSE, size);
+    Chuck_ArrayInt * range = new Chuck_ArrayInt(FALSE, size);
     // initialize with trappings of Object
-    initialize_object(range, SHRED->vm_ref->env()->ckt_array);
+    initialize_object(range, SHRED->vm_ref->env()->ckt_array, SHRED, SHRED->vm_ref);
 
     // the value
     t_CKINT value = start;
@@ -1076,7 +1072,7 @@ t_CKBOOL KBHitManager::init()
     the_buf = new CBufferAdvance;
     if( !the_buf->initialize( BUFFER_SIZE, sizeof(t_CKINT) ) )
     {
-        EM_log( CK_LOG_SEVERE, "KBHitManager: couldn't allocate central KB buffer..." );
+        EM_log( CK_LOG_HERALD, "KBHitManager: couldn't allocate central KB buffer..." );
         CK_SAFE_DELETE( the_buf );
         return FALSE;
     }
@@ -1434,7 +1430,10 @@ void LineEvent::prompt( const string & what )
 {
     // set what
     g_le_what = what;
-    if( g_le_what != "" ) g_le_what += " ";
+
+    // remove the extra space
+    // if( g_le_what != "" ) g_le_what += " ";
+
     // signal
     g_le_wait = FALSE;
 }

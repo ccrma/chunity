@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------
-  ChucK Concurrent, On-the-fly Audio Programming Language
+  ChucK Strongly-timed Audio Programming Language
     Compiler and Virtual Machine
 
-  Copyright (c) 2004 Ge Wang and Perry R. Cook.  All rights reserved.
+  Copyright (c) 2003 Ge Wang and Perry R. Cook. All rights reserved.
     http://chuck.stanford.edu/
     http://chuck.cs.princeton.edu/
 
@@ -56,6 +56,7 @@ t_CKBOOL init_class_event( Chuck_Env * env, Chuck_Type * type );
 t_CKBOOL init_class_shred( Chuck_Env * env, Chuck_Type * type );
 t_CKBOOL init_class_string( Chuck_Env * env, Chuck_Type * type );
 t_CKBOOL init_class_array( Chuck_Env * env, Chuck_Type * type );
+t_CKBOOL init_class_vec2( Chuck_Env * env, Chuck_Type * type ); // 1.5.1.7
 t_CKBOOL init_class_vec3( Chuck_Env * env, Chuck_Type * type ); // 1.3.5.3
 t_CKBOOL init_class_vec4( Chuck_Env * env, Chuck_Type * type ); // 1.3.5.3
 t_CKBOOL init_class_type( Chuck_Env * env, Chuck_Type * type ); // 1.5.0.0
@@ -137,8 +138,8 @@ public:
 
 public:
     t_CKTIME & when();
-    Chuck_Array8 & fvals();
-    Chuck_Array16 & cvals();
+    Chuck_ArrayFloat & fvals();
+    Chuck_ArrayVec2 & cvals();
 
 public:
     Chuck_Object * realblob() { return m_blob; }
@@ -162,12 +163,19 @@ CK_DLL_MFUN( shred_id );
 CK_DLL_MFUN( shred_yield );
 CK_DLL_MFUN( shred_running );
 CK_DLL_MFUN( shred_done );
+CK_DLL_MFUN( shred_gc ); // added 1.5.2.0 (ge)
 CK_DLL_MFUN( shred_numArgs );
 CK_DLL_MFUN( shred_getArg );
 CK_DLL_MFUN( shred_sourcePath ); // added 1.3.0.0
 CK_DLL_MFUN( shred_sourceDir ); // added 1.3.0.0
 CK_DLL_MFUN( shred_sourceDir2 ); // added 1.3.2.0
 CK_DLL_SFUN( shred_fromId ); // added 1.3.2.0
+CK_DLL_SFUN( shred_parent ); // added 1.5.2.0 (nshaheed)
+CK_DLL_SFUN( shred_ancestor ); // added 1.5.2.0 (nshaheed)
+CK_DLL_MFUN( shred_ctrl_hintChildMemSize ); // added 1.5.1.5
+CK_DLL_MFUN( shred_cget_hintChildMemSize ); // added 1.5.1.5
+CK_DLL_MFUN( shred_ctrl_hintChildRegSize ); // added 1.5.1.5
+CK_DLL_MFUN( shred_cget_hintChildRegSize ); // added 1.5.1.5
 
 
 //-----------------------------------------------------------------------------
@@ -207,13 +215,13 @@ CK_DLL_MFUN( event_signal );
 CK_DLL_MFUN( event_broadcast );
 CK_DLL_MFUN( event_wait );
 CK_DLL_MFUN( event_can_wait );
+CK_DLL_MFUN( event_waiting_on );
 
 
 //-----------------------------------------------------------------------------
 // string API
 //-----------------------------------------------------------------------------
-CK_DLL_CTOR( string_ctor );
-CK_DLL_DTOR( string_dtor );
+CK_DLL_CTOR( string_ctor_str );
 CK_DLL_MFUN( string_length );
 CK_DLL_MFUN( string_upper );
 CK_DLL_MFUN( string_lower );
@@ -230,6 +238,7 @@ CK_DLL_MFUN( string_substringN);
 CK_DLL_MFUN( string_insert);
 CK_DLL_MFUN( string_replace);
 CK_DLL_MFUN( string_replaceN);
+CK_DLL_MFUN( string_replace_str);
 CK_DLL_MFUN( string_find);
 CK_DLL_MFUN( string_findStart);
 CK_DLL_MFUN( string_findStr);
@@ -245,8 +254,13 @@ CK_DLL_MFUN( string_parent);
 
 
 //-----------------------------------------------------------------------------
-// vector API (vec3, vec4, eventually vector) ge: 1.3.5.3
+// vector API (vec3, vec4, eventually vector) (ge) 1.3.5.3
+// add vec2 (ge) 1.5.1.7
 //-----------------------------------------------------------------------------
+CK_DLL_MFUN( vec2_set );
+CK_DLL_MFUN( vec2_setAll );
+CK_DLL_MFUN( vec2_magnitude );
+CK_DLL_MFUN( vec2_normalize );
 CK_DLL_MFUN( vec3_set );
 CK_DLL_MFUN( vec3_setAll );
 CK_DLL_MFUN( vec3_magnitude );

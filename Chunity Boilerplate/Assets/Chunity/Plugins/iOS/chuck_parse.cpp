@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------
-  ChucK Concurrent, On-the-fly Audio Programming Language
+  ChucK Strongly-timed Audio Programming Language
     Compiler and Virtual Machine
 
-  Copyright (c) 2004 Ge Wang and Perry R. Cook.  All rights reserved.
+  Copyright (c) 2003 Ge Wang and Perry R. Cook. All rights reserved.
     http://chuck.stanford.edu/
     http://chuck.cs.princeton.edu/
 
@@ -114,6 +114,8 @@ t_CKBOOL chuck_parse( const std::string & fname, const std::string & codeLiteral
     {
         // clean lexer
         yyrestart( NULL );
+        // set to initial condition | 1.5.2.4 (ge) added
+        yyinitial();
         // load string (yy_scan_string will copy the C string)
         yyCodeBuffer = yy_scan_string( codeLiteral.c_str() );
         // if could load
@@ -409,9 +411,9 @@ string absyn_stmt2str( a_Stmt stmt )
 // name: absyn2str()
 // desc: convert abstract syntax exp to string
 //-----------------------------------------------------------------------------
-string absyn2str( a_Exp exp )
+string absyn2str( a_Exp exp, t_CKBOOL appendSemicolon )
 {
-    return absyn_exp2str( exp ) + ";";
+    return absyn_exp2str( exp ) + (appendSemicolon ? ";" : "" );
 }
 
 
@@ -523,60 +525,7 @@ string absyn_exp2str( a_Exp exp, t_CKBOOL iterate )
 //-----------------------------------------------------------------------------
 string absyn_op2str( ae_Operator op )
 {
-    string str;
-    // get operation string
-    switch( op )
-    {
-        case ae_op_plus: str = "+"; break;
-        case ae_op_plus_chuck: str = "+=>"; break;
-        case ae_op_minus: str = "-"; break;
-        case ae_op_minus_chuck: str = "-=>"; break;
-        case ae_op_times: str = "*"; break;
-        case ae_op_times_chuck: str = "*=>"; break;
-        case ae_op_divide: str = "/"; break;
-        case ae_op_divide_chuck: str = "/=>"; break;
-        case ae_op_s_or: str = "|"; break;
-        case ae_op_s_or_chuck: str = "|=>"; break;
-        case ae_op_s_and: str = "&"; break;
-        case ae_op_s_and_chuck: str = "&=>"; break;
-        case ae_op_shift_left: str = "<<"; break;
-        case ae_op_shift_left_chuck: str = "<<=>"; break;
-        case ae_op_shift_right: str = ">>"; break;
-        case ae_op_shift_right_chuck: str = ">>=>"; break;
-        case ae_op_percent: str = "%"; break;
-        case ae_op_percent_chuck: str = "%=>"; break;
-        case ae_op_s_xor: str = "^"; break;
-        case ae_op_s_xor_chuck: str = "^=>"; break;
-        case ae_op_chuck: str = "=>"; break;
-        case ae_op_unchuck: str = "=<"; break;
-        case ae_op_upchuck: str = "=^"; break;
-        case ae_op_at_chuck: str = "@=>"; break;
-        // case ae_op_s_chuck: str = ""; break;
-        case ae_op_eq: str = "=="; break;
-        case ae_op_neq: str = "!="; break;
-        case ae_op_lt: str = "<"; break;
-        case ae_op_le: str = "<="; break;
-        case ae_op_gt: str = ">"; break;
-        case ae_op_ge: str = ">="; break;
-        case ae_op_and: str = "&&"; break;
-        case ae_op_or: str = "||"; break;
-        case ae_op_arrow_left: str = "<-"; break;
-        case ae_op_arrow_right: str = "->"; break;
-
-        // unary
-        case ae_op_plusplus: str = "++"; break;
-        case ae_op_minusminus: str = "--"; break;
-        case ae_op_tilda: str = "~"; break;
-        case ae_op_exclamation: str = "!"; break;
-        case ae_op_spork: str = "spork ~"; break;
-        case ae_op_new: str = "new"; break;
-
-        // not used
-        case ae_op_typeof: str = "typeof"; break;
-        case ae_op_sizeof: str = "sizeof"; break;
-        default: str = "[OP]"; break;
-    }
-    return str;
+    return op2str( op );
 }
 
 
@@ -612,6 +561,7 @@ string absyn_binary2str( a_Exp_Binary binary )
         case ae_op_chuck:
         case ae_op_unchuck:
         case ae_op_upchuck:
+        case ae_op_downchuck:
         case ae_op_at_chuck:
         case ae_op_eq:
         case ae_op_neq:
@@ -619,6 +569,8 @@ string absyn_binary2str( a_Exp_Binary binary )
         case ae_op_gt:
         case ae_op_le:
         case ae_op_ge:
+        case ae_op_and:
+        case ae_op_or:
             paren = false;
             spacing = true;
             break;
@@ -650,6 +602,7 @@ string absyn_unary2str( a_Exp_Unary unary )
     {
         case ae_op_new:
             s = absyn_op2str(unary->op) + " " + unary->self->type->name();
+            if( unary->ctor.invoked ) s += "(" + absyn_exp2str(unary->ctor.args) + ")";
             break;
         default:
             s = absyn_op2str(unary->op) + " " + absyn_exp2str(unary->exp);
@@ -718,7 +671,7 @@ string absyn_primary2str( a_Exp_Primary primary )
         case ae_primary_array: str = "["+absyn_exp2str(primary->array->exp_list)+"]"; break;
         case ae_primary_complex: str = "#("+absyn_exp2str(primary->complex->re)+","+absyn_exp2str(primary->complex->im)+")"; break;
         case ae_primary_polar: str = "%("+absyn_exp2str(primary->polar->mod)+","+absyn_exp2str(primary->polar->phase)+")"; break;
-        case ae_primary_vec: str = "@("+absyn_exp2str(primary->vec->args)+")"; break;
+        case ae_primary_vec: str = "@("+absyn_exp2str(primary->vec->args,TRUE)+")"; break;
         case ae_primary_exp: str = absyn_exp2str(primary->exp); break;
         case ae_primary_hack: str = "<<< " + absyn_exp2str(primary->exp) + " >>>"; break;
         case ae_primary_nil: str = "(void)"; break;
@@ -824,6 +777,11 @@ string absyn_decl2str( a_Exp_Decl decl )
     {
         // type
         str += list->var_decl->value->type->base_name + " " + (decl->type->ref ? "@ " : "") + list->var_decl->value->name;
+        // constructor?
+        if( list->var_decl->ctor.invoked )
+        {
+            str += "(" + absyn_exp2str(list->var_decl->ctor.args) + ")";
+        }
         // array?
         if( list->var_decl->array )
         {

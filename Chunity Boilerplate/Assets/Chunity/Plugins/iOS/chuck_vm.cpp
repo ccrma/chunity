@@ -1,8 +1,8 @@
 /*----------------------------------------------------------------------------
-  ChucK Concurrent, On-the-fly Audio Programming Language
+  ChucK Strongly-timed Audio Programming Language
     Compiler and Virtual Machine
 
-  Copyright (c) 2004 Ge Wang and Perry R. Cook.  All rights reserved.
+  Copyright (c) 2003 Ge Wang and Perry R. Cook. All rights reserved.
     http://chuck.stanford.edu/
     http://chuck.cs.princeton.edu/
 
@@ -54,12 +54,25 @@
 #include "midiio_rtmidi.h"  // 1.4.1.0
 #endif
 
+#include <limits.h> // 1.5.1.5 | for ULONG_MAX
+#include <iomanip>
 #include <string>
 #include <algorithm>
 using namespace std;
 
 
 
+
+//-----------------------------------------------------------------------------
+// uncomment AND set to 1 to compile VM stack observe messages
+//-----------------------------------------------------------------------------
+#define CK_VM_STACK_OBSERVE_ENABLE 0
+// vm statck observe macros
+#if CK_VM_STACK_OBSERVE_ENABLE
+#define CK_VM_STACK_OBSERVE(x) x
+#else
+#define CK_VM_STACK_OBSERVE(x)
+#endif
 
 //-----------------------------------------------------------------------------
 // uncomment AND set to 1 to compile VM stack debug messages
@@ -72,6 +85,7 @@ using namespace std;
 #else
 #define CK_VM_STACK_DEBUG(x)
 #endif
+
 
 
 
@@ -169,7 +183,12 @@ Chuck_VM::Chuck_VM()
     // REFACTOR-2017: refs
     m_carrier = NULL;
 
-    // data
+    // machine state
+    m_init = FALSE;
+    m_halt = TRUE;
+    m_is_running = FALSE;
+
+    // shred management
     m_num_shreds = 0;
     m_shreduler = NULL;
     m_num_dumped_shreds = 0;
@@ -178,16 +197,15 @@ Chuck_VM::Chuck_VM()
     m_reply_buffer = NULL;
     m_event_buffer = NULL;
     m_shred_id = 0;
-    m_halt = TRUE;
-    m_is_running = FALSE;
+    m_shred_check4dupes = FALSE; // 1.5.1.5 (ge)
 
+    // audio hookups
     m_dac = NULL;
     m_adc = NULL;
     m_bunghole = NULL;
     m_srate = 0;
     m_num_dac_channels = 0;
     m_num_adc_channels = 0;
-    m_init = FALSE;
     m_input_ref = NULL;
     m_output_ref = NULL;
     m_current_buffer_frames = 0;
@@ -278,7 +296,7 @@ t_CKBOOL Chuck_VM::initialize( t_CKUINT srate, t_CKUINT dac_chan,
 // name: initialize_synthesis()
 // desc: requires type system
 //-----------------------------------------------------------------------------
-t_CKBOOL Chuck_VM::initialize_synthesis( )
+t_CKBOOL Chuck_VM::initialize_synthesis()
 {
     if( !m_init )
     {
@@ -299,37 +317,53 @@ t_CKBOOL Chuck_VM::initialize_synthesis( )
     }
 
     // log
-    EM_log( CK_LOG_SEVERE, "initializing 'dac'..." );
+    EM_log( CK_LOG_HERALD, "initializing 'dac'..." );
     // allocate dac and adc (REFACTOR-2017: g_t_dac changed to env()->ckt_dac)
     env()->ckt_dac->ugen_info->num_outs = env()->ckt_dac->ugen_info->num_ins = m_num_dac_channels;
     m_dac = (Chuck_UGen *)instantiate_and_initialize_object( env()->ckt_dac, this );
-    // Chuck_DL_Api::Api::instance() added 1.3.0.0
-    object_ctor( m_dac, NULL, this, NULL, Chuck_DL_Api::Api::instance() ); // TODO: this can't be the place to do this
-    stereo_ctor( m_dac, NULL, this, NULL, Chuck_DL_Api::Api::instance() ); // TODO: is the NULL shred a problem?
-    multi_ctor( m_dac, NULL, this, NULL, Chuck_DL_Api::Api::instance() );  // TODO: remove and let type system do this
+    // special case: DAC is a UGen_Multi, but due to the underlying system /
+    // command-line flags, it's possible to only have one channel | 1.5.2.0
+    if( m_num_dac_channels == 1 ) {
+        m_dac->m_multi_chan = new Chuck_UGen *[1];
+        // assign first channel to dac itself
+        m_dac->m_multi_chan[0] = m_dac;
+        // no ref count will deal with this explicitly on clean up in Chuck_VM::shutdown()
+    }
+    // Chuck_DL_Api::instance() added 1.3.0.0
+    object_ctor( m_dac, NULL, this, NULL, Chuck_DL_Api::instance() ); // TODO: this can't be the place to do this
+    multi_ctor( m_dac, NULL, this, NULL, Chuck_DL_Api::instance() );  // TODO: remove and let type system do this
+    stereo_ctor( m_dac, NULL, this, NULL, Chuck_DL_Api::instance() ); // TODO: is the NULL shred a problem?
     m_dac->add_ref();
     // lock it
     m_dac->lock();
 
     // log
-    EM_log( CK_LOG_SEVERE, "initializing 'adc'..." );
+    EM_log( CK_LOG_HERALD, "initializing 'adc'..." );
     // (REFACTOR-2017: g_t_adc changed to env()->ckt_adc)
     env()->ckt_adc->ugen_info->num_ins = env()->ckt_adc->ugen_info->num_outs = m_num_adc_channels;
     m_adc = (Chuck_UGen *)instantiate_and_initialize_object( env()->ckt_adc, this );
-    // Chuck_DL_Api::Api::instance() added 1.3.0.0
-    object_ctor( m_adc, NULL, this, NULL, Chuck_DL_Api::Api::instance() ); // TODO: this can't be the place to do this
-    stereo_ctor( m_adc, NULL, this, NULL, Chuck_DL_Api::Api::instance() );
-    multi_ctor( m_adc, NULL, this, NULL, Chuck_DL_Api::Api::instance() ); // TODO: remove and let type system do this
+    // special case: ADC is a UGen_Multi, but due to the underlying system /
+    // command-line flags, it's possible to only have one channel | 1.5.2.0
+    if( m_num_adc_channels == 1 ) {
+        m_adc->m_multi_chan = new Chuck_UGen *[1];
+        // assign first channel to adc itself
+        m_adc->m_multi_chan[0] = m_adc;
+        // no ref count will deal with this explicitly on clean up in Chuck_VM::shutdown()
+    }
+    // Chuck_DL_Api::instance() added 1.3.0.0
+    object_ctor( m_adc, NULL, this, NULL, Chuck_DL_Api::instance() ); // TODO: this can't be the place to do this
+    multi_ctor( m_adc, NULL, this, NULL, Chuck_DL_Api::instance() ); // TODO: remove and let type system do this
+    stereo_ctor( m_adc, NULL, this, NULL, Chuck_DL_Api::instance() );
     m_adc->add_ref();
     // lock it
     m_adc->lock();
 
     // log
-    EM_log( CK_LOG_SEVERE, "initializing 'blackhole'..." );
+    EM_log( CK_LOG_HERALD, "initializing 'blackhole'..." );
     m_bunghole = new Chuck_UGen;
     m_bunghole->add_ref();
     m_bunghole->lock();
-    initialize_object( m_bunghole, env()->ckt_ugen );
+    initialize_object( m_bunghole, env()->ckt_ugen, NULL, this );
     m_bunghole->tick = NULL;
     m_bunghole->alloc_v( m_shreduler->m_max_block_size );
     m_shreduler->m_dac = m_dac;
@@ -367,14 +401,9 @@ t_CKBOOL Chuck_VM::shutdown()
     CK_SAFE_DELETE( m_globals_manager );
 
     // log
-    EM_log( CK_LOG_SEVERE, "removing shreds..." );
+    EM_log( CK_LOG_HERALD, "removing shreds..." );
     // removal all | 1.5.0.8 (ge) updated from previously non-functioning code
     this->removeAll();
-
-    // log
-    EM_log( CK_LOG_SYSTEM, "freeing shreduler..." );
-    // free the shreduler
-    CK_SAFE_DELETE( m_shreduler );
 
     #ifndef __DISABLE_HID__
     // log
@@ -399,14 +428,42 @@ t_CKBOOL Chuck_VM::shutdown()
 
     // log
     EM_pushlog();
-    EM_log( CK_LOG_SEVERE, "freeing dumped shreds..." );
+    EM_log( CK_LOG_HERALD, "freeing dumped shreds..." );
     // do it
     this->release_dump();
     EM_poplog();
 
     // log
+    EM_log( CK_LOG_SYSTEM, "freeing shreduler..." );
+    // free the shreduler; do this later as dumped shreds may refer to shreduler
+    CK_SAFE_DELETE( m_shreduler );
+
+    // log
     EM_log( CK_LOG_SYSTEM, "freeing special ugens..." );
-    // go
+    // explcitly calling a destructor, accounting for internal ref counts | 1.5.2.0
+    stereo_dtor( m_dac, this, NULL, Chuck_DL_Api::instance() );
+    stereo_dtor( m_adc, this, NULL, Chuck_DL_Api::instance() );
+    // special case: if mono, must zero out multi-chan[0] (see Chuck_VM::initialize_synthesis())
+    if( m_num_dac_channels == 1 ) // 1.5.2.0 (ge) added
+    {
+        // verify
+        assert( m_dac->m_multi_chan_size == 0 );
+        // zero out, no ref count -- this flies under the ref counting system...
+        m_dac->m_multi_chan[0] = NULL;
+        // reclaim
+        CK_SAFE_DELETE_ARRAY( m_dac->m_multi_chan );
+    }
+    // special case: if mono, must zero out multi-chan[0] (see Chuck_VM::initialize_synthesis())
+    if( m_num_adc_channels == 1 ) // 1.5.2.0 (ge) added
+    {
+        // verify
+        assert( m_adc->m_multi_chan_size == 0 );
+        // zero out, no ref count -- this flies under the ref counting system...
+        m_adc->m_multi_chan[0] = NULL;
+        // reclaim
+        CK_SAFE_DELETE_ARRAY( m_adc->m_multi_chan );
+    }
+    // release
     CK_SAFE_RELEASE( m_dac );
     CK_SAFE_RELEASE( m_adc );
     CK_SAFE_RELEASE( m_bunghole );
@@ -512,7 +569,7 @@ t_CKBOOL Chuck_VM::compute()
                 // track shred deactivation
                 CK_TRACK( Chuck_Stats::instance()->deactivate_shred( shred ) );
 
-                this->free( shred, TRUE );
+                this->free_shred( shred, TRUE );
                 shred = NULL;
                 if( !m_num_shreds && m_halt ) return FALSE;
             }
@@ -622,24 +679,23 @@ vm_stop:
 
 
 
-
 //-----------------------------------------------------------------------------
-// name: gc
-// desc: ...
-//-----------------------------------------------------------------------------
-void Chuck_VM::gc( t_CKUINT amount )
-{
-}
-
-
-
-
-//-----------------------------------------------------------------------------
-// name: gc
-// desc: ...
+// name: gc() | 1.5.2.0 (ge) added
+// desc: manually trigger a VM-level garbage collection pass
 //-----------------------------------------------------------------------------
 void Chuck_VM::gc( )
 {
+    // vector of shreds
+    vector<Chuck_VM_Shred *> shreds;
+    // retrieve all shreds currently in the shreduler; this includes the
+    // ready list, the blocked list, and the currently executing shred
+    m_shreduler->get_all_shreds( shreds );
+    // iterate through all shreds in VM
+    for( t_CKUINT i = 0; i < shreds.size(); i++ )
+    {
+        // manually trigger GC pass in each shred
+        shreds[i]->gc();
+    }
 }
 
 
@@ -703,11 +759,27 @@ CBufferSimple * Chuck_VM::create_event_buffer()
 //-----------------------------------------------------------------------------
 // name: destroy_event_buffer()
 // desc: added 1.3.0.0 to fix uber-crash
+//       updated 1.5.13 and broken into two parts
 //-----------------------------------------------------------------------------
 void Chuck_VM::destroy_event_buffer( CBufferSimple * buffer )
 {
+    // always detach, even if buffer already detached by external calls
+    this->detach_event_buffer_without_delete( buffer );
+    // reclaim
+    CK_SAFE_DELETE( buffer );
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: detach_event_buffer_without_delete() | 1.5.1.3
+// desc: detach event buffer from VM, without deleting buffer
+//-----------------------------------------------------------------------------
+void Chuck_VM::detach_event_buffer_without_delete( CBufferSimple * buffer )
+{
+    // detach
     m_event_buffers.remove( buffer );
-    delete buffer;
 }
 
 
@@ -734,7 +806,7 @@ Chuck_Msg * Chuck_VM::get_reply()
 //       and msg will be cleaned up by the VM
 // TODO: make thread safe for multiple consumers
 //-----------------------------------------------------------------------------
-t_CKUINT Chuck_VM::process_msg( Chuck_Msg * msg )
+t_CKUINT Chuck_VM::process_msg( Chuck_Msg * & msg )
 {
     t_CKUINT retval = 0xfffffff0;
 
@@ -742,14 +814,16 @@ t_CKUINT Chuck_VM::process_msg( Chuck_Msg * msg )
     if( msg->type == CK_MSG_REPLACE )
     {
         Chuck_VM_Shred * out = m_shreduler->lookup( msg->param );
-        if( !out )
+        if( !out && !msg->alwaysAdd )
         {
-            EM_print2orange( "(VM) replacing shred: no shred with id %i...", msg->param );
+            EM_print2orange( "(VM) replacing shred: no shred with id %lu...", msg->param );
             retval = 0;
             goto done;
         }
 
+        // get a shred one way or another
         Chuck_VM_Shred * shred = msg->shred;
+        // if shred wasn't created on the outside
         if( !shred )
         {
             shred = new Chuck_VM_Shred;
@@ -757,38 +831,48 @@ t_CKUINT Chuck_VM::process_msg( Chuck_Msg * msg )
             shred->initialize( msg->code );
             shred->name = msg->code->name;
             shred->base_ref = shred->mem;
-            shred->add_ref();
+            // NOTE no add_ref() since we spork() later
         }
-        // set the current time
-        shred->start = m_shreduler->now_system;
-        // set the id
+        // set the id (even if out is NULL)
         shred->xid = msg->param;
-        // set the now
-        shred->now = shred->wake_time = m_shreduler->now_system;
-        // set the vm
-        shred->vm_ref = this;
         // set args
         if( msg->args ) shred->args = *(msg->args);
-        // add it to the parent
-        if( shred->parent )
-            shred->parent->children[shred->xid] = shred;
 
-        // replace
-        if( m_shreduler->remove( out ) && m_shreduler->shredule( shred ) )
+        // check for different scenarios of replace
+        // replace-target absent | 1.5.1.5 (nshaheed) added
+        if( !out )
         {
-            EM_print2blue( "(VM) replacing shred %i (%s) with %i (%s)...",
-                            out->xid, mini(out->name.c_str()), shred->xid, mini(shred->name.c_str()) );
-            this->free( out, TRUE, FALSE );
-            retval = shred->xid;
+            // spork it
+            this->spork( shred );
 
+            // print
+            const char * s = (msg->shred ? msg->shred->name.c_str() : msg->code->name.c_str());
+            EM_print2orange( "(VM) (optional) replacing shred: %lu not found...", msg->param );
+            EM_print2green( "(VM) sporking incoming shred: %lu (%s)...", shred->xid, mini(s) );
+
+            // return value
+            retval = shred->xid;
+            // done
+            goto done;
+        }
+        // replace-target present
+        // modified shredule(shred) -> spork(shred) | 1.5.1.5 (ge)
+        else if( m_shreduler->remove( out ) && this->spork( shred ) )
+        {
+            EM_print2blue( "(VM) replacing shred %lu (%s) with %lu (%s)...",
+                            out->xid, mini(out->name.c_str()), shred->xid, mini(shred->name.c_str()) );
+            // free shred; dec==TRUE since spork above always increments shred count
+            this->free_shred( out, TRUE, TRUE );
+            // set return value to shred ID
+            retval = shred->xid;
             // tracking new shred
             CK_TRACK( Chuck_Stats::instance()->add_shred( shred ) );
-
             goto done;
         }
         else
         {
-            EM_print2blue( "(VM) shreduler replacing shred %i...", out->xid );
+            // shouldn't get here!
+            EM_print2blue( "(VM) (internal error) replacing shred %lu...", out->xid );
             shred->release();
             retval = 0;
             goto done;
@@ -805,15 +889,15 @@ t_CKUINT Chuck_VM::process_msg( Chuck_Msg * msg )
                 goto done;
             }
 
-            t_CKINT xid = m_shred_id;
+            t_CKUINT xid = m_shred_id;
             Chuck_VM_Shred * shred = NULL;
-            while( xid >= 0 && m_shreduler->remove( shred = m_shreduler->lookup( xid ) ) == 0 )
+            while( xid > 0 && m_shreduler->remove( shred = m_shreduler->lookup( xid ) ) == 0 )
                 xid--;
-            if( xid >= 0 )
+            if( xid > 0 )
             {
-                EM_print2orange( "(VM) removing recent shred: %i (%s)...",
-                                xid, mini(shred->name.c_str()) );
-                this->free( shred, TRUE );
+                EM_print2orange( "(VM) removing recent shred: %lu (%s)...",
+                                 xid, mini(shred->name.c_str()) );
+                this->free_shred( shred, TRUE );
                 retval = xid;
             }
             else
@@ -828,25 +912,25 @@ t_CKUINT Chuck_VM::process_msg( Chuck_Msg * msg )
             Chuck_VM_Shred * shred = m_shreduler->lookup( msg->param );
             if( !shred )
             {
-                EM_print2orange( "(VM) cannot remove: no shred with id %i...", msg->param );
+                EM_print2orange( "(VM) cannot remove: no shred with id %lu...", msg->param );
                 retval = 0;
                 goto done;
             }
             if( shred != m_shreduler->m_current_shred && !m_shreduler->remove( shred ) )  // was lookup
             {
-                EM_print2orange( "(VM) shreduler: cannot remove shred %i...", msg->param );
+                EM_print2orange( "(VM) shreduler: cannot remove shred %lu...", msg->param );
                 retval = 0;
                 goto done;
             }
-            EM_print2orange( "(VM) removing shred: %i (%s)...", msg->param, mini(shred->name.c_str()) );
-            this->free( shred, TRUE );
+            EM_print2orange( "(VM) removing shred: %lu (%s)...", msg->param, mini(shred->name.c_str()) );
+            this->free_shred( shred, TRUE );
             retval = msg->param;
         }
     }
     else if( msg->type == CK_MSG_REMOVEALL )
     {
         // print
-        EM_print2magenta( "(VM) removing all (%i) shreds...", m_num_shreds );
+        EM_print2magenta( "(VM) removing all (%lu) shreds...", m_num_shreds );
         // remove all shreds
         this->removeAll();
     }
@@ -857,7 +941,14 @@ t_CKUINT Chuck_VM::process_msg( Chuck_Msg * msg )
         // first, remove all shreds
         this->removeAll();
         // next, clear user type system
-        if( env() ) env()->clear_user_namespace();
+        if( env() )
+        {
+            // clear user namespace
+            env()->clear_user_namespace();
+            // reset operload overloading to default | 1.5.1.5
+            // not needed; this is implicit in clear_user_namespace() which calls reset()
+            // env()->op_registry.reset();
+        }
         // 1.4.1.0 (jack): also clear any global variables
         m_globals_manager->cleanup_global_variables();
     }
@@ -876,7 +967,7 @@ t_CKUINT Chuck_VM::process_msg( Chuck_Msg * msg )
         if( msg->args ) shred->args = *(msg->args);
 
         const char * s = ( msg->shred ? msg->shred->name.c_str() : msg->code->name.c_str() );
-        EM_print2green( "(VM) sporking incoming shred: %i (%s)...", xid, mini(s) );
+        EM_print2green( "(VM) sporking incoming shred: %lu (%s)...", xid, mini(s) );
         retval = xid;
         goto done;
     }
@@ -908,24 +999,48 @@ t_CKUINT Chuck_VM::process_msg( Chuck_Msg * msg )
     }
     else if( msg->type == CK_MSG_TIME )
     {
-        float srate = m_srate; // 1.3.5.3; was: (float)Digitalio::sampling_rate();
-        EM_print2magenta( "(VM) earth time: %s", timestamp_formatted().c_str() );
-        EM_print2magenta( "(VM) chuck time: %.0f::samp (now)", m_shreduler->now_system );
-        EM_print2vanilla( "%22.6f::second since VM start", m_shreduler->now_system / srate );
-        EM_print2vanilla( "%22.6f::minute", m_shreduler->now_system / srate / 60.0f );
-        EM_print2vanilla( "%22.6f::hour", m_shreduler->now_system / srate / 60.0f / 60.0f );
-        EM_print2vanilla( "%22.6f::day", m_shreduler->now_system / srate / 60.0f / 60.0f / 24.0f );
-        EM_print2vanilla( "%22.6f::week", m_shreduler->now_system / srate / 60.0f / 60.0f / 24.0f / 7.0f );
+        // string stream
+        ostringstream sout;
+        // generate string; fixed notation
+        sout << "chuck time: " << std::fixed << m_shreduler->now_system << "::samp (now)";
+        // get string
+        string ckt_str = sout.str();
+        // find occurence of ::
+        size_t where = ckt_str.find( "::" );
+        // just in case
+        if( where == string::npos ) where = 22;
+        // sample rate
+        t_CKFLOAT srate = m_srate;
+
+        // earth time
+        EM_print2magenta( "local time: %s", timestamp_formatted().c_str() );
+        // chuck time
+        EM_print2magenta( ckt_str.c_str() );
+
+        // clear and generate
+        sout.str(std::string()); sout << "%" << where << ".6f::second since VM start";
+        EM_print2vanilla( sout.str().c_str(), m_shreduler->now_system / srate );
+
+        sout.str(std::string()); sout << "%" << where << ".6f::minute";
+        EM_print2vanilla( sout.str().c_str(), m_shreduler->now_system / srate / 60.0f );
+
+        sout.str(std::string()); sout << "%" << where << ".6f::hour";
+        EM_print2vanilla( sout.str().c_str(), m_shreduler->now_system / srate / 60.0f / 60.0f );
+
+        sout.str(std::string()); sout << "%" << where << ".6f::day";
+        EM_print2vanilla( sout.str().c_str(), m_shreduler->now_system / srate / 60.0f / 60.0f / 24.0f );
+
+        sout.str(std::string()); sout << "%" << where << ".6f::week";
+        EM_print2vanilla( sout.str().c_str(), m_shreduler->now_system / srate / 60.0f / 60.0f / 24.0f / 7.0f );
     }
     else if( msg->type == CK_MSG_RESET_ID )
     {
-        // reset ID to currently active shred ID + 1
+        // reset ID to current highest shred ID + 1
         // could be helpful to keep shred ID #'s low, especially after a lot of sporks
         EM_print2magenta( "(VM) resetting shred id to %lu...", this->reset_id() );
     }
 
 done:
-
     // set return value
     msg->replyA = retval;
 
@@ -943,7 +1058,9 @@ done:
     else
     {
         // nothing further to be done; delete msg
-        CK_SAFE_DELETE(msg);
+        // FYI since msg pointer is passed into this function by reference,
+        // this will also set the external msg pointer to NULL
+        CK_SAFE_DELETE( msg );
     }
 
     return retval;
@@ -956,9 +1073,48 @@ done:
 // name: next_id()
 // desc: first increments the shred id, then returns it
 //-----------------------------------------------------------------------------
-t_CKUINT Chuck_VM::next_id( )
+t_CKUINT Chuck_VM::next_id( const Chuck_VM_Shred * shred )
 {
-    return ++m_shred_id;
+    // max id
+    const t_CKUINT MAX_ID = ULONG_MAX;
+
+    // see if shred passed in and already has an ID to use (e.g., from REPLACE)
+    if( shred && shred->xid != 0 )
+    {
+        // check if we need to raise m_shred_id as highest shred ID...
+        // NOTE if check4dupes is enabled, m_shred_id may no longer be the
+        // highest ID but instead is a counter for possible next shred IDs,
+        // which will repeatedly increment+check for duplicates until an
+        // available ID is found | 1.5.1.5 (ge and nshaheed) added
+        if( !m_shred_check4dupes && shred->xid > m_shred_id )
+        {
+            // update as highest ID so far
+            m_shred_id = shred->xid;
+        }
+        // return the shred's ID back
+        return shred->xid;
+    }
+
+    // test for bound
+    if( m_shred_id == MAX_ID )
+    {
+        // print congratulatory message
+        EM_print2orange( "(VM) you have surpassed max shred ID: %lu", m_shred_id );
+        EM_print2orange( "(VM) congratulations! resetting IDs back to 1 and up..." );
+        // reset ID back to 0
+        m_shred_id = 0;
+        // set to check for duplicates, since there now could be collisions
+        m_shred_check4dupes = TRUE;
+    }
+
+    // check for dupes (after shred id wraps from MAX_ID) | 1.5.1.5
+    if( !m_shred_check4dupes ) return ++m_shred_id;
+
+    // find next unused shred ID | 1.5.1.5
+    while( m_shreduler->lookup( ++m_shred_id ) );
+
+    // return it
+    return m_shred_id;
 }
 
 
@@ -1038,8 +1194,11 @@ Chuck_VM_Shred * Chuck_VM::spork( Chuck_VM_Code * code, Chuck_VM_Shred * parent,
     Chuck_VM_Shred * shred = new Chuck_VM_Shred;
     // set the vm
     shred->vm_ref = this;
+    // get stack size hints | 1.5.1.5
+    t_CKINT mems = parent ? parent->childGetMemSize() : 0;
+    t_CKINT regs = parent ? parent->childGetRegSize() : 0;
     // initialize the shred (default stack size)
-    shred->initialize( code );
+    shred->initialize( code, mems, regs );
     // set the name
     shred->name = code->name;
     // set the parent
@@ -1094,9 +1253,10 @@ Chuck_VM_Shred * Chuck_VM::spork( Chuck_VM_Shred * shred )
     // set the now
     shred->now = shred->wake_time = m_shreduler->now_system;
     // set the id, if one hasn't been assigned yet | 1.5.0.8 (ge) add check
-    if( !shred->xid ) shred->xid = next_id();
+    // pass in the shred into next_id() instead of checking here | 1.5.1.5
+    shred->xid = next_id( shred );
     // add ref
-    shred->add_ref();
+    CK_SAFE_ADD_REF( shred );
     // add it to the parent
     if( shred->parent )
         shred->parent->children[shred->xid] = shred;
@@ -1104,6 +1264,9 @@ Chuck_VM_Shred * Chuck_VM::spork( Chuck_VM_Shred * shred )
     m_shreduler->shredule( shred );
     // count
     m_num_shreds++;
+
+    // notify watcher | 1.5.1.5
+    notify_watchers( ckvm_shreds_watch_SPORK, shred, m_shreds_watchers_spork );
 
     return shred;
 }
@@ -1133,28 +1296,35 @@ void Chuck_VM::removeAll()
     // itereate over sorted list
     for( vector<Chuck_VM_Shred *>::iterator s = shreds.begin(); s != shreds.end(); s++ )
     {
-        // remove and free
-        if( m_shreduler->remove( *s ) ) this->free( *s, TRUE );
+        // remove from shreduler
+        if( m_shreduler->remove( *s ) )
+        {
+            // free the shred
+            this->free_shred( *s, TRUE );
+        }
     }
 
     // reset
     m_shred_id = 0;
     m_num_shreds = 0;
+
+    // can safely reset this as well | 1.5.1.5
+    m_shred_check4dupes = FALSE;
 }
 
 
 
 
 //-----------------------------------------------------------------------------
-// name: free()
+// name: free_shred()
 // desc: deallocate a shred
 //-----------------------------------------------------------------------------
-t_CKBOOL Chuck_VM::free( Chuck_VM_Shred * shred, t_CKBOOL cascade, t_CKBOOL dec )
+t_CKBOOL Chuck_VM::free_shred( Chuck_VM_Shred * shred, t_CKBOOL cascade, t_CKBOOL dec )
 {
     assert( cascade );
 
     // log
-    EM_log( CK_LOG_FINER, "freeing shred (id==%d | ptr==%p)", shred->xid,
+    EM_log( CK_LOG_FINER, "freeing shred (id==%lu | ptr==%p)", shred->xid,
             (t_CKUINT)shred );
 
     // abort on the double free
@@ -1173,7 +1343,7 @@ t_CKBOOL Chuck_VM::free( Chuck_VM_Shred * shred, t_CKBOOL cascade, t_CKBOOL dec 
         for( iter = shred->children.begin(); iter != shred->children.end(); iter++ )
             list[i++] = (*iter).second;
         for( i = 0; i < size; i++ )
-            this->free( list[i], cascade );
+            this->free_shred( list[i], cascade );
     }
 
     // make sure it's done
@@ -1193,7 +1363,21 @@ t_CKBOOL Chuck_VM::free( Chuck_VM_Shred * shred, t_CKBOOL cascade, t_CKBOOL dec 
     // OLD: shred->release();
     this->dump_shred( shred );
     shred = NULL;
-    if( dec ) m_num_shreds--;
+
+    // decrement?
+    if( dec )
+    {
+        // make sure shred counter isn't already zero
+        if( m_num_shreds == 0 )
+        {
+            EM_print2magenta( "(VM) internal inconsistency detected: shreds counter already zero." );
+            return FALSE;
+        }
+        // decrement
+        m_num_shreds--;
+    }
+
+    // reset ID if no more shreds currently
     if( !m_num_shreds ) m_shred_id = 0;
 
     return TRUE;
@@ -1206,7 +1390,7 @@ t_CKBOOL Chuck_VM::free( Chuck_VM_Shred * shred, t_CKBOOL cascade, t_CKBOOL dec 
 // name: abort_current_shred()
 // desc: abort the current shred
 //-----------------------------------------------------------------------------
-t_CKBOOL Chuck_VM::abort_current_shred( )
+t_CKBOOL Chuck_VM::abort_current_shred()
 {
     // for threading
     Chuck_VM_Shred * shred = m_shreduler->m_current_shred;
@@ -1215,17 +1399,58 @@ t_CKBOOL Chuck_VM::abort_current_shred( )
     if( shred )
     {
         // log
-        EM_log( CK_LOG_SEVERE, "trying to abort current shred (id: %d)", shred->xid );
+        EM_log( CK_LOG_HERALD, "trying to abort current shred (id: %lu)", shred->xid );
         // flag it
         shred->is_abort = TRUE;
     }
     else
     {
         // log
-        EM_log( CK_LOG_SEVERE, "cannot abort shred: nothing currently running!" );
+        EM_log( CK_LOG_HERALD, "cannot abort shred: nothing currently running!" );
     }
 
     return shred != NULL;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: get_current_shred()
+// desc: get currently executing shred
+//       NOTE this can only be non-NULL during a Chuck_VM::compute() cycle
+//-----------------------------------------------------------------------------
+Chuck_VM_Shred * Chuck_VM::get_current_shred() const
+{
+    // no shreduler
+    if( !m_shreduler ) return NULL;
+    // return shreduler's current shred
+    return m_shreduler->get_current_shred();
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: notify_watchers()
+// desc: notify watchers for a particular subscription | 1.5.1.5
+//-----------------------------------------------------------------------------
+void Chuck_VM::notify_watchers( ckvm_ShredsWatcherFlag which,
+                                Chuck_VM_Shred * shred,
+                                list<Chuck_VM_Shreds_Watcher> & v )
+{
+    // the function to call eventually
+    f_shreds_watcher f = NULL;
+    // iterator
+    list<Chuck_VM_Shreds_Watcher>::iterator it;
+    // iterate
+    for( it = v.begin(); it != v.end(); it++ )
+    {
+        // the function
+        f = (*it).cb;
+        // call it with user data
+        f( shred, which, 0, this, (*it).userdata );
+    }
 }
 
 
@@ -1238,7 +1463,7 @@ t_CKBOOL Chuck_VM::abort_current_shred( )
 void Chuck_VM::dump_shred( Chuck_VM_Shred * shred )
 {
     // log
-    EM_log( CK_LOG_FINER, "dumping shred (id==%d | ptr==%p)", shred->xid,
+    EM_log( CK_LOG_FINER, "dumping shred (id==%lu | ptr==%p)", shred->xid,
             (t_CKUINT)shred );
     // add
     m_shred_dump.push_back( shred );
@@ -1246,6 +1471,10 @@ void Chuck_VM::dump_shred( Chuck_VM_Shred * shred )
     shred->is_running = FALSE;
     shred->is_done = TRUE;
     shred->is_dumped = TRUE;
+
+    // before we reset the shred ID, notify watchers
+    notify_watchers( ckvm_shreds_watch_REMOVE, shred, m_shreds_watchers_remove );
+
     // TODO: cool?
     shred->xid = 0;
     // inc
@@ -1266,12 +1495,76 @@ void Chuck_VM::release_dump( )
 
     // iterate through dump
     for( t_CKUINT i = 0; i < m_shred_dump.size(); i++ )
+    {
+        // detach ugens | 1.5.1.5 (moved here from inside shred destructor)
+        // (ensure we always do this, even if release below doesn't
+        // actually delete the shred due to reference count)
+        m_shred_dump[i]->detach_ugens();
+        // release
         CK_SAFE_RELEASE( m_shred_dump[i] );
+    }
 
     // clear the dump
     m_shred_dump.clear();
     // reset
     m_num_dumped_shreds = 0;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// helper function
+//-----------------------------------------------------------------------------
+static void ckvm_process_watcher( t_CKBOOL add, list<Chuck_VM_Shreds_Watcher> & v,
+                                  Chuck_VM_Shreds_Watcher & watcher )
+{
+    // ensure no duplicates
+    list<Chuck_VM_Shreds_Watcher>::iterator it = std::find( v.begin(), v.end(), watcher );
+
+    // add or remove
+    if( add )
+    {
+        // if not found, add
+        if( it == v.end() ) v.push_back( watcher );
+    }
+    else if( it != v.end() )
+    {
+        // erase it
+        v.erase( it );
+    }
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: subscribe_watcher() | 1.5.1.5
+// desc: subscribe shreds watcher callback
+//-----------------------------------------------------------------------------
+void Chuck_VM::subscribe_watcher( f_shreds_watcher cb, t_CKUINT options, void * userdata )
+{
+    // check
+    if( !cb ) return;
+    // watcher bundle
+    Chuck_VM_Shreds_Watcher w( cb, userdata );
+    // check options and subscribe the watcher
+    ckvm_process_watcher( options & ckvm_shreds_watch_SPORK, m_shreds_watchers_spork, w );
+    ckvm_process_watcher( options & ckvm_shreds_watch_REMOVE, m_shreds_watchers_remove, w );
+    ckvm_process_watcher( options & ckvm_shreds_watch_SUSPEND, m_shreds_watchers_suspend, w );
+    ckvm_process_watcher( options & ckvm_shreds_watch_ACTIVATE, m_shreds_watchers_activate, w );
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: remove_watcher() | 1.5.1.5
+// desc: remove shreds watcher callback
+//-----------------------------------------------------------------------------
+void Chuck_VM::remove_watcher( f_shreds_watcher cb )
+{
+    subscribe_watcher( cb, ckvm_shreds_watch_NONE );
 }
 
 
@@ -1286,6 +1579,7 @@ Chuck_VM_Stack::Chuck_VM_Stack()
     stack = sp = sp_max = NULL;
     prev = next = NULL;
     m_is_init = FALSE;
+    m_size = 0;
 }
 
 
@@ -1315,7 +1609,7 @@ Chuck_VM_Code::Chuck_VM_Code()
     need_this = FALSE;
     is_static = FALSE;
     native_func = 0;
-    native_func_type = NATIVE_UNKNOWN;
+    native_func_kind = ae_fp_unknown;
 }
 
 
@@ -1344,34 +1638,43 @@ Chuck_VM_Code::~Chuck_VM_Code()
 
 
 
+// minimum stack size | 1.5.1.5 (ge) added
+#define VM_STACK_MINIMUM_SIZE 2048
 // offset in bytes at the beginning of a stack for initializing data
-#define VM_STACK_OFFSET  16
-// 1/factor of stack is left blank, to give room to detect overflow
-#define VM_STACK_PADDING_FACTOR 16
+#define VM_STACK_OFFSET 16
+// overflow padding in bytes, to allow some overflow before detection
+#define VM_STACK_OVERFLOW_PADDING 512
 //-----------------------------------------------------------------------------
 // name: initialize()
-// desc: initialize VM stack
+// desc: initialize VM stack, with at least 'size' bytes
 //-----------------------------------------------------------------------------
 t_CKBOOL Chuck_VM_Stack::initialize( t_CKUINT size )
 {
-    if( m_is_init )
-        return FALSE;
+    // check if already initialized
+    if( m_is_init ) return FALSE;
 
-    // make room for header
-    size += VM_STACK_OFFSET;
+    // ensure stack size >= minimum size | 1.5.1.5
+    if( size < VM_STACK_MINIMUM_SIZE ) size = VM_STACK_MINIMUM_SIZE;
+    // actual size in bytes to allocate; stack header + size + overflow pad
+    t_CKUINT alloc_size = VM_STACK_OFFSET + size + VM_STACK_OVERFLOW_PADDING;
+
     // allocate stack
-    stack = new t_CKBYTE[size];
+    stack = new t_CKBYTE[alloc_size];
     if( !stack ) goto out_of_memory;
-
-    // zero
-    memset( stack, 0, size );
+    // zero the memory
+    memset( stack, 0, alloc_size );
 
     // advance stack after the header
     stack += VM_STACK_OFFSET;
     // set the sp
     sp = stack;
-    // upper limit (padding factor)
-    sp_max = sp + size - (size / VM_STACK_PADDING_FACTOR);
+    // upper limit (beyond which is the overflow padding)
+    sp_max = stack + size;
+    // remember size
+    m_size = size;
+
+    // log
+    EM_log( CK_LOG_FINER, "allocated VM stack (size:%lu alloc:%lu)", size, alloc_size );
 
     // set flag and return
     return m_is_init = TRUE;
@@ -1379,7 +1682,7 @@ t_CKBOOL Chuck_VM_Stack::initialize( t_CKUINT size )
 out_of_memory:
 
     // we have a problem
-    EM_error2( 0, "(VM) OutOfMemory: while allocating stack" );
+    EM_exception( "OutOfMemory: VM stack [size=%lu alloc=%lu]", size, alloc_size );
 
     // return FALSE
     return FALSE;
@@ -1397,13 +1700,17 @@ t_CKBOOL Chuck_VM_Stack::shutdown()
     if( !m_is_init )
         return FALSE;
 
-    // free the stack
+    // return stack to the allocation point
     stack -= VM_STACK_OFFSET;
+    // free the stack
     CK_SAFE_DELETE_ARRAY( stack );
+    // zero out the stack pointer
     sp = sp_max = NULL;
 
     // set the flag to false
     m_is_init = FALSE;
+    // set size to 0 | 1.5.1.5
+    m_size = 0;
 
     return TRUE;
 }
@@ -1417,14 +1724,12 @@ t_CKBOOL Chuck_VM_Stack::shutdown()
 //-----------------------------------------------------------------------------
 Chuck_VM_Shred::Chuck_VM_Shred()
 {
-    mem = new Chuck_VM_Stack;
-    reg = new Chuck_VM_Stack;
+    mem = NULL;
+    reg = NULL;
     code = code_orig = NULL;
     next = prev = NULL;
     instr = NULL;
     parent = NULL;
-    // obj_array = NULL;
-    // obj_array_size = 0;
     base_ref = NULL;
     vm_ref = NULL;
     event = NULL;
@@ -1439,6 +1744,18 @@ Chuck_VM_Shred::Chuck_VM_Shred()
     now = 0;
     start = 0;
     wake_time = 0;
+
+    // set children stack size hints to default | 1.5.1.5
+    childSetMemSize( 0 );
+    childSetRegSize( 0 );
+
+    // immediate mode | 1.5.1.5
+    is_immediate_mode = FALSE;
+    is_immediate_mode_violation = FALSE;
+
+    // garbage collection related | 1.5.2.0
+    m_gc_inc = 0;
+    m_gc_threshold = 4192; // default samps until next per-shred GC event
 
 #ifndef __DISABLE_SERIAL__
     m_serials = NULL;
@@ -1471,17 +1788,34 @@ t_CKBOOL Chuck_VM_Shred::initialize( Chuck_VM_Code * c,
                                      t_CKUINT mem_stack_size,
                                      t_CKUINT reg_stack_size )
 {
-    // allocate mem and reg
-    if( !mem->initialize( mem_stack_size ) ) return FALSE;
-    if( !reg->initialize( reg_stack_size ) ) return FALSE;
+    // ensure we don't multi-initialize the shred | 1.5.1.5
+    // FYI explicitly call shutdown() before re-initializing shred
+    if( mem ) return FALSE;
+
+    // verify
+    assert( vm_ref != NULL );
+
+    // allocate new stacks
+    mem = new Chuck_VM_Stack;
+    reg = new Chuck_VM_Stack;
+
+    // check for default | 1.5.1.5
+    if( mem_stack_size == 0 ) mem_stack_size = CKVM_MEM_STACK_SIZE;
+    if( reg_stack_size == 0 ) reg_stack_size = CKVM_REG_STACK_SIZE;
+
+    // initialize mem and reg
+    if( !mem->initialize( mem_stack_size ) ) goto error;
+    if( !reg->initialize( reg_stack_size ) ) goto error;
 
     // program counter
     pc = 0;
     next_pc = 1;
-    // code pointer
-    code_orig = code = c;
-    // add reference
-    code_orig->add_ref();
+    // copy vm code for this shred
+    CK_SAFE_REF_ASSIGN( code_orig, c );
+    // initialize code to shred origin code
+    code = code_orig;
+    // set the instr | possible shred origin code == NULL (e.g., `Shred s;`)
+    instr = code ? code->instr : NULL;
     // shred in dump (all done)
     is_dumped = FALSE;
     // shred done
@@ -1490,15 +1824,170 @@ t_CKBOOL Chuck_VM_Shred::initialize( Chuck_VM_Code * c,
     is_running = FALSE;
     // shred abort
     is_abort = FALSE;
-    // set the instr
-    instr = c->instr;
     // zero out the id
     xid = 0;
 
     // initialize
-    initialize_object( this, vm_ref->env()->ckt_shred );
+    if( !initialize_object( this, vm_ref->env()->ckt_shred, this, vm_ref ) ) goto error;
+
+    // inherit size hints for shreds sporked from this shred | 1.5.1.5
+    childSetMemSize( mem_stack_size );
+    childSetRegSize( reg_stack_size );
 
     return TRUE;
+
+error:
+    // clean up what has been allocated so far
+    shutdown();
+
+    return FALSE;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: detach_ugens()
+// desc: detach all associate ugens created on a shred
+//-----------------------------------------------------------------------------
+void Chuck_VM_Shred::detach_ugens()
+{
+    // check if we have anything in ugen map for this shred
+    if( !m_ugen_map.size() )
+        return;
+
+    // spencer - March 2012 (added 1.3.0.0)
+    // can't dealloc ugens while they are still keys to a map;
+    // add reference, store them in a vector, and release them after
+    // SPENCERTODO: is there a better way to do this????
+    std::vector<Chuck_UGen *> release_v;
+    release_v.reserve( m_ugen_map.size() );
+
+    // get iterator to our map
+    map<Chuck_UGen *, Chuck_UGen *>::iterator iter = m_ugen_map.begin();
+    while( iter != m_ugen_map.end() )
+    {
+        // get the ugen
+        Chuck_UGen * ugen = iter->first;
+
+        // store ref in array for now (added 1.3.0.0)
+        // NOTE no need to bump reference since now ugen_map ref counts
+        release_v.push_back(ugen);
+
+        // make sure if ugen has an origin shred, it is this one | 1.5.1.5
+        assert( !ugen->originShred() || ugen->originShred() == this );
+        // also clear reference to this shred | 1.5.1.5
+        ugen->setOriginShred( NULL );
+        // disconnect
+        ugen->disconnect( TRUE );
+
+        // advance the iterator
+        iter++;
+    }
+    // clear map
+    m_ugen_map.clear();
+
+    // loop over vector
+    for( vector<Chuck_UGen *>::iterator rvi = release_v.begin();
+         rvi != release_v.end(); rvi++ )
+    {
+        // cerr << "RELEASE: " << (void *) *rvi<< endl;
+        // release it
+        CK_SAFE_RELEASE( *rvi );
+    }
+    // clear the release vector
+    release_v.clear();
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: prune_ugens() | 1.5.2.0 (ge) added
+// desc: manually trigger a pruning of UGens that can be safely released,
+//       associated with this shred, instead of waiting for the shred to finish
+//       NOTE this can be useful if a shred dynamically creates a lot of
+//       UGens without exiting
+//-----------------------------------------------------------------------------
+void Chuck_VM_Shred::prune_ugens()
+{
+    // check if we have anything in ugen map for this shred
+    if( !m_ugen_map.size() )
+        return;
+
+    // ugens to release
+    std::vector<Chuck_UGen *> release_v;
+
+    // get iterator to our map
+    map<Chuck_UGen *, Chuck_UGen *>::iterator iter = m_ugen_map.begin();
+    while( iter != m_ugen_map.end() )
+    {
+        // get the ugen
+        Chuck_UGen * ugen = iter->first;
+
+        // verify
+        assert( ugen->refcount() > 0 );
+        // check for ugens with only one reference (to this shred)
+        if( ugen->refcount() == 1 ) release_v.push_back( ugen );
+
+        // advance the iterator
+        iter++;
+    }
+
+    // check if anything to prune
+    if( release_v.size() )
+    {
+        // log
+        EM_log( CK_LOG_FINE, "pruning '%ld' ugen(s) from shred: %x...", release_v.size(), this );
+
+        // loop over vector
+        for( vector<Chuck_UGen *>::iterator rvi = release_v.begin();
+            rvi != release_v.end(); rvi++ )
+        {
+            // remove from map
+            m_ugen_map.erase( *rvi );
+            // release the ugen
+            CK_SAFE_RELEASE( *rvi );
+        }
+        // clear the release vector
+        release_v.clear();
+    }
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: gc_inc() | 1.5.2.0 (ge) added
+// desc: acrue towards a GC pass
+//-----------------------------------------------------------------------------
+void Chuck_VM_Shred::gc_inc( t_CKDUR inc )
+{
+    // log
+    // EM_log( CK_LOG_FINE, "accruing '%f' towards GC on shred: %x", inc, this );
+
+    // accumulate
+    m_gc_inc += inc;
+    // check threshold
+    if( m_gc_inc > m_gc_threshold )
+    {
+        // invoke gc
+        gc();
+        // reset inc
+        m_gc_inc = 0;
+    }
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: gc() | 1.5.2.0 (ge) added
+// desc: manually trigger a pre-shred garbage collection pass
+//-----------------------------------------------------------------------------
+void Chuck_VM_Shred::gc()
+{
+    this->prune_ugens();
 }
 
 
@@ -1510,90 +1999,60 @@ t_CKBOOL Chuck_VM_Shred::initialize( Chuck_VM_Code * c,
 //-----------------------------------------------------------------------------
 t_CKBOOL Chuck_VM_Shred::shutdown()
 {
-    // spencer - March 2012 (added 1.3.0.0)
-    // can't dealloc ugens while they are still keys to a map;
-    // add reference, store them in a vector, and release them after
-    // SPENCERTODO: is there a better way to do this????
-    std::vector<Chuck_UGen *> release_v;
-    release_v.reserve(m_ugen_map.size());
+    // detach ugens
+    detach_ugens();
 
-    // get iterator to our map
-    map<Chuck_UGen *, Chuck_UGen *>::iterator iter = m_ugen_map.begin();
-    while( iter != m_ugen_map.end() )
+    // check if we have parent object references to clean up
+    if( m_parent_objects.size() )
     {
-        // get the ugen
-        Chuck_UGen * ugen = iter->first;
-        // CK_GC_LOG("Chuck_VM_Shred::shutdown() disconnect: 0x%08x", ugen);
-
-        // store ref in array for now (added 1.3.0.0)
-        release_v.push_back(ugen);
-        // no need to bump reference since now ugen_map ref counts
-        // ugen->add_ref();
-
-        // disconnect
-        ugen->disconnect( TRUE );
-
-        // advance the iterator
-        iter++;
+        // loop over parent object references (added 1.3.1.2)
+        for( vector<Chuck_Object *>::iterator it = m_parent_objects.begin();
+             it != m_parent_objects.end(); it++ )
+        {
+            // release it
+            CK_SAFE_RELEASE( *it );
+        }
+        // clear the vectors (added 1.3.1.2)
+        m_parent_objects.clear();
     }
-
-    // clear map
-    m_ugen_map.clear();
-
-    // loop over vector
-    for( vector<Chuck_UGen *>::iterator rvi = release_v.begin();
-         rvi != release_v.end(); rvi++ )
-    {
-        // release it
-        (*rvi)->release();
-    }
-
-    // loop over parent object references (added 1.3.1.2)
-    for( vector<Chuck_Object *>::iterator it = m_parent_objects.begin();
-         it != m_parent_objects.end(); it++ )
-    {
-        // release it
-        (*it)->release();
-    }
-
-    // clear the vectors (added 1.3.1.2)
-    release_v.clear();
-    m_parent_objects.clear();
 
     // reclaim the stacks
     CK_SAFE_DELETE( mem );
     CK_SAFE_DELETE( reg );
     base_ref = NULL;
 
-    // delete temp pointer space
-    // CK_SAFE_DELETE_ARRAY( obj_array );
-    // obj_array_size = 0;
-
-    // TODO: is this right?
-    if( code_orig )
-        code_orig->release();
+    // release vm code
+    CK_SAFE_RELEASE( code_orig );
     // clear it
     code_orig = code = NULL;
 
+    // set children stack size hints to default | 1.5.1.5
+    childSetMemSize( 0 );
+    childSetRegSize( 0 );
+
     #ifndef __DISABLE_SERIAL__
     // HACK (added 1.3.2.0): close serial devices
-    if(m_serials != NULL)
+    if( m_serials != NULL )
     {
-        for(list<Chuck_IO_Serial *>::iterator i = m_serials->begin(); i != m_serials->end(); i++)
+        for( list<Chuck_IO_Serial *>::iterator i = m_serials->begin(); i != m_serials->end(); i++ )
         {
-            (*i)->release();
+            // close first
             (*i)->close();
+            // release
+            CK_SAFE_RELEASE( *i );
         }
-
+        // clear list
         m_serials->clear();
-        CK_SAFE_DELETE(m_serials);
+        // clean up list
+        CK_SAFE_DELETE( m_serials );
     }
     #endif
 
     // 1.3.5.3 pop all loop counters
     while( this->popLoopCounter() );
 
-    // TODO: what to do with next and prev?
+    // NOTE what to do with next and prev? for now, nothing...
+    // next/prev should be handled externally, e.g., by shreduler
 
     return TRUE;
 }
@@ -1611,7 +2070,7 @@ t_CKBOOL Chuck_VM_Shred::add( Chuck_UGen * ugen )
         return FALSE;
 
     // increment reference count (added 1.3.0.0)
-    ugen->add_ref();
+    CK_SAFE_ADD_REF( ugen );
 
     // RUBBISH
     // cerr << "vm add ugen: 0x" << hex << (int)ugen << endl;
@@ -1632,14 +2091,12 @@ t_CKBOOL Chuck_VM_Shred::remove( Chuck_UGen * ugen )
     if( !ugen || !m_ugen_map[ugen] )
         return FALSE;
 
+    // remove it
+    m_ugen_map.erase( ugen );
+
     // decrement reference count (added 1.3.0.0)
     ugen->release();
 
-    // RUBBISH
-    // cerr << "vm remove ugen: 0x" << hex << (int)ugen << endl;
-
-    // remove it
-    m_ugen_map.erase( ugen );
     return TRUE;
 }
 
@@ -1661,6 +2118,86 @@ t_CKVOID Chuck_VM_Shred::add_parent_ref( Chuck_Object * obj )
 
     // add it to vector
     m_parent_objects.push_back( obj );
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: childSetMemSize() | 1.5.1.3
+// desc: set hint; affects children shreds sporked from this one
+//-----------------------------------------------------------------------------
+t_CKINT Chuck_VM_Shred::childSetMemSize( t_CKINT sizeInBytes )
+{
+    // check for negative
+    if( sizeInBytes < 0 ) sizeInBytes = 0;
+    // mem is call stack (for function calls / local vars)
+    memStackSize = sizeInBytes;
+    // return
+    return childGetMemSize();
+}
+// get value (if 0, return default)
+t_CKINT Chuck_VM_Shred::childGetMemSize()
+{ return memStackSize > 0 ? memStackSize : CKVM_MEM_STACK_SIZE; }
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: childSetRegSize() | 1.5.1.3
+// desc: set hint; affects children shreds sporked from this one
+//-----------------------------------------------------------------------------
+t_CKINT Chuck_VM_Shred::childSetRegSize( t_CKINT sizeInBytes )
+{
+    // check for negative
+    if( sizeInBytes < 0 ) sizeInBytes = 0;
+    // reg is operand stack (for evaluating expressions)
+    regStackSize = sizeInBytes;
+    // return
+    return regStackSize;
+}
+// get value (if 0, return default)
+t_CKINT Chuck_VM_Shred::childGetRegSize()
+{ return regStackSize > 0 ? regStackSize : CKVM_REG_STACK_SIZE; }
+
+
+
+
+//-----------------------------------------------------------------------------
+// mechanism to observe the growth of maximum stacks depth (reg and mem) across
+// all shreds;  when enabled, this is called every instruction in the VM;
+// used to gauge stack utilization and to assess default shred stacks sizes
+// 1.5.1.5 (ge) added
+//-----------------------------------------------------------------------------
+static t_CKUINT g_mem_stack_depth_reached = 0;
+static t_CKUINT g_reg_stack_depth_reached = 0;
+static void ckvm_observe_stackdepth_across_all_shreds( Chuck_VM_Shred * currentShred )
+{
+    // track stack depth
+    t_CKBOOL printStackInfo = FALSE;
+
+    // mem stack (for local variables)
+    t_CKUINT mem_depth = currentShred->mem->sp - currentShred->mem->stack;
+    if( mem_depth > g_mem_stack_depth_reached )
+    {
+        g_mem_stack_depth_reached = mem_depth;
+        printStackInfo = TRUE;
+    }
+
+    // mem stack (for operands, e.g., in expression or in array initializer lists)
+    t_CKUINT reg_depth = currentShred->reg->sp - currentShred->reg->stack;
+    if( reg_depth > g_reg_stack_depth_reached )
+    {
+        g_reg_stack_depth_reached = reg_depth;
+        printStackInfo = TRUE;
+    }
+
+    // something new to print
+    if( printStackInfo )
+    {
+        CK_FPRINTF_STDERR( "[chuck]:(VM DEBUG) global max stack depths -> mem:%lu reg:%lu\n",
+                           g_mem_stack_depth_reached, g_reg_stack_depth_reached );
+    }
 }
 
 
@@ -1697,19 +2234,30 @@ CK_VM_STACK_DEBUG( CK_FPRINTF_STDERR( "CK_VM_DEBUG mem sp in: 0x%08lx out: 0x%08
 CK_VM_STACK_DEBUG( CK_FPRINTF_STDERR( "CK_VM_DEBUG reg sp in: 0x%08lx out: 0x%08lx\n",
                    (unsigned long)t_reg_sp, (unsigned long)this->reg->sp ) );
 //-----------------------------------------------------------------------------
+        // detect operand stack overflow | 1.5.1.5
+        if( overflow_( this->reg ) )
+        { ck_handle_overflow( this, vm_ref, "shred operand stack exceeded" ); break; }
+        // detect mem stack overflow ("catch all") | 1.5.1.5
+        // NOTE func-call & alloc instrucions already detect
+        if( overflow_( this->mem ) && is_running ) // <- is_running==FALSE if already detected
+        { ck_handle_overflow( this, vm_ref, "shred memory stack exceeded" ); break; }
+
         // set to next_pc;
         pc = next_pc;
+        // advance program counter
         next_pc++;
 
         // track number of cycles
         CK_TRACK( this->stat->cycles++ );
+        // if enabled, update shred stacks depth observation | 1.5.1.5
+        CK_VM_STACK_OBSERVE( ckvm_observe_stackdepth_across_all_shreds( this ) );
     }
 
     // check abort
     if( is_abort )
     {
         // log
-        EM_log( CK_LOG_SYSTEM, "aborting shred (id: %d)", this->xid );
+        EM_log( CK_LOG_SYSTEM, "aborting shred (id: %lu)", this->xid );
         // done
         is_done = TRUE;
     }
@@ -1732,10 +2280,14 @@ t_CKBOOL Chuck_VM_Shred::yield()
     // need a VM to yield on
     if( !this->vm_ref ) return FALSE;
 
+    // check for immediate mode exception | 1.5.1.5 (ge)
+    if( this->checkImmediatModeException() ) return FALSE;
+
     // suspend this shred
     this->is_running = FALSE;
     // reshredule this at the current time
     vm_ref->shreduler()->shredule( this, this->now );
+
     // done
     return TRUE;
 }
@@ -1828,6 +2380,52 @@ bool Chuck_VM_Shred::popLoopCounter()
     return true;
 }
 
+
+
+
+//-----------------------------------------------------------------------------
+// name: checkImmediatModeException() | 1.5.1.5 (ge) added
+// desc: check for immediate mode exception, if detected print and set state
+//-----------------------------------------------------------------------------
+t_CKBOOL Chuck_VM_Shred::checkImmediatModeException( t_CKUINT linepos )
+{
+    // check for immediate mode
+    if( this->immediateMode() )
+    {
+        // we have a problem
+        EM_exception( "ImmediateModeTemporalViolation:" );
+        // check linepos
+        if( linepos ) EM_exception( " |- on line %lu within %s", linepos, this->name.c_str() );
+        else          EM_exception( " |- within %s", this->name.c_str() );
+        // more info
+        EM_error3(
+                  "\nThis exception is thrown if shred has been placed in IMMEDIATE MODE\n"
+                  "and performs any time/event-related, context-switching operations, including:\n"
+                  "    1) advancing time (including by 0 duration),\n"
+                  "    2) or waiting on an Event,\n"
+                  "    3) or callling `me.yield()` or `Machine.eval()`;\n"
+                  "       (the latter implicits yields to runs code on a new shred)." );
+        // more info
+        EM_error3(
+                  "\nIMMEDIATE MODE is set by the ChucK virtual machine in specific cases\n"
+                  "where the programmer is to provide a time-critical callback function\n"
+                  "that is expected to return \"immediately\", i.e., without any shreduling.\n"
+                  "Examples include `tick()` in Chugens and `update()` in GGens." );
+        // potential fix
+        EM_error3(
+                  "\nPotential fix: ensure the function in question has no time/event operations as\n"
+                  "described above, either directly in the function or its function calls.\n"
+                  "(NB `spork ~` and `Machine.add()` can be used in this mode, as these are\n"
+                  "non-context-switching.)\n------");
+        // set violation
+        is_immediate_mode_violation = TRUE;
+        // report back
+        return TRUE;
+    }
+
+    // situation normal
+    return FALSE;
+}
 
 
 
@@ -1986,6 +2584,14 @@ t_CKBOOL Chuck_VM_Shreduler::shredule( Chuck_VM_Shred * shred,
         return FALSE;
     }
 
+    // check for immediate mode and report exception | 1.5.1.5 (ge)
+    if( shred->checkImmediatModeException() )
+    {
+        // let's not shredule!
+        return FALSE;
+    }
+
+    // set wake time
     shred->wake_time = wake_time;
 
     // list empty
@@ -2344,6 +2950,15 @@ t_CKBOOL Chuck_VM_Shreduler::remove( Chuck_VM_Shred * out )
         return remove_blocked( out );
     }
 
+    // if current shred | 1.5.1.3 (ge) added
+    if( out == m_current_shred )
+    {
+        // flag as done, and let the VM gracefully clean up the current shred
+        m_current_shred->is_done = TRUE;
+        m_current_shred->is_abort = TRUE;
+        return TRUE;
+    }
+
     // sanity check
     if( !out->prev && !out->next && out != shred_list )
         return FALSE;
@@ -2639,9 +3254,9 @@ void Chuck_VM_Shreduler::status()
     t_CKUINT h = m_status.t_hour;
     t_CKUINT m = m_status.t_minute;
     t_CKUINT sec = m_status.t_second;
-    EM_print2magenta( "(VM) status | # of shreds in VM: %ld", m_status.list.size() );
-    EM_print2vanilla( "chuck time: %.0f::samp (%ldh%ldm%lds)", m_status.now_system, h, m, sec );
-    EM_print2vanilla( "earth time: %s", timestamp_formatted().c_str() );
+    EM_print2magenta( "(VM status) # of shreds in VM: %ld", m_status.list.size() );
+    EM_print2magenta( "local time: %s", timestamp_formatted().c_str() );
+    EM_print2magenta( "chuck time: %.0f::samp (%ldh%ldm%lds)", m_status.now_system, h, m, sec );
 
     // print status
     if( m_status.list.size() ) EM_print2vanilla( "--------" );
@@ -2698,6 +3313,549 @@ void Chuck_VM_Status::clear()
     }
 
     list.clear();
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: Chuck_VM_MFunInvoker()
+// desc: constructor
+//-----------------------------------------------------------------------------
+Chuck_VM_MFunInvoker::Chuck_VM_MFunInvoker()
+{
+    // zero
+    invoker_shred = NULL;
+    instr_pushThis = NULL;
+    instr_pushReturnVar = NULL;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: ~Chuck_VM_MFunInvoker()
+// desc: destructor
+//-----------------------------------------------------------------------------
+Chuck_VM_MFunInvoker::~Chuck_VM_MFunInvoker()
+{
+    cleanup();
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: setup()
+// desc: setup the invoker for use
+//-----------------------------------------------------------------------------
+t_CKBOOL Chuck_VM_MFunInvoker::setup( Chuck_Func * func, t_CKUINT func_vt_offset, Chuck_VM * vm, Chuck_VM_Shred * caller )
+{
+    // clean up first
+    if( invoker_shred ) cleanup();
+
+    // a vector of VM instructions
+    vector<Chuck_Instr *> instructions;
+
+    // get argument list
+    a_Arg_List args = func->def()->arg_list;
+    // argument size in bytes
+    t_CKUINT args_size_bytes = 0;
+    // type kind
+    te_KindOf kind = kindof_VOID;
+    // iterate over arguments
+    while( args )
+    {
+        // get size
+        args_size_bytes += args->type->size;
+        // get kind
+        kind = getkindof( vm->env(), args->type );
+
+        // check kind; allocate instruction (with placeholder values; to be filled when invoked)
+        switch( kind )
+        {
+            case kindof_INT:
+                // push value INT
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm(0) );
+                break;
+
+            case kindof_FLOAT:
+                // push value FLOAT
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                break;
+
+            case kindof_VEC2: // vec2 / complex / polar
+                // push value FLOAT FLOAT
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                break;
+
+            case kindof_VEC3:
+                // push value FLOA FLOAT FLOAT
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                break;
+
+            case kindof_VEC4:
+                // push value FLOA FLOAT FLOAT FLOAT
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                instr_args.push_back( new Chuck_Instr_Reg_Push_Imm2(0) );
+                break;
+
+            // shouldn't get here
+            case kindof_VOID:
+            default:
+                // error
+                EM_error3( "(internal error) unhandled argument kind in MFunInvoker.init()" );
+                // clean up
+                for( t_CKUINT i = 0; i < instr_args.size(); i++ ) CK_SAFE_DELETE( instr_args[i] );
+                // clear the array
+                instr_args.clear();
+                // error out
+                return FALSE;
+        }
+
+        // next arg
+        args = args->next;
+    }
+    // account for 'this', since this is a member function
+    args_size_bytes += sz_VOIDPTR;
+
+    // push arguments
+    for( t_CKUINT i = 0; i < instr_args.size(); i++ )
+    {
+        // copy references over
+        instructions.push_back( instr_args[i] );
+    }
+    // push this (as func arg) -- will set later
+    instr_pushThis = new Chuck_Instr_Reg_Push_Imm( 0 );
+    instructions.push_back( instr_pushThis );
+    // reg dup last (push this again) (for member func resolution)
+    instructions.push_back( new Chuck_Instr_Reg_Dup_Last);
+    // dot member func
+    instructions.push_back( new Chuck_Instr_Dot_Member_Func(func_vt_offset) );
+    // func to code
+    instructions.push_back( new Chuck_Instr_Func_To_Code );
+    // frame offset; use 0 since we have no local variables
+    // was: push stack depth (in bytes)
+    // was: instructions.push_back( new Chuck_Instr_Reg_Push_Imm(args_size_bytes) );
+    instructions.push_back( new Chuck_Instr_Reg_Push_Imm(0) );
+    // func call
+    instructions.push_back( new Chuck_Instr_Func_Call());
+
+    // figure out what to assign based on return type kind
+    kind = getkindof( vm->env(), func->type() );
+
+    // if not void
+    if( kind != kindof_VOID )
+    {
+        // push immediate to copy RETURN
+        instr_pushReturnVar = new Chuck_Instr_Reg_Push_Imm(0);
+        instructions.push_back( instr_pushReturnVar ); // 1.3.1.0: changed to t_CKUINT
+    }
+
+    // check kind; allocate instruction (with placeholder values; to be filled when invoked)
+    switch( kind )
+    {
+        case kindof_INT: // assign int or object ref
+            if( isobj(vm->env(), func->type()) ) {
+                // return type is an Object reference
+                instructions.push_back( new Chuck_Instr_Assign_Object );
+                instructions.push_back( new Chuck_Instr_Release_Object3_Pop_Int );
+            } else {
+                // return type is a primitive int
+                instructions.push_back( new Chuck_Instr_Assign_Primitive );
+                instructions.push_back( new Chuck_Instr_Reg_Pop_Int );
+            }
+            break;
+        case kindof_FLOAT: // assign float
+            instructions.push_back( new Chuck_Instr_Assign_Primitive2 );
+            instructions.push_back( new Chuck_Instr_Reg_Pop_Float );
+           break;
+        case kindof_VEC2: // assign vec2 / complex / polar
+            instructions.push_back( new Chuck_Instr_Assign_Primitive4 );
+            instructions.push_back( new Chuck_Instr_Reg_Pop_Vec2ComplexPolar );
+            break;
+        case kindof_VEC3: // assign vec3
+            instructions.push_back( new Chuck_Instr_Assign_PrimitiveVec3 );
+            instructions.push_back( new Chuck_Instr_Reg_Pop_Vec3 );
+            break;
+        case kindof_VEC4: // assign vec4
+            instructions.push_back( new Chuck_Instr_Assign_PrimitiveVec4 );
+            instructions.push_back( new Chuck_Instr_Reg_Pop_Vec4 );
+            break;
+
+        // shouldn't get here
+        case kindof_VOID:
+            // do nothing for void return type
+            break;
+
+        default:
+            // error
+            EM_error3( "(internal error) unhandled argument kind in MFunInvoker.init()" );
+            // clean up instructions
+            for( t_CKUINT i = 0; i < instructions.size(); i++ ) CK_SAFE_DELETE( instructions[i] );
+            // clear instructions
+            instructions.clear();
+            // error out
+            return FALSE;
+    }
+
+    // end of code
+    instructions.push_back( new Chuck_Instr_EOC);
+
+    // create VM code
+    Chuck_VM_Code * code = new Chuck_VM_Code;
+    // allocate instruction array
+    code->instr = new Chuck_Instr*[instructions.size()];
+    // number of instructions
+    code->num_instr = instructions.size();
+    // copy instructions
+    for( t_CKUINT i = 0; i < instructions.size(); i++ ) code->instr[i] = instructions[i];
+    // TODO: should this be > 0
+    code->stack_depth = 0;
+    // TODO: should this be this true?
+    code->need_this = FALSE;
+
+    // create dedicated shred
+    invoker_shred = new Chuck_VM_Shred;
+    // set the VM ref (needed by initialize)
+    invoker_shred->vm_ref = vm;
+    // initialize with code + allocate stacks
+    invoker_shred->initialize( code );
+    // set name
+    invoker_shred->name = func->signature(FALSE,TRUE);
+    // enter immediate mode (will throw runtime exception on any time/event ops)
+    invoker_shred->setImmediateMode( TRUE );
+
+    // done
+    return TRUE;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// helper function
+//-----------------------------------------------------------------------------
+static Chuck_Instr_Reg_Push_Imm * ckvm_next_instr_as_int( vector<Chuck_Instr *> & v, t_CKUINT & index )
+{
+    // check bounds
+    if( index >= v.size() )
+    {
+        // error
+        EM_error3( "(internal error) misaligned arguments (get int) in MFunInvoker.invoke()" );
+        return NULL;
+    }
+
+    return (Chuck_Instr_Reg_Push_Imm *)v[index++];
+}
+//-----------------------------------------------------------------------------
+// helper function
+//-----------------------------------------------------------------------------
+static Chuck_Instr_Reg_Push_Imm2 * ckvm_next_instr_as_float( vector<Chuck_Instr *> & v, t_CKUINT & index )
+{
+    // check bounds
+    if( index >= v.size() )
+    {
+        // error
+        EM_error3( "(internal error) misaligned arguments (get float) in MFunInvoker.invoke()" );
+        return NULL;
+    }
+
+    return (Chuck_Instr_Reg_Push_Imm2 *)v[index++];
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: invoke()
+// desc: invoke the mfun
+//-----------------------------------------------------------------------------
+Chuck_DL_Return Chuck_VM_MFunInvoker::invoke( Chuck_Object * obj, const vector<Chuck_DL_Arg> & args, Chuck_VM_Shred * parent_shred )
+{
+    // the return value
+    Chuck_DL_Return RETURN;
+    // instruction pointers
+    Chuck_Instr_Reg_Push_Imm * instr_pushInt = NULL;
+    Chuck_Instr_Reg_Push_Imm2 * instr_pushFloat = NULL;
+    // index
+    t_CKUINT index = 0;
+    // no shred?
+    if( !invoker_shred ) return RETURN;
+    // verify
+    assert( instr_pushThis != NULL );
+
+    // set the actual argument values into the instructions
+    for( t_CKUINT i = 0; i < args.size(); i++ )
+    {
+        // the current arg
+        Chuck_DL_Arg arg = args[i];
+        // check the argument kind
+        switch( arg.kind )
+        {
+            case kindof_INT:
+                instr_pushInt = ckvm_next_instr_as_int(instr_args, index); if( !instr_pushInt ) goto error;
+                instr_pushInt->set( arg.value.v_int );
+                break;
+            case kindof_FLOAT:
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_float );
+                break;
+            case kindof_VEC2:
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_vec2.x );
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_vec2.y );
+                break;
+            case kindof_VEC3:
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_vec3.x );
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_vec3.y );
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_vec3.z );
+                break;
+            case kindof_VEC4:
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_vec4.x );
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_vec4.y );
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_vec4.z );
+                instr_pushFloat = ckvm_next_instr_as_float(instr_args, index); if( !instr_pushFloat ) goto error;
+                instr_pushFloat->set( arg.value.v_vec4.w );
+                break;
+            case kindof_VOID:
+            default:
+                // error
+                EM_error3( "(internal error) unhandle argument kind in MFunInvoker.invoke()" );
+                goto error;
+        }
+    }
+
+    // arguments not matched, more expected
+    if( index < instr_args.size() )
+    {
+        // error
+        EM_error3( "(internal error) misaligned arguments (left over) in MFunInvoker.invoke()" );
+        goto error;
+    }
+
+    // set this pointer
+    instr_pushThis->set( (t_CKUINT)obj );
+    // set the return var, if the function was set up to return a value
+    if( instr_pushReturnVar ) instr_pushReturnVar->set( (t_CKUINT)&RETURN );
+
+    // reset shred: program counter
+    invoker_shred->pc = 0;
+    // next pc
+    invoker_shred->next_pc = 1;
+
+    // set parent
+    invoker_shred->parent = parent_shred;
+    // commented out: parent if any should have been set in setup()
+    // invoker_shred->parent = obj->originShred();
+
+    // set parent base_ref; in case mfun is part of a non-public class
+    // that can access file-global variables outside the class definition
+    if( invoker_shred->parent ) invoker_shred->base_ref = invoker_shred->parent->base_ref;
+    else invoker_shred->base_ref = invoker_shred->mem;
+
+    // shred in dump (all done)
+    invoker_shred->is_dumped = FALSE;
+    // shred done
+    invoker_shred->is_done = FALSE;
+    // shred running
+    invoker_shred->is_running = FALSE;
+    // shred abort
+    invoker_shred->is_abort = FALSE;
+    // set the instr
+    invoker_shred->instr = invoker_shred->code->instr;
+    // zero out the id (shred is in immediate mode and cannot be shreduled)
+    invoker_shred->xid = 0;
+    // inherit now from vm
+    invoker_shred->now = invoker_shred->vm_ref->now();
+    // run shred on VM
+    invoker_shred->run( invoker_shred->vm_ref );
+
+    // done; by the point, return should have been filled with return value, if func has one
+    return RETURN;
+
+error:
+    // do the same thing for now
+    return RETURN;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: cleanup()
+// desc: clean up
+//-----------------------------------------------------------------------------
+void Chuck_VM_MFunInvoker::cleanup()
+{
+    // release shred reference
+    // NB this should also cleanup the code and VM instruction we created in setup
+    CK_SAFE_RELEASE( invoker_shred );
+
+    // clear the arg instructions
+    instr_args.clear();
+
+    // zero out
+    instr_pushThis = NULL;
+    instr_pushReturnVar = NULL;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: Chuck_VM_DtorInvoker()
+// desc: constructor
+//-----------------------------------------------------------------------------
+Chuck_VM_DtorInvoker::Chuck_VM_DtorInvoker()
+{
+    // zero
+    invoker_shred = NULL;
+    instr_pushThis = NULL;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: ~Chuck_VM_DtorInvoker()
+// desc: destructor
+//-----------------------------------------------------------------------------
+Chuck_VM_DtorInvoker::~Chuck_VM_DtorInvoker()
+{
+    cleanup();
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: setup()
+// desc: setup the invoker for use
+//-----------------------------------------------------------------------------
+t_CKBOOL Chuck_VM_DtorInvoker::setup( Chuck_Func * dtor, Chuck_VM * vm )
+{
+    // clean up first
+    if( invoker_shred ) cleanup();
+
+    // a vector of VM instructions
+    vector<Chuck_Instr *> instructions;
+
+    // push this (as func arg) -- will set later
+    instr_pushThis = new Chuck_Instr_Reg_Push_Imm( 0 );
+    instructions.push_back( instr_pushThis );
+    // push destructor VM code
+    instructions.push_back( new Chuck_Instr_Reg_Push_Code(dtor->code) );
+    // push stack offset; 0 since this is a dedicated shred for invoking
+    instructions.push_back( new Chuck_Instr_Reg_Push_Imm(0) );
+    // func call
+    instructions.push_back( new Chuck_Instr_Func_Call());
+    // end of code
+    instructions.push_back( new Chuck_Instr_EOC);
+
+    // create VM code
+    Chuck_VM_Code * code = new Chuck_VM_Code;
+    // allocate instruction array
+    code->instr = new Chuck_Instr*[instructions.size()];
+    // number of instructions
+    code->num_instr = instructions.size();
+    // copy instructions
+    for( t_CKUINT i = 0; i < instructions.size(); i++ ) code->instr[i] = instructions[i];
+    // TODO: should this be > 0
+    code->stack_depth = 0;
+    // TODO: should this be this true?
+    code->need_this = FALSE;
+
+    // create dedicated shred
+    invoker_shred = new Chuck_VM_Shred;
+    // set the VM ref (needed by initialize)
+    invoker_shred->vm_ref = vm;
+    // initialize with code + allocate stacks
+    invoker_shred->initialize( code );
+    // set name
+    invoker_shred->name = dtor->signature(FALSE,TRUE);
+    // enter immediate mode (will throw runtime exception on any time/event ops)
+    invoker_shred->setImmediateMode( TRUE );
+
+    // done
+    return TRUE;
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: invoke()
+// desc: invoke the dtor
+//-----------------------------------------------------------------------------
+void Chuck_VM_DtorInvoker::invoke( Chuck_Object * obj, Chuck_VM_Shred * parent_shred )
+{
+    // no shred?
+    if( !invoker_shred ) return;
+    // verify
+    assert( instr_pushThis != NULL );
+
+    // set this pointer
+    instr_pushThis->set( (t_CKUINT)obj );
+    // reset shred: program counter
+    invoker_shred->pc = 0;
+    // next pc
+    invoker_shred->next_pc = 1;
+    // set parent
+    invoker_shred->parent = parent_shred;
+
+    // set parent base_ref; in case mfun is part of a non-public class
+    // that can access file-global variables outside the class definition
+    if( invoker_shred->parent )
+    { invoker_shred->base_ref = invoker_shred->parent->base_ref; }
+    else
+    { invoker_shred->base_ref = invoker_shred->mem; }
+
+    // shred in dump (all done)
+    invoker_shred->is_dumped = FALSE;
+    // shred done
+    invoker_shred->is_done = FALSE;
+    // shred running
+    invoker_shred->is_running = FALSE;
+    // shred abort
+    invoker_shred->is_abort = FALSE;
+    // set the instr
+    invoker_shred->instr = invoker_shred->code->instr;
+    // zero out the id (shred is in immediate mode and cannot be shreduled)
+    invoker_shred->xid = 0;
+    // inherit now from vm
+    invoker_shred->now = invoker_shred->vm_ref->now();
+    // run shred on VM
+    invoker_shred->run( invoker_shred->vm_ref );
+}
+
+
+
+
+//-----------------------------------------------------------------------------
+// name: cleanup()
+// desc: clean up
+//-----------------------------------------------------------------------------
+void Chuck_VM_DtorInvoker::cleanup()
+{
+    // release shred reference
+    // NB this should also cleanup the code and VM instruction we created in setup
+    CK_SAFE_RELEASE( invoker_shred );
+
+    // zero out
+    instr_pushThis = NULL;
 }
 
 
@@ -2917,7 +4075,7 @@ std::string Chuck_VM_Debug::info( Chuck_VM_Object * obj )
     // get the type
     string type = mini_type(typeid(*obj).name());
     // info str [POINTER:REFCOUNT](TYPE)
-    string ret = string("[") + ptoa(obj) + ":" + TC::blue(itoa(obj->refcount()),true) + "](" + TC::green(type,true) + "): ";
+    string ret = string("[") + ptoa(obj) + ":" + TC::blue(ck_itoa(obj->refcount()),true) + "](" + TC::green(type,true) + "): ";
 
     // match on type name
     if( type == "Chuck_Object" ) ret += info_obj( (Chuck_Object *)obj );
