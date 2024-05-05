@@ -1096,19 +1096,19 @@ public class ChuckMainInstance : MonoBehaviour
 
     private void SetupMic()
     {
-        //Check if there is a microphone device available
-        if (Microphone.devices.Length == 0)
+        // default device
+        myMicDevice = "";
+    #if UNITY_WEBGL
+        // TODO
+        // pass; could setup later if I wanted from chuckscript
+    #else
+        // check if there is a microphone device available | added v2.2.0 (eito)
+        if( Microphone.devices.Length == 0 )
         {
             Debug.Log( "No microphone device available" );
             return;
         }
 
-        // default device
-        myMicDevice = "";
-        #if UNITY_WEBGL
-        // TODO
-        // pass; could setup later if I wanted from chuckscript
-        #else
         // try to find one that matches identifier
         if( microphoneIdentifier != "" )
         {
@@ -1133,7 +1133,7 @@ public class ChuckMainInstance : MonoBehaviour
         while( !( Microphone.GetPosition( myMicDevice ) > 0 ) ) { };
         // play audio source!
         mySource.Play();
-        #endif
+    #endif
     }
 
     #if UNITY_WEBGL
