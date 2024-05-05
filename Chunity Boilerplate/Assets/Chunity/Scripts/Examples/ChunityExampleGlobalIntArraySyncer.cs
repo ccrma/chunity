@@ -23,7 +23,7 @@ public class ChunityExampleGlobalIntArraySyncer : MonoBehaviour
 	ChuckSubInstance myChuck;
     ChuckIntArraySyncer intArraySyncer;
 
-	public CK_INT[] myMidiNotes = { 60, 65, 69, 72 };
+	public CK_INT[] myMidiNotes = { (CK_INT)60, (CK_INT)65, (CK_INT)69, (CK_INT)72 };
 
 	// Use this for initialization
 	void Start()
