@@ -1165,11 +1165,14 @@ public class ChuckMainInstance : MonoBehaviour
     #else
     void OnAudioFilterRead( float[] data, int channels )
     {
-        // check whether channels is correct
-        if( channels != myNumChannels )
+        // check whether channels is correct | added buffer length check (v2.2.0) eito
+        if( channels != myNumChannels || data.Length != myOutBuffer.Length )
         {
-            // sadness -- num channels has changed so we must reconstruct myOutBuffer
+            // sadness -- num channels may have changed...
             myNumChannels = channels;
+            // and/or audio block size may have changed...
+            myBufferLength = data.Length / channels;
+            // so we must reconstruct myOutBuffer
             myOutBuffer = new float[myBufferLength * myNumChannels];
         }
 
