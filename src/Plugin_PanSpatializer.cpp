@@ -148,7 +148,7 @@ namespace PanSpatializer
         float azimuthPan = sinf( azimuthRad );
         float azimuthPanMatrix[2] = { 1.0f - azimuthPan, 1.0f + azimuthPan };
 
-        for (int n = 0; n < length; n++)
+        for (unsigned int n = 0; n < length; n++)
         {
             float left = inbuffer[n * 2];
             float right = inbuffer[n * 2 + 1];
