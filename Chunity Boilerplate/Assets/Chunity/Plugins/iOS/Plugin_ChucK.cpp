@@ -7,6 +7,7 @@
 //-----------------------------------------------------------------------------
 #include "Plugin_ChucK.h"
 #include "chuck_globals.h"
+#include "chuck_vm.h"
 #include "util_platforms.h" // for ck_usleep
 
 #include <iostream>
