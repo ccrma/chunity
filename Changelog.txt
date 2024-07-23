@@ -2,12 +2,14 @@
 Chunity VERSIONS log
 --------------------
 
-2.2.0 (May 2024)
+2.2.0 (August 2024)
 =====
-Updated to ChucK language version 1.5.2.4 (chai).
+Updated to ChucK language version 1.5.2.5 (chai).
 (added) audio-thread-friendly global array setters
-(fixed) improved general stability
 (fixed) Chunity Linux support
+(fixed) Chunity iOS support
+(fixed) fixed critical crashing issue using all Syncers
+(fixed) improved general stability
 (fixed) fixed crash in cases where no microphone is available
 (fixed) il2cpp link error on some platforms (thanks @kshoji)
 
