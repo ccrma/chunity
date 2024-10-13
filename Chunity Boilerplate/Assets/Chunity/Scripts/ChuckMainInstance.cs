@@ -1211,9 +1211,9 @@ public class ChuckMainInstance : MonoBehaviour
         return false;
     }
 
-    public bool GetUGenSamples( string variableName, float[] buffer, int numSamples )
+    public bool GetUGenSamples( string variableName, float[] buffer, int numFrames, int numChannels )
     {
-        return Chuck.Manager.GetUGenSamples( myChuckId, variableName, buffer, numSamples );
+        return Chuck.Manager.GetUGenSamples( myChuckId, variableName, buffer, numFrames, numChannels );
     }
 
     public bool RunCodeWithReplacementDac( string code, string replacementDac )

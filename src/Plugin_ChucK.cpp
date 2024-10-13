@@ -428,17 +428,17 @@ namespace ChucK_For_Unity
 
 
     UNITY_INTERFACE_EXPORT bool getGlobalUGenSamples( unsigned int chuckID,
-        const char * name, SAMPLE * buffer, int numSamples )
+        const char * name, SAMPLE * buffer, int numFrames, int numChannels )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
         if( gm == NULL ) { return false; }
 
         if( !gm->getGlobalUGenSamples(
-            name, buffer, numSamples ) )
+            name, buffer, numFrames, numChannels ) )
         {
             // failed. fill with zeroes.
-            memset( buffer, 0, sizeof( SAMPLE ) * numSamples );
+            memset( buffer, 0, sizeof( SAMPLE ) * numFrames * numChannels );
             return false;
         }
 

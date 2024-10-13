@@ -2,6 +2,11 @@
 Chunity VERSIONS log
 --------------------
 
+2.2.1
+=====
+(added) support for stereo
+
+
 2.2.0 (August 2024)
 =====
 Updated to ChucK language version 1.5.2.5 (chai).

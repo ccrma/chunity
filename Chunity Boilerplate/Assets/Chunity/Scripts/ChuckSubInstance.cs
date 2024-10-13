@@ -1035,9 +1035,8 @@ public class ChuckSubInstance : MonoBehaviour
     private string myOutputUgen;
 
     private bool running = false;
-    private int myNumChannels = 2;
     private int myBufferLength;
-    private float[] myMonoBuffer;
+    private float[] myStereoBuffer;
     private AudioSource mySource;
     private bool isMuted;
     private bool prevSpatialize;
@@ -1060,7 +1059,8 @@ public class ChuckSubInstance : MonoBehaviour
         int numBuffers;
         AudioSettings.GetDSPBufferSize( out myBufferLength, out numBuffers );
 
-        myMonoBuffer = new float[myBufferLength];
+        // stereo buffer | v2.2.1 (eito, nick, ge, kelly, nils)
+        myStereoBuffer = new float[myBufferLength * 2];
 
         // setup group for reliable ordering
         mySource = GetComponent<AudioSource>();
@@ -1090,8 +1090,10 @@ public class ChuckSubInstance : MonoBehaviour
         #else
         // replacement dac is initted and constructed here!
         // so it shouldn't have to be anywhere else.
+        // changed to UGen_Stereo for 1) stereo 2) access to .left .right
+        // -- v2.2.1 (eito nick ge nils)
         chuckMainInstance.RunCode( string.Format( @"
-			global Gain {0} => blackhole;
+			global UGen_Stereo {0} => blackhole;
 			true => {0}.buffered;
 		", myOutputUgen ) );
         #endif
@@ -1181,12 +1183,6 @@ public class ChuckSubInstance : MonoBehaviour
             return;
         }
 
-        // check whether channels is correct
-        if( channels != myNumChannels )
-        {
-            myNumChannels = channels;
-        }
-
         // update num samples seen
         int numFrames = data.Length / channels;
         numSamplesSeen += numFrames;
@@ -1199,7 +1195,8 @@ public class ChuckSubInstance : MonoBehaviour
         }
 
         // get ugen output
-        chuckMainInstance.GetUGenSamples( myOutputUgen, myMonoBuffer, numFrames );
+        // NOTE: # of samples in myStereoBuffer == numFrames * 2
+        chuckMainInstance.GetUGenSamples( myOutputUgen, myStereoBuffer, numFrames, 2 );
 
         // always multiply output by input
         // if spatializing, input is some lowered level
@@ -1208,7 +1205,8 @@ public class ChuckSubInstance : MonoBehaviour
         {
             for( int j = 0; j < channels; j++ )
             {
-                data[i * channels + j] *= myMonoBuffer[i];
+                // copy non-interleaved stereo audio into interleaved array
+                data[i * channels + j] *= myStereoBuffer[i+(j%2)*(numFrames)];
             }
         }
     }
