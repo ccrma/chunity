@@ -791,7 +791,7 @@ public class Chuck
         #if UNITY_WEBGL
         return false;
         #else
-        return getGlobalUGenSamples( chuckID, name, buffer, numFrames, numChannels );
+        return getGlobalUGenSamplesMulti( chuckID, name, buffer, numFrames, numChannels );
         #endif
     }
 
@@ -1502,7 +1502,7 @@ public class Chuck
         System.UInt32 numFrames, System.UInt32 inChannels, System.UInt32 outChannels );
 
     [DllImport( PLUGIN_NAME )]
-    private static extern bool getGlobalUGenSamples( System.UInt32 chuckID, System.String name,
+    private static extern bool getGlobalUGenSamplesMulti( System.UInt32 chuckID, System.String name,
         float[] stereoBuffer, System.Int32 numFrames, System.Int32 numChannels );
 #endif
     // TODO: actually implement named-gets in iOS and WebGL

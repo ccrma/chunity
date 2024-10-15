@@ -426,16 +426,31 @@ namespace ChucK_For_Unity
             name, callbackID, callback );
     }
 
-
     UNITY_INTERFACE_EXPORT bool getGlobalUGenSamples( unsigned int chuckID,
+                                                      const char * name, SAMPLE * buffer, int numSamples )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
+
+        if( !gm->getGlobalUGenSamples( name, buffer, numSamples ) )
+        {
+            // failed. fill with zeroes.
+            memset( buffer, 0, sizeof( SAMPLE ) * numSamples );
+            return false;
+        }
+
+        return true;
+    }
+
+    UNITY_INTERFACE_EXPORT bool getGlobalUGenSamplesMulti( unsigned int chuckID,
         const char * name, SAMPLE * buffer, int numFrames, int numChannels )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
         if( gm == NULL ) { return false; }
 
-        if( !gm->getGlobalUGenSamples(
-            name, buffer, numFrames, numChannels ) )
+        if( !gm->getGlobalUGenSamplesMulti( name, buffer, numFrames, numChannels ) )
         {
             // failed. fill with zeroes.
             memset( buffer, 0, sizeof( SAMPLE ) * numFrames * numChannels );
