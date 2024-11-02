@@ -854,6 +854,7 @@ namespace ChucK_For_Unity
 
 
 
+    // this is typically called from Chuck.cs, and set to StreamingAssets
     UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir )
     {
         chuck_global_data_dir = std::string( dir );
@@ -886,12 +887,35 @@ namespace ChucK_For_Unity
             chuck->setParam( CHUCK_PARAM_DUMP_INSTRUCTIONS, (t_CKINT) 0 );
             // directory for compiled.code
             chuck->setParam( CHUCK_PARAM_WORKING_DIRECTORY, chuck_global_data_dir );
-            // directories to search for chugins and auto-run ck files
-            std::list< std::string > chugin_search;
-            chugin_search.push_back( chuck_global_data_dir + "/Chugins" );
-            chugin_search.push_back( chuck_global_data_dir + "/ChuGins" );
-            chugin_search.push_back( chuck_global_data_dir + "/chugins" );
-            chuck->setParam( CHUCK_PARAM_USER_CHUGIN_DIRECTORIES, chugin_search );
+
+            //---------------------------------------------------------
+            // chuck 1.5.4.0 @import system integration (ge)
+            //---------------------------------------------------------
+            // FYI in Chunity, system and user import search paths are handled
+            //   differently than in from chuck/miniAudicle, in order to
+            //   encourage keeping chuck-related dependencies (.chug and
+            //   .ck files) inside the Unity project; as needed, a user could
+            //   copy .chug and .ck files into one of these following
+            //   directories for use from Chunity...
+            //---------------------------------------------------------
+            // user search paths for importing chugins and .ck files
+            // files in these paths must be imported using @import
+            std::list< std::string > import_search_paths_user;
+            // 1.5.4.0 | added the global_data_dir itself, chuck;
+            // FYI typically chuck_global_data_dir == StreamingAssets folder
+            import_search_paths_user.push_back( chuck_global_data_dir );
+            import_search_paths_user.push_back( chuck_global_data_dir + "/chuck" );
+            // set user search paths
+            chuck->setParam( CHUCK_PARAM_IMPORT_PATH_USER, import_search_paths_user );
+            //---------------------------------------------------------
+            // chugins in system search paths are auto-loaded at startup,
+            // .ck files in system search paths must still be @imported
+            std::list< std::string > import_search_paths_system;
+            // 1.5.4.0 (ge) removed /ChuGins and /Chugins variants
+            import_search_paths_system.push_back( chuck_global_data_dir + "/chugins" );
+            // set system search paths
+            chuck->setParam( CHUCK_PARAM_IMPORT_PATH_SYSTEM, import_search_paths_system );
+            //---------------------------------------------------------
 
             // initialize and start
             chuck->init();
