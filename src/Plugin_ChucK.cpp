@@ -860,7 +860,49 @@ namespace ChucK_For_Unity
         chuck_global_data_dir = std::string( dir );
         return true;
     }
+    
 
+
+    // (for power users...) manually overwrite System Path for @import
+    UNITY_INTERFACE_EXPORT bool setSystemPath( unsigned int chuckID, const char* dir )
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+
+        std::list< std::string > import_search_paths_system;
+        parse_path_list( dir, import_search_paths_system );
+        chuck_instances[chuckID]->setParam( CHUCK_PARAM_IMPORT_PATH_SYSTEM, import_search_paths_system );
+
+        return true;
+    }
+
+
+
+    // (for power users...) manually overwrite Packages Path for @import
+    UNITY_INTERFACE_EXPORT bool setPackagesPath( unsigned int chuckID, const char* dir )
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+
+        std::list< std::string > import_search_paths_packages;
+        parse_path_list( dir, import_search_paths_packages );
+        chuck_instances[chuckID]->setParam( CHUCK_PARAM_IMPORT_PATH_PACKAGES, import_search_paths_packages );
+
+        return true;
+    }
+
+
+
+    // (for power users...) manually overwrite User Path for @import
+    UNITY_INTERFACE_EXPORT bool setUserPath( unsigned int chuckID, const char* dir )
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+
+        std::list< std::string > import_search_paths_user;
+        parse_path_list( dir, import_search_paths_user );
+        chuck_instances[chuckID]->setParam( CHUCK_PARAM_IMPORT_PATH_USER, import_search_paths_user );
+
+        return true;
+    }
+        
 
 
     UNITY_INTERFACE_EXPORT bool setLogLevel( unsigned int level )

@@ -110,7 +110,12 @@ namespace ChucK_For_Unity {
     UNITY_INTERFACE_EXPORT bool setStderrCallback( void (* callback)(const char *) );
     
     UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir );
-    
+
+    // (for power users...)
+    UNITY_INTERFACE_EXPORT bool setSystemPath( unsigned int chuckID, const char* dir );
+    UNITY_INTERFACE_EXPORT bool setPackagesPath( unsigned int chuckID, const char* dir );
+    UNITY_INTERFACE_EXPORT bool setUserPath( unsigned int chuckID, const char* dir );
+
     UNITY_INTERFACE_EXPORT bool setLogLevel( unsigned int level );
     
 }; // namespace ChucK_For_Unity
