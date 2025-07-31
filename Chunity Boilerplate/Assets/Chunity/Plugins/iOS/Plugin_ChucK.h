@@ -61,7 +61,8 @@ namespace ChucK_For_Unity {
     UNITY_INTERFACE_EXPORT bool stopListeningForNamedChuckEvent( unsigned int chuckID, const char * name, void (* callback)(const char *) );
     UNITY_INTERFACE_EXPORT bool stopListeningForChuckEventWithID( unsigned int chuckID, t_CKINT callbackID, const char * name, void (* callback)(t_CKINT) );
     
-    UNITY_INTERFACE_EXPORT bool getGlobalUGenSamples( unsigned int chuckID, const char * name, SAMPLE * buffer, int numSamples );
+    UNITY_INTERFACE_EXPORT bool getGlobalUGenSamples( unsigned int chuckID, const char * name, SAMPLE * buffer, int numFrames );
+    UNITY_INTERFACE_EXPORT bool getGlobalUGenSamplesMulti( unsigned int chuckID, const char * name, SAMPLE * buffer, int numFrames, int numChannels );
     
     // int array methods
     UNITY_INTERFACE_EXPORT bool setGlobalIntArray( unsigned int chuckID, const char * name, t_CKINT arrayValues[], unsigned int numValues );
@@ -109,7 +110,12 @@ namespace ChucK_For_Unity {
     UNITY_INTERFACE_EXPORT bool setStderrCallback( void (* callback)(const char *) );
     
     UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir );
-    
+
+    // (for power users...)
+    UNITY_INTERFACE_EXPORT bool setSystemPath( unsigned int chuckID, const char* dir );
+    UNITY_INTERFACE_EXPORT bool setPackagesPath( unsigned int chuckID, const char* dir );
+    UNITY_INTERFACE_EXPORT bool setUserPath( unsigned int chuckID, const char* dir );
+
     UNITY_INTERFACE_EXPORT bool setLogLevel( unsigned int level );
     
 }; // namespace ChucK_For_Unity

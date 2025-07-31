@@ -426,19 +426,34 @@ namespace ChucK_For_Unity
             name, callbackID, callback );
     }
 
-
     UNITY_INTERFACE_EXPORT bool getGlobalUGenSamples( unsigned int chuckID,
-        const char * name, SAMPLE * buffer, int numSamples )
+                                                      const char * name, SAMPLE * buffer, int numSamples )
     {
         if( chuck_instances.count( chuckID ) == 0 ) { return false; }
         Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
         if( gm == NULL ) { return false; }
 
-        if( !gm->getGlobalUGenSamples(
-            name, buffer, numSamples ) )
+        if( !gm->getGlobalUGenSamples( name, buffer, numSamples ) )
         {
             // failed. fill with zeroes.
             memset( buffer, 0, sizeof( SAMPLE ) * numSamples );
+            return false;
+        }
+
+        return true;
+    }
+
+    UNITY_INTERFACE_EXPORT bool getGlobalUGenSamplesMulti( unsigned int chuckID,
+        const char * name, SAMPLE * buffer, int numFrames, int numChannels )
+    {
+        if( chuck_instances.count( chuckID ) == 0 ) { return false; }
+        Chuck_Globals_Manager * gm = chuck_instances[chuckID]->globals();
+        if( gm == NULL ) { return false; }
+
+        if( !gm->getGlobalUGenSamplesMulti( name, buffer, numFrames, numChannels ) )
+        {
+            // failed. fill with zeroes.
+            memset( buffer, 0, sizeof( SAMPLE ) * numFrames * numChannels );
             return false;
         }
 
@@ -839,12 +854,55 @@ namespace ChucK_For_Unity
 
 
 
+    // this is typically called from Chuck.cs, and set to StreamingAssets
     UNITY_INTERFACE_EXPORT bool setDataDir( const char * dir )
     {
         chuck_global_data_dir = std::string( dir );
         return true;
     }
+    
 
+
+    // (for power users...) manually overwrite System Path for @import
+    UNITY_INTERFACE_EXPORT bool setSystemPath( unsigned int chuckID, const char* dir )
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+
+        std::list< std::string > import_search_paths_system;
+        parse_path_list( dir, import_search_paths_system );
+        chuck_instances[chuckID]->setParam( CHUCK_PARAM_IMPORT_PATH_SYSTEM, import_search_paths_system );
+
+        return true;
+    }
+
+
+
+    // (for power users...) manually overwrite Packages Path for @import
+    UNITY_INTERFACE_EXPORT bool setPackagesPath( unsigned int chuckID, const char* dir )
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+
+        std::list< std::string > import_search_paths_packages;
+        parse_path_list( dir, import_search_paths_packages );
+        chuck_instances[chuckID]->setParam( CHUCK_PARAM_IMPORT_PATH_PACKAGES, import_search_paths_packages );
+
+        return true;
+    }
+
+
+
+    // (for power users...) manually overwrite User Path for @import
+    UNITY_INTERFACE_EXPORT bool setUserPath( unsigned int chuckID, const char* dir )
+    {
+        if (chuck_instances.count(chuckID) == 0) { return false; }
+
+        std::list< std::string > import_search_paths_user;
+        parse_path_list( dir, import_search_paths_user );
+        chuck_instances[chuckID]->setParam( CHUCK_PARAM_IMPORT_PATH_USER, import_search_paths_user );
+
+        return true;
+    }
+        
 
 
     UNITY_INTERFACE_EXPORT bool setLogLevel( unsigned int level )
@@ -871,12 +929,35 @@ namespace ChucK_For_Unity
             chuck->setParam( CHUCK_PARAM_DUMP_INSTRUCTIONS, (t_CKINT) 0 );
             // directory for compiled.code
             chuck->setParam( CHUCK_PARAM_WORKING_DIRECTORY, chuck_global_data_dir );
-            // directories to search for chugins and auto-run ck files
-            std::list< std::string > chugin_search;
-            chugin_search.push_back( chuck_global_data_dir + "/Chugins" );
-            chugin_search.push_back( chuck_global_data_dir + "/ChuGins" );
-            chugin_search.push_back( chuck_global_data_dir + "/chugins" );
-            chuck->setParam( CHUCK_PARAM_USER_CHUGIN_DIRECTORIES, chugin_search );
+
+            //---------------------------------------------------------
+            // chuck 1.5.4.0 @import system integration (ge)
+            //---------------------------------------------------------
+            // FYI in Chunity, system and user import search paths are handled
+            //   differently than in from chuck/miniAudicle, in order to
+            //   encourage keeping chuck-related dependencies (.chug and
+            //   .ck files) inside the Unity project; as needed, a user could
+            //   copy .chug and .ck files into one of these following
+            //   directories for use from Chunity...
+            //---------------------------------------------------------
+            // user search paths for importing chugins and .ck files
+            // files in these paths must be imported using @import
+            std::list< std::string > import_search_paths_user;
+            // 1.5.4.0 | added the global_data_dir itself, chuck;
+            // FYI typically chuck_global_data_dir == StreamingAssets folder
+            import_search_paths_user.push_back( chuck_global_data_dir );
+            import_search_paths_user.push_back( chuck_global_data_dir + "/chuck" );
+            // set user search paths
+            chuck->setParam( CHUCK_PARAM_IMPORT_PATH_USER, import_search_paths_user );
+            //---------------------------------------------------------
+            // chugins in system search paths are auto-loaded at startup,
+            // .ck files in system search paths must still be @imported
+            std::list< std::string > import_search_paths_system;
+            // 1.5.4.0 (ge) removed /ChuGins and /Chugins variants
+            import_search_paths_system.push_back( chuck_global_data_dir + "/chugins" );
+            // set system search paths
+            chuck->setParam( CHUCK_PARAM_IMPORT_PATH_SYSTEM, import_search_paths_system );
+            //---------------------------------------------------------
 
             // initialize and start
             chuck->init();
