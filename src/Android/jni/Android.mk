@@ -16,7 +16,6 @@ LOCAL_SRC_FILES := ../../Plugin_ChucK.cpp \
 ../../chuck/src/core/chuck_frame.cpp \
 ../../chuck/src/core/chuck_symbol.cpp \
 ../../chuck/src/core/chuck_table.cpp \
-../../chuck/src/core/chuck_utils.cpp \
 ../../chuck/src/core/chuck_vm.cpp \
 ../../chuck/src/core/chuck_instr.cpp \
 ../../chuck/src/core/chuck_scan.cpp \
