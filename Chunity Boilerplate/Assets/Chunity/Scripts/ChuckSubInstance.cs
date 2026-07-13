@@ -979,6 +979,16 @@ public class ChuckSubInstance : MonoBehaviour
         return chuckMainInstance.GetFloat( variableName, gameObjectWithCallback, callback );
     }
 
+    public bool GetIntArray( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return chuckMainInstance.GetIntArray( variableName, gameObjectWithCallback, callback );
+    }
+
+    public bool GetFloatArray( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return chuckMainInstance.GetFloatArray( variableName, gameObjectWithCallback, callback );
+    }
+
     public bool GetString( string variableName, string gameObjectWithCallback, string callback )
     {
         return chuckMainInstance.GetString( variableName, gameObjectWithCallback, callback );

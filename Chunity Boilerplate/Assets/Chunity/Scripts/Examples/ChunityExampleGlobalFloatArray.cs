@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,8 +51,10 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 			}
 		" );
 
+		#if !UNITY_WEBGL
 		myFloatArrayCallback = GetInitialArrayCallback;
 		myFloatCallback = GetANumberCallback;
+		#endif
 	}
 
 	// Update is called once per frame
@@ -72,14 +75,13 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 
 
 			// test some gets too
-			myChuck.GetFloatArray( "myFloatNotes", myFloatArrayCallback );
 			#if UNITY_WEBGL
-			// WebGL specific float callback signature: game object name, method name
+			// WebGL: SendMessage can only pass string/number (arrays arrive as JSON)
+			myChuck.GetFloatArray( "myFloatNotes", gameObject.name, "GetInitialArrayCallback" );
 			myChuck.GetFloatArrayValue( "myFloatNotes", 1, gameObject.name, "GetANumberCallback" );
 			myChuck.GetAssociativeFloatArrayValue( "myFloatNotes", "numPlayed", gameObject.name, "GetANumberCallback" );
-		
-			// NOTE: can do it the below way if the callback is made into a *static* method
 			#else
+			myChuck.GetFloatArray( "myFloatNotes", myFloatArrayCallback );
 			myChuck.GetFloatArrayValue( "myFloatNotes", 1, myFloatCallback );
 			myChuck.GetAssociativeFloatArrayValue( "myFloatNotes", "numPlayed", myFloatCallback );
 			#endif
@@ -91,6 +93,30 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 		}
 	}
 
+#if UNITY_WEBGL
+	[Serializable]
+	private class FloatArrayJson
+	{
+		public CK_FLOAT[] items;
+	}
+
+	// Instance methods required for Unity SendMessage
+	void GetInitialArrayCallback( string json )
+	{
+		FloatArrayJson parsed = JsonUtility.FromJson<FloatArrayJson>( json );
+		CK_FLOAT[] values = ( parsed != null && parsed.items != null ) ? parsed.items : new CK_FLOAT[] {};
+		Debug.Log( "Float array has " + values.Length.ToString() + " numbers which are: " );
+		for( int i = 0; i < values.Length; i++ )
+		{
+			Debug.Log( "        " + values[i].ToString() );
+		}
+	}
+
+	void GetANumberCallback( float value )
+	{
+		Debug.Log( "I got a number! " + value.ToString() );
+	}
+#else
 	#if ( UNITY_IOS || UNITY_ANDROID ) && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallback))]
 	#endif
@@ -110,4 +136,5 @@ public class ChunityExampleGlobalFloatArray : MonoBehaviour
 	{
 		Debug.Log( "I got a number! " + value.ToString() );
 	}
+#endif
 }

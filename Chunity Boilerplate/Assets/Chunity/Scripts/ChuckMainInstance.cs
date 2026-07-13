@@ -992,6 +992,16 @@ public class ChuckMainInstance : MonoBehaviour
         return Chuck.Manager.GetFloat( myChuckId, variableName, gameObjectWithCallback, callback );
     }
 
+    public bool GetIntArray( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.GetIntArray( myChuckId, variableName, gameObjectWithCallback, callback );
+    }
+
+    public bool GetFloatArray( string variableName, string gameObjectWithCallback, string callback )
+    {
+        return Chuck.Manager.GetFloatArray( myChuckId, variableName, gameObjectWithCallback, callback );
+    }
+
     public bool GetString( string variableName, string gameObjectWithCallback, string callback )
     {
         return Chuck.Manager.GetString( myChuckId, variableName, gameObjectWithCallback, callback );

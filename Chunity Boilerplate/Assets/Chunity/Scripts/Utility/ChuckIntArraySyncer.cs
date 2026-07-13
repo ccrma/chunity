@@ -146,17 +146,21 @@ public class ChuckIntArraySyncer : MonoBehaviour
 
     private void AllocateCallback()
     {
+#if !UNITY_WEBGL
         // regular allocation
         myIntArrayCallback = StaticCallback;
         activeCallbacks[myID] = this;
+#endif
     }
 
     private void ReturnCallback()
     {
+#if !UNITY_WEBGL
         // deallocate
         activeCallbacks.Remove( myID );
         // always set my callback to null
         myIntArrayCallback = null;
+#endif
     }
 
 
@@ -178,16 +182,38 @@ public class ChuckIntArraySyncer : MonoBehaviour
     }
 
     private CK_INT[] myIntArray = {};
+
+#if UNITY_WEBGL
+    [Serializable]
+    private class IntArrayJson
+    {
+        public CK_INT[] items;
+    }
+
+    private void MyCallback( string json )
+    {
+        if( string.IsNullOrEmpty( json ) )
+        {
+            myIntArray = new CK_INT[] {};
+            return;
+        }
+
+        IntArrayJson parsed = JsonUtility.FromJson<IntArrayJson>( json );
+        myIntArray = ( parsed != null && parsed.items != null ) ? parsed.items : new CK_INT[] {};
+    }
+#else
     private void MyCallback( CK_INT[] newArray )
     {
         myIntArray = newArray;
     }
+#endif
 
     void OnDestroy()
     {
         StopSyncing();
     }
 
+#if !UNITY_WEBGL
     #if AOT
     [AOT.MonoPInvokeCallback(typeof(Chuck.IntArrayCallbackWithID))]
     #endif
@@ -198,5 +224,6 @@ public class ChuckIntArraySyncer : MonoBehaviour
             activeCallbacks[id].MyCallback( newValue );
         }
     }
+#endif
     
 }

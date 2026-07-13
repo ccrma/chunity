@@ -1415,6 +1415,18 @@ public class Chuck
         return true;
     }
 
+    public bool GetIntArray( System.UInt32 chuckID, string variableName, string gameObjectWithCallback, string callback )
+    {
+        getGlobalIntArrayWithUnityStyleCallback( chuckID, variableName, gameObjectWithCallback, callback );
+        return true;
+    }
+
+    public bool GetFloatArray( System.UInt32 chuckID, string variableName, string gameObjectWithCallback, string callback )
+    {
+        getGlobalFloatArrayWithUnityStyleCallback( chuckID, variableName, gameObjectWithCallback, callback );
+        return true;
+    }
+
     public bool GetString( System.UInt32 chuckID, string variableName, string gameObjectWithCallback, string callback )
     {
         getChuckStringWithUnityStyleCallback( chuckID, variableName, gameObjectWithCallback, callback );
@@ -1481,9 +1493,13 @@ public class Chuck
     [DllImport( PLUGIN_NAME) ]
     private static extern void stopListeningForChuckEventWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String gameObject, System.String method );
     [DllImport( PLUGIN_NAME) ]
+    private static extern void getGlobalIntArrayWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
     private static extern void getGlobalIntArrayValueWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.UInt32 index, System.String gameObject, System.String method );
     [DllImport( PLUGIN_NAME) ]
     private static extern void getGlobalAssociativeIntArrayValueWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String key, System.String gameObject, System.String method );
+    [DllImport( PLUGIN_NAME) ]
+    private static extern void getGlobalFloatArrayWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.String gameObject, System.String method );
     [DllImport( PLUGIN_NAME) ]
     private static extern void getGlobalFloatArrayValueWithUnityStyleCallback( System.UInt32 chuckID, System.String name, System.UInt32 index, System.String gameObject, System.String method );
     [DllImport( PLUGIN_NAME) ]

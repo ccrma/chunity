@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,8 +51,10 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 			}
 		" );
 
+		#if !UNITY_WEBGL
 		myIntArrayCallback = GetInitialArrayCallback;
 		myIntCallback = GetANumberCallback;
+		#endif
 	}
 
 	// Update is called once per frame
@@ -74,15 +77,13 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 
 
 			// test some gets too
-			myChuck.GetIntArray( "myNotes", myIntArrayCallback );
-
 			#if UNITY_WEBGL
-			// WebGL specific float callback signature: game object name, method name
+			// WebGL: SendMessage can only pass string/number (arrays arrive as JSON)
+			myChuck.GetIntArray( "myNotes", gameObject.name, "GetInitialArrayCallback" );
 			myChuck.GetIntArrayValue( "myNotes", 1, gameObject.name, "GetANumberCallback" );
 			myChuck.GetAssociativeIntArrayValue( "myNotes", "numPlayed", gameObject.name, "GetANumberCallback" );
-		
-			// NOTE: can do it the below way if the callback is made into a *static* method
 			#else
+			myChuck.GetIntArray( "myNotes", myIntArrayCallback );
 			myChuck.GetIntArrayValue( "myNotes", 1, myIntCallback );
 			myChuck.GetAssociativeIntArrayValue( "myNotes", "numPlayed", myIntCallback );
 			#endif
@@ -91,6 +92,30 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 		}
 	}
 
+#if UNITY_WEBGL
+	[Serializable]
+	private class IntArrayJson
+	{
+		public CK_INT[] items;
+	}
+
+	// Instance methods required for Unity SendMessage
+	void GetInitialArrayCallback( string json )
+	{
+		IntArrayJson parsed = JsonUtility.FromJson<IntArrayJson>( json );
+		CK_INT[] values = ( parsed != null && parsed.items != null ) ? parsed.items : new CK_INT[] {};
+		Debug.Log( "Int array has " + values.Length.ToString() + " numbers which are: " );
+		for( int i = 0; i < values.Length; i++ )
+		{
+			Debug.Log( "        " + values[i].ToString() );
+		}
+	}
+
+	void GetANumberCallback( int value )
+	{
+		Debug.Log( "I got a number! " + value.ToString() );
+	}
+#else
 	#if ( UNITY_IOS || UNITY_ANDROID ) && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntArrayCallback))]
 	#endif
@@ -105,9 +130,10 @@ public class ChunityExampleGlobalIntArray : MonoBehaviour
 
 	#if ( UNITY_IOS || UNITY_ANDROID ) && !UNITY_EDITOR
 	[AOT.MonoPInvokeCallback(typeof(Chuck.IntCallback))]
-	#endif 
+	#endif
 	static void GetANumberCallback( CK_INT value )
 	{
 		Debug.Log( "I got a number! " + value.ToString() );
 	}
+#endif
 }

@@ -146,17 +146,21 @@ public class ChuckFloatArraySyncer : MonoBehaviour
 
     private void AllocateCallback()
     {
+#if !UNITY_WEBGL
         // regular allocation
         myFloatArrayCallback = StaticCallback;
         activeCallbacks[myID] = this;
+#endif
     }
 
     private void ReturnCallback()
     {
+#if !UNITY_WEBGL
         // deallocate
         activeCallbacks.Remove( myID );
         // always set my callback to null
         myFloatArrayCallback = null;
+#endif
     }
 
 
@@ -178,16 +182,38 @@ public class ChuckFloatArraySyncer : MonoBehaviour
     }
 
     private CK_FLOAT[] myFloatArray = {};
+
+#if UNITY_WEBGL
+    [Serializable]
+    private class FloatArrayJson
+    {
+        public CK_FLOAT[] items;
+    }
+
+    private void MyCallback( string json )
+    {
+        if( string.IsNullOrEmpty( json ) )
+        {
+            myFloatArray = new CK_FLOAT[] {};
+            return;
+        }
+
+        FloatArrayJson parsed = JsonUtility.FromJson<FloatArrayJson>( json );
+        myFloatArray = ( parsed != null && parsed.items != null ) ? parsed.items : new CK_FLOAT[] {};
+    }
+#else
     private void MyCallback( CK_FLOAT[] newArray )
     {
         myFloatArray = newArray;
     }
+#endif
 
     void OnDestroy()
     {
         StopSyncing();
     }
 
+#if !UNITY_WEBGL
     #if AOT
     [AOT.MonoPInvokeCallback(typeof(Chuck.FloatArrayCallbackWithID))]
     #endif
@@ -198,5 +224,6 @@ public class ChuckFloatArraySyncer : MonoBehaviour
             activeCallbacks[id].MyCallback( newValue );
         }
     }
+#endif
     
 }
