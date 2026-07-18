@@ -25,6 +25,17 @@ public class ChuckSubInstance : MonoBehaviour
 
 
     // ----------------------------------------------------
+    // name: useBuiltInAudioFilter
+    // desc: when true (default), OnAudioFilterRead pulls
+    //       this Sub's replacement-DAC UGen. Set false when
+    //       an external audio driver reads the UGen instead.
+    // ----------------------------------------------------
+    [Tooltip( "Whether OnAudioFilterRead drives this Sub. Set false when an external audio driver reads OutputUgen instead." )]
+    public bool useBuiltInAudioFilter = true;
+
+
+
+    // ----------------------------------------------------
     // name: chuckMainInstance
     // desc: ChuckSubInstance relies on a ChuckMainInstance
     //       that it shares with all other ChuckSubInstances
@@ -1176,6 +1187,11 @@ public class ChuckSubInstance : MonoBehaviour
     #else
     void OnAudioFilterRead( float[] data, int channels )
     {
+        if( !useBuiltInAudioFilter )
+        {
+            return;
+        }
+
         if( !chuckMainInstance.HasInit() )
         {
             // my chuck is not ready. be silent.
@@ -1212,6 +1228,28 @@ public class ChuckSubInstance : MonoBehaviour
     }
     #endif
 
+
+    // ----------------------------------------------------
+    // name: OutputUgen
+    // desc: global UGen name used as this Sub's replacement
+    //       DAC (e.g. __dac__N). External drivers can pass
+    //       this to GetUGenSamples.
+    // ----------------------------------------------------
+    public string OutputUgen
+    {
+        get { return myOutputUgen; }
+    }
+
+    // ----------------------------------------------------
+    // name: IsRunning
+    // desc: true after Awake finishes Sub setup; false after
+    //       teardown. Matches the running gate used by
+    //       OnAudioFilterRead.
+    // ----------------------------------------------------
+    public bool IsRunning
+    {
+        get { return running; }
+    }
 
     public string GetUniqueVariableName()
     {
